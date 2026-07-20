@@ -115,6 +115,7 @@ final class AppViewModel: ObservableObject {
         do {
             try KeychainService.saveToken(token)
             tokenConfigured = true
+            tokenInput = ""
             connectionTestResult = "Jeton enregistré."
         } catch {
             connectionTestResult = error.localizedDescription

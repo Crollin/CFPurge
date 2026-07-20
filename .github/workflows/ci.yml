@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  swift-tests:
+    name: Tests Swift (macOS)
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install xcodegen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Run unit tests
+        run: |
+          xcodebuild \
+            -project CFPurge.xcodeproj \
+            -scheme CFPurge \
+            -destination 'platform=macOS' \
+            -quiet \
+            test
+
+  raycast-extension:
+    name: Extension Raycast (TypeScript)
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: raycast-cfpurge/package-lock.json
+
+      - name: Install dependencies
+        working-directory: raycast-cfpurge
+        run: npm ci
+
+      - name: TypeScript check
+        working-directory: raycast-cfpurge
+        run: npx tsc --noEmit
+
+      - name: Build extension
+        working-directory: raycast-cfpurge
+        run: npm run build

@@ -5,6 +5,9 @@ Utilitaire macOS en barre de menus pour purger le cache Cloudflare de vos sites 
 ![macOS](https://img.shields.io/badge/macOS-14%2B-blue)
 ![Swift](https://img.shields.io/badge/Swift-5.9-orange)
 ![License](https://img.shields.io/badge/License-MIT-green)
+![CI](https://github.com/Crollin/CFPurge/actions/workflows/ci.yml/badge.svg)
+
+> Projet open source sous [licence MIT](LICENSE). Les contributions sont les bienvenues — voir [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Fonctionnalités
 
@@ -16,7 +19,7 @@ Utilitaire macOS en barre de menus pour purger le cache Cloudflare de vos sites 
 - **Démarrage automatique** — option pour lancer CFPurge à la connexion
 - **Gestion DNS** (optionnelle) — consultez et créez des enregistrements DNS Cloudflare
 - **Interface en français**
-- **Intégration Raycast** — purge depuis le lanceur via extension privée (voir [raycast-cfpurge/README.md](raycast-cfpurge/README.md))
+- **Intégration Raycast** — purge depuis le lanceur via extension companion (voir [raycast-cfpurge/README.md](raycast-cfpurge/README.md))
 
 ## Prérequis
 
@@ -116,7 +119,9 @@ Tests unitaires : normalisation d'URL, validation de domaine, chemins relatifs.
 
 ## Intégration Raycast
 
-Une extension Raycast privée permet de purger le cache directement depuis le lanceur, sans ouvrir CFPurge.
+Une extension Raycast companion permet de purger le cache directement depuis le lanceur, sans ouvrir CFPurge.
+
+**Prérequis** : Node.js 22.22+ et [Raycast](https://raycast.com/).
 
 ```bash
 cd raycast-cfpurge
@@ -138,7 +143,7 @@ CFPurge/
 │   ├── Views/           # MenuBar, Settings, SiteEditor, DNS
 │   └── Utilities/       # URLNormalizer, erreurs
 ├── CFPurgeTests/
-├── raycast-cfpurge/     # Extension Raycast privée
+├── raycast-cfpurge/     # Extension Raycast companion
 ├── project.yml          # Config xcodegen
 └── install.sh           # Script d'installation
 ```
@@ -154,6 +159,14 @@ CFPurge/
 | Zone introuvable | Vérifiez le Zone ID dans le dashboard Cloudflare |
 | Trop de purges | Cloudflare limite les purges totales, attendez quelques minutes |
 | Démarrage auto ne fonctionne pas | L'app doit être dans `/Applications` |
+
+## Contribuer
+
+Voir [CONTRIBUTING.md](CONTRIBUTING.md) pour les instructions de développement et de test.
+
+## Sécurité
+
+Pour signaler une vulnérabilité, consultez [SECURITY.md](SECURITY.md).
 
 ## Licence
 

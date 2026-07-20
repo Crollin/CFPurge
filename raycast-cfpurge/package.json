@@ -7,6 +7,9 @@
   "author": "creactiveweb",
   "categories": ["Developer Tools"],
   "license": "MIT",
+  "engines": {
+    "node": ">=22.22.2"
+  },
   "preferences": [
     {
       "name": "apiToken",

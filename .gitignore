@@ -24,9 +24,13 @@ Package.resolved
 # Env / secrets
 .env
 *.local
+**/sites.json
 
 # SDD scratch (local progress ledger)
 .superpowers/
+
+# Local tooling
+.serena/
 
 # Raycast extension
 raycast-cfpurge/node_modules/

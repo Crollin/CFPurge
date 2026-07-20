@@ -28,12 +28,17 @@ enum SiteStore {
     }
 
     static func saveSites(_ sites: [Site]) throws {
-        try FileManager.default.createDirectory(at: storageURL, withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(
+            at: storageURL,
+            withIntermediateDirectories: true,
+            attributes: [.posixPermissions: 0o700]
+        )
 
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
         let data = try encoder.encode(sites)
         try data.write(to: fileURL, options: .atomic)
+        try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: fileURL.path)
     }
 
     private static func normalizeSortOrder(_ sites: [Site]) -> [Site] {

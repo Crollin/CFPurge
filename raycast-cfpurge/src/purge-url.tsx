@@ -1,9 +1,9 @@
 import { Action, ActionPanel, Detail, Form, Icon, Toast, openExtensionPreferences, showToast } from "@raycast/api";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 import { purgeURLs } from "./lib/cloudflare";
-import { getErrorMessage, requireAPIToken, requireSites } from "./lib/preferences";
-import { SitesNotConfiguredError } from "./lib/types";
+import { getErrorMessage, requireAPIToken } from "./lib/preferences";
+import { useSites } from "./lib/use-sites";
 import { normalizeURL } from "./lib/url-normalizer";
 
 interface FormValues {
@@ -13,20 +13,7 @@ interface FormValues {
 
 export default function Command() {
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  const sites = useMemo(() => {
-    try {
-      return requireSites();
-    } catch (error) {
-      if (error instanceof SitesNotConfiguredError) {
-        setErrorMessage(error.message);
-      } else {
-        setErrorMessage(getErrorMessage(error));
-      }
-      return [];
-    }
-  }, []);
+  const { sites, errorMessage } = useSites();
 
   if (errorMessage) {
     return (
