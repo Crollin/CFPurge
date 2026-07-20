@@ -9,6 +9,7 @@ struct CFPurgeApp: App {
     @StateObject private var updater = UpdaterManager()
 
     var body: some Scene {
+        // Label = Image (pas un View Canvas) : sinon pas d'icône barre de menus.
         MenuBarExtra {
             MenuBarView()
                 .environmentObject(viewModel)
@@ -16,7 +17,7 @@ struct CFPurgeApp: App {
                     appDelegate.bind(viewModel: viewModel)
                 }
         } label: {
-            CFPurgeMark(size: 18, showsBackground: false)
+            Image(nsImage: CFPurgeMenuBarIcon.nsImage)
         }
         .menuBarExtraStyle(.window)
         .commands {

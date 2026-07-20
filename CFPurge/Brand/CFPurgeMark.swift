@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 /// The CFPurge mark: two channels narrowing into a clean, empty center.
@@ -45,6 +46,39 @@ enum CFPurgeBrand {
     static let cyan = Color(red: 102 / 255, green: 227 / 255, blue: 208 / 255)
     static let blue = Color(red: 79 / 255, green: 124 / 255, blue: 255 / 255)
     static let orange = Color(red: 255 / 255, green: 157 / 255, blue: 77 / 255)
+}
+
+/// `MenuBarExtra` n'affiche que Text / Image / Label — un Canvas custom est ignoré
+/// (app « agent » sans Dock = impression que rien ne se lance).
+enum CFPurgeMenuBarIcon {
+    private static let pointSize: CGFloat = 18
+
+    @MainActor
+    static let nsImage: NSImage = {
+        let content = CFPurgeMark(size: 16, showsBackground: false)
+            .frame(width: pointSize, height: pointSize)
+        let renderer = ImageRenderer(content: content)
+        renderer.scale = 2
+
+        if let rendered = renderer.nsImage {
+            rendered.isTemplate = false
+            rendered.size = NSSize(width: pointSize, height: pointSize)
+            return rendered
+        }
+
+        return NSImage(systemSymbolName: "cloud.fill", accessibilityDescription: "CFPurge")
+            ?? NSImage(size: NSSize(width: pointSize, height: pointSize))
+    }()
+}
+
+#Preview {
+    HStack(spacing: 16) {
+        CFPurgeMark(size: 64)
+        CFPurgeMark(size: 28)
+        CFPurgeMark(size: 18, showsBackground: false)
+    }
+    .padding(24)
+    .background(CFPurgeBrand.surface)
 }
 
 #Preview {

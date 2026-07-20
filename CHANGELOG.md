@@ -12,6 +12,12 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/)
 - README recentré sur présentation + installation ; détails dev dans CONTRIBUTING
 - Garde-fous dépôt : `.gitignore` renforcé, `scripts/check-repo-hygiene.sh`, hooks Git et job CI
 
+## [1.0.4] — 2026-07-20
+
+### Corrigé
+
+- L’icône barre de menus réapparaît : `MenuBarExtra` utilise une `Image` rendue (plus un Canvas SwiftUI ignoré par le système)
+
 ## [1.0.3] — 2026-07-20
 
 ### Ajouté
