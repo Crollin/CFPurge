@@ -1,15 +1,17 @@
 # CFPurge — Extension Raycast
 
-Extension Raycast privée pour purger le cache Cloudflare depuis le lanceur, en réutilisant les sites configurés dans [CFPurge](../README.md).
+Extension Raycast companion pour purger le cache Cloudflare depuis le lanceur, en réutilisant les sites configurés dans [CFPurge](../README.md).
 
 ## Prérequis
 
 - [Raycast](https://raycast.com/) installé sur macOS
-- Node.js 18+
+- Node.js **22.22+**
 - CFPurge configuré avec au moins un site dans `~/Library/Application Support/CFPurge/sites.json`
 - Un [token API Cloudflare](https://developers.cloudflare.com/fundamentals/api/get-started/create-token/) avec **Zone > Cache Purge > Edit**
 
-## Installation (privée)
+## Installation
+
+### Mode développement
 
 ```bash
 cd raycast-cfpurge
@@ -19,13 +21,15 @@ npm run dev
 
 Raycast détecte automatiquement l'extension en mode développement. Les commandes apparaissent sous **CFPurge**.
 
-Pour un usage permanent sans serveur de dev :
+### Installation permanente
 
 ```bash
 npm run build
 ```
 
 Puis dans Raycast : **Manage Extensions → + → Import Extension** et sélectionnez le dossier `raycast-cfpurge`.
+
+> Pour publier sur le Raycast Store, utilisez `npm run publish` (nécessite un compte développeur Raycast).
 
 ## Configuration
 
@@ -64,8 +68,8 @@ Puis dans Raycast : **Manage Extensions → + → Import Extension** et sélecti
 
 ```bash
 npm run dev      # mode développement avec rechargement
-npm run lint     # vérification ESLint
 npm run build    # compilation production
+npx tsc --noEmit # vérification TypeScript
 ```
 
 ## Licence

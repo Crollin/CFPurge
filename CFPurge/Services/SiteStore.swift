@@ -34,6 +34,7 @@ enum SiteStore {
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
         let data = try encoder.encode(sites)
         try data.write(to: fileURL, options: .atomic)
+        try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: fileURL.path)
     }
 
     private static func normalizeSortOrder(_ sites: [Site]) -> [Site] {

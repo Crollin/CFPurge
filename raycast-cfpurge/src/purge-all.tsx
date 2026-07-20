@@ -1,26 +1,14 @@
 import { Action, ActionPanel, Alert, Detail, Icon, List, Toast, confirmAlert, openExtensionPreferences, showToast } from "@raycast/api";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 import { purgeEverything } from "./lib/cloudflare";
-import { getErrorMessage, requireAPIToken, requireSites } from "./lib/preferences";
-import { Site, SitesNotConfiguredError } from "./lib/types";
+import { getErrorMessage, requireAPIToken } from "./lib/preferences";
+import { Site } from "./lib/types";
+import { useSites } from "./lib/use-sites";
 
 export default function Command() {
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  const sites = useMemo(() => {
-    try {
-      return requireSites();
-    } catch (error) {
-      if (error instanceof SitesNotConfiguredError) {
-        setErrorMessage(error.message);
-      } else {
-        setErrorMessage(getErrorMessage(error));
-      }
-      return [];
-    }
-  }, []);
+  const { sites, errorMessage } = useSites();
 
   if (errorMessage) {
     return (
