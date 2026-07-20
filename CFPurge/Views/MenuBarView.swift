@@ -4,8 +4,6 @@ struct MenuBarView: View {
     @EnvironmentObject private var viewModel: AppViewModel
     @Environment(\.openSettings) private var openSettings
     @Environment(\.openWindow) private var openWindow
-    @State private var showPurgeEverythingConfirmation = false
-
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
@@ -29,16 +27,6 @@ struct MenuBarView: View {
         }
         .padding(16)
         .frame(width: 320)
-        .alert("Vider tout le cache ?", isPresented: $showPurgeEverythingConfirmation) {
-            Button("Annuler", role: .cancel) {}
-            Button("Vider", role: .destructive) {
-                Task { await viewModel.purgeEverything() }
-            }
-        } message: {
-            if let site = viewModel.selectedSite {
-                Text("Cette action purgera l'intégralité du cache Cloudflare pour \(site.name).")
-            }
-        }
     }
 
     private var setupPrompt: some View {
@@ -91,7 +79,7 @@ struct MenuBarView: View {
             .disabled(viewModel.isLoading || viewModel.selectedSite == nil || viewModel.urlInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
 
             Button("Vider tous les éléments") {
-                showPurgeEverythingConfirmation = true
+                confirmPurgeEverything()
             }
             .buttonStyle(.borderedProminent)
             .tint(.red)
@@ -120,6 +108,21 @@ struct MenuBarView: View {
         openSettings()
         openWindow(id: "settings-window")
         viewModel.shouldOpenSettings = false
+    }
+
+    private func confirmPurgeEverything() {
+        guard let site = viewModel.selectedSite else { return }
+
+        let confirmed = ConfirmationAlert.confirm(
+            title: "Vider tout le cache ?",
+            message: "Cette action purgera l'intégralité du cache Cloudflare pour \(site.name).",
+            confirmTitle: "Vider",
+            isDestructive: true
+        )
+
+        guard confirmed else { return }
+
+        Task { await viewModel.purgeEverything() }
     }
 
     private var statusColor: Color {

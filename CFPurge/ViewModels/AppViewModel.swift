@@ -30,6 +30,7 @@ final class AppViewModel: ObservableObject {
     init() {
         reloadSites()
         tokenConfigured = KeychainService.loadToken() != nil
+        PurgeNotificationService.requestAuthorizationIfNeeded()
     }
 
     func reloadSites() {
@@ -122,12 +123,12 @@ final class AppViewModel: ObservableObject {
 
     func purgeURL() async {
         guard let site = selectedSite else {
-            status = .error(CFPurgeError.noSiteSelected.localizedDescription ?? "")
+            status = .error(CFPurgeError.noSiteSelected.localizedDescription)
             return
         }
 
         guard let token = KeychainService.loadToken() else {
-            status = .error(CFPurgeError.missingToken.localizedDescription ?? "")
+            status = .error(CFPurgeError.missingToken.localizedDescription)
             return
         }
 
@@ -137,6 +138,9 @@ final class AppViewModel: ObservableObject {
             let normalizedURL = try URLNormalizer.normalize(urlInput, for: site)
             try await CloudflareService.purgeURLs([normalizedURL], zoneId: site.zoneId, token: token)
             status = .success("Cache purgé pour \(normalizedURL)")
+            PurgeFeedback.showPurgeSuccess(
+                detail: "Le cache Cloudflare a été purgé pour \(normalizedURL)."
+            )
         } catch {
             status = .error(error.localizedDescription)
         }
@@ -144,12 +148,12 @@ final class AppViewModel: ObservableObject {
 
     func purgeEverything() async {
         guard let site = selectedSite else {
-            status = .error(CFPurgeError.noSiteSelected.localizedDescription ?? "")
+            status = .error(CFPurgeError.noSiteSelected.localizedDescription)
             return
         }
 
         guard let token = KeychainService.loadToken() else {
-            status = .error(CFPurgeError.missingToken.localizedDescription ?? "")
+            status = .error(CFPurgeError.missingToken.localizedDescription)
             return
         }
 
@@ -158,6 +162,9 @@ final class AppViewModel: ObservableObject {
         do {
             try await CloudflareService.purgeEverything(zoneId: site.zoneId, token: token)
             status = .success("Tout le cache a été vidé pour \(site.name)")
+            PurgeFeedback.showPurgeSuccess(
+                detail: "Tout le cache Cloudflare a été vidé pour \(site.name)."
+            )
         } catch {
             status = .error(error.localizedDescription)
         }
