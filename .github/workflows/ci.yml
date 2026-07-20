@@ -19,6 +19,15 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+  repo-hygiene:
+    name: Hygiène dépôt (fichiers inutiles)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Vérifier qu'aucun fichier interdit n'est tracké
+        run: bash scripts/check-repo-hygiene.sh
+
   swift-tests:
     name: Tests Swift (macOS)
     runs-on: macos-15
