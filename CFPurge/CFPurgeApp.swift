@@ -5,6 +5,7 @@ import SwiftUI
 struct CFPurgeApp: App {
     @StateObject private var viewModel = AppViewModel()
     @StateObject private var dnsViewModel = DNSViewModel()
+    @StateObject private var updater = UpdaterManager()
 
     var body: some Scene {
         MenuBarExtra("CFPurge", systemImage: "cloud.fill") {
@@ -24,6 +25,7 @@ struct CFPurgeApp: App {
         Window("Réglages CFPurge", id: "settings-window") {
             SettingsView()
                 .environmentObject(viewModel)
+                .environmentObject(updater)
         }
         .windowResizability(.contentSize)
         .defaultSize(width: 680, height: 520)

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @EnvironmentObject private var viewModel: AppViewModel
+    @EnvironmentObject private var updater: UpdaterManager
     @Environment(\.openWindow) private var openWindow
 
     @State private var selectedTab: SettingsTab = .general
@@ -90,6 +91,58 @@ struct SettingsView: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
+            }
+
+            Section("Mises à jour") {
+                LabeledContent("Version installée") {
+                    Text(updater.currentVersion)
+                        .foregroundStyle(.secondary)
+                }
+
+                Toggle("Vérifier automatiquement les mises à jour", isOn: Binding(
+                    get: { updater.automaticallyChecksForUpdates },
+                    set: { updater.automaticallyChecksForUpdates = $0 }
+                ))
+
+                HStack {
+                    Button("Vérifier maintenant") {
+                        updater.checkForUpdates()
+                    }
+                    .disabled(updater.isChecking || updater.isInstalling)
+
+                    if updater.isChecking {
+                        ProgressView()
+                            .controlSize(.small)
+                    }
+                }
+
+                if updater.updateAvailable, let latestVersion = updater.latestVersion {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Label("Version \(latestVersion) disponible", systemImage: "arrow.down.circle.fill")
+                            .foregroundStyle(.blue)
+
+                        HStack {
+                            Button(updater.isInstalling ? "Installation…" : "Installer la mise à jour") {
+                                updater.installUpdate()
+                            }
+                            .disabled(updater.isInstalling)
+
+                            Button("Voir la release") {
+                                updater.openReleasePage()
+                            }
+                        }
+                    }
+                }
+
+                if let installError = updater.installError {
+                    Text(installError)
+                        .font(.caption)
+                        .foregroundStyle(.red)
+                }
+
+                Text("Les mises à jour sont téléchargées depuis GitHub Releases. L'app se ferme brièvement pendant l'installation.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
         }
         .formStyle(.grouped)
@@ -234,4 +287,5 @@ private struct SiteSettingsRow: View {
 #Preview {
     SettingsView()
         .environmentObject(AppViewModel())
+        .environmentObject(UpdaterManager())
 }
