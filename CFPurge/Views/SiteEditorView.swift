@@ -64,7 +64,13 @@ struct SiteEditorView: View {
         }
 
         if let site {
-            viewModel.updateSite(Site(id: site.id, name: trimmedName, zoneId: trimmedZoneId, domain: trimmedDomain))
+            viewModel.updateSite(Site(
+                id: site.id,
+                name: trimmedName,
+                zoneId: trimmedZoneId,
+                domain: trimmedDomain,
+                sortOrder: site.sortOrder
+            ))
         } else {
             viewModel.addSite(Site(name: trimmedName, zoneId: trimmedZoneId, domain: trimmedDomain))
         }

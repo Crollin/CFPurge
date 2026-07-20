@@ -14,6 +14,7 @@ Utilitaire macOS en barre de menus pour purger le cache Cloudflare de vos sites 
 - **Purge totale** — vide tout le cache d'une zone (avec confirmation)
 - **Jeton sécurisé** — stocké dans le Keychain macOS
 - **Démarrage automatique** — option pour lancer CFPurge à la connexion
+- **Gestion DNS** (optionnelle) — consultez et créez des enregistrements DNS Cloudflare
 - **Interface en français**
 
 ## Prérequis
@@ -21,6 +22,7 @@ Utilitaire macOS en barre de menus pour purger le cache Cloudflare de vos sites 
 - macOS 14 (Sonoma) ou supérieur
 - [Xcode 15+](https://developer.apple.com/xcode/) (pour compiler)
 - Un [token API Cloudflare](https://developers.cloudflare.com/fundamentals/api/get-started/create-token/) avec la permission **Zone > Cache Purge** (Edit) sur vos zones
+- Pour la gestion DNS (optionnelle) : ajoutez aussi **Zone > DNS** (Edit)
 
 ## Installation rapide
 
@@ -61,6 +63,7 @@ Copiez ensuite `CFPurge.app` depuis `DerivedData` vers `/Applications`.
    - **Zone ID** : visible dans Cloudflare → votre domaine → Aperçu (colonne droite)
    - **Domaine** : ex. `monsite.com` (sans `https://`)
 5. Optionnel : activez **Lancer CFPurge à la connexion**
+6. Optionnel : activez **Activer la gestion DNS** dans Réglages → Fonctionnalités
 
 ## Utilisation
 
@@ -69,6 +72,7 @@ Copiez ensuite `CFPurge.app` depuis `DerivedData` vers `/Applications`.
 | Purger une page | Sélectionnez le site, saisissez l'URL ou le chemin, cliquez **Personnaliser le vidage** |
 | Purger tout le cache | Sélectionnez le site, cliquez **Vider tous les éléments**, confirmez |
 | Modifier les sites | Engrenage → section **Sites** |
+| Gérer le DNS | Activez l'option DNS dans Réglages, puis **Gérer le DNS** (popover) ou **DNS** (par site) |
 
 ### Exemples d'URL
 
@@ -91,13 +95,15 @@ Le token n'est **jamais** écrit dans un fichier.
 ## API Cloudflare utilisée
 
 ```
-GET  /client/v4/zones?per_page=1          → vérification du token
+GET  /client/v4/zones?per_page=1                    → vérification du token
 POST /client/v4/zones/{zone_id}/purge_cache
-     {"purge_everything": true}            → purge totale
-     {"files": ["https://..."]}            → purge par URL
+     {"purge_everything": true}                    → purge totale
+     {"files": ["https://..."]}                      → purge par URL
+GET  /client/v4/zones/{zone_id}/dns_records         → liste des enregistrements DNS
+POST /client/v4/zones/{zone_id}/dns_records         → création d'un enregistrement DNS
 ```
 
-Documentation : [Purge cache — Cloudflare](https://developers.cloudflare.com/cache/how-to/purge-cache/)
+Documentation : [Purge cache — Cloudflare](https://developers.cloudflare.com/cache/how-to/purge-cache/) · [DNS records — Cloudflare](https://developers.cloudflare.com/dns/manage-dns-records/)
 
 ## Tests
 
@@ -114,8 +120,8 @@ CFPurge/
 ├── CFPurge/
 │   ├── Models/          # Site, réponses API, statuts
 │   ├── Services/        # Keychain, SiteStore, Cloudflare API
-│   ├── ViewModels/      # AppViewModel
-│   ├── Views/           # MenuBar, Settings, SiteEditor
+│   ├── ViewModels/      # AppViewModel, DNSViewModel
+│   ├── Views/           # MenuBar, Settings, SiteEditor, DNS
 │   └── Utilities/       # URLNormalizer, erreurs
 ├── CFPurgeTests/
 ├── project.yml          # Config xcodegen
@@ -129,6 +135,7 @@ CFPurge/
 | L'icône nuage n'apparaît pas | Relancez l'app depuis `/Applications/CFPurge.app` |
 | Les réglages ne s'ouvrent pas | Cliquez l'engrenage ou **Ouvrir les réglages** dans le popover |
 | Token invalide | Vérifiez la permission **Cache Purge** sur toutes vos zones |
+| Erreur DNS / 403 | Ajoutez la permission **Zone > DNS > Edit** à votre token API |
 | Zone introuvable | Vérifiez le Zone ID dans le dashboard Cloudflare |
 | Trop de purges | Cloudflare limite les purges totales, attendez quelques minutes |
 | Démarrage auto ne fonctionne pas | L'app doit être dans `/Applications` |

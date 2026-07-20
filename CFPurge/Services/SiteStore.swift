@@ -20,7 +20,8 @@ enum SiteStore {
 
         do {
             let data = try Data(contentsOf: fileURL)
-            return try JSONDecoder().decode([Site].self, from: data)
+            let sites = try JSONDecoder().decode([Site].self, from: data)
+            return normalizeSortOrder(sites)
         } catch {
             return []
         }
@@ -33,5 +34,20 @@ enum SiteStore {
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
         let data = try encoder.encode(sites)
         try data.write(to: fileURL, options: .atomic)
+    }
+
+    private static func normalizeSortOrder(_ sites: [Site]) -> [Site] {
+        var sorted = sites.sorted {
+            if $0.sortOrder != $1.sortOrder {
+                return $0.sortOrder < $1.sortOrder
+            }
+            return $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
+        }
+
+        for index in sorted.indices {
+            sorted[index].sortOrder = index
+        }
+
+        return sorted
     }
 }

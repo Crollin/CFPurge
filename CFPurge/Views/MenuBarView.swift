@@ -1,32 +1,59 @@
+import AppKit
 import SwiftUI
 
 struct MenuBarView: View {
     @EnvironmentObject private var viewModel: AppViewModel
-    @Environment(\.openSettings) private var openSettings
     @Environment(\.openWindow) private var openWindow
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Text("CFPurge")
-                    .font(.headline)
-                Spacer()
-                Button {
-                    openSettingsPanel()
-                } label: {
-                    Image(systemName: "gearshape")
-                }
-                .buttonStyle(.borderless)
-                .help("Réglages")
-            }
+        VStack(alignment: .leading, spacing: 14) {
+            header
 
             if viewModel.needsSetup {
                 setupPrompt
             } else {
                 purgeControls
             }
+
+            Divider()
+
+            Button("Quitter CFPurge") {
+                NSApplication.shared.terminate(nil)
+            }
+            .buttonStyle(.borderless)
+            .foregroundStyle(.secondary)
+            .font(.caption)
+            .frame(maxWidth: .infinity, alignment: .trailing)
         }
         .padding(16)
-        .frame(width: 320)
+        .frame(width: 340)
+        .animation(.easeInOut(duration: 0.2), value: viewModel.status)
+        .onAppear {
+            viewModel.openSettingsIfNeeded {
+                SettingsWindowPresenter.present(openWindow: openWindow)
+            }
+        }
+    }
+
+    private var header: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "cloud.fill")
+                .font(.title3)
+                .foregroundStyle(Color(red: 0.96, green: 0.51, blue: 0.11))
+
+            Text("CFPurge")
+                .font(.headline)
+
+            Spacer()
+
+            Button {
+                openSettingsPanel()
+            } label: {
+                Image(systemName: "gearshape")
+            }
+            .buttonStyle(.borderless)
+            .help("Réglages")
+        }
     }
 
     private var setupPrompt: some View {
@@ -48,35 +75,34 @@ struct MenuBarView: View {
                 openSettingsPanel()
             }
             .buttonStyle(.borderedProminent)
+            .tint(Color(red: 0.96, green: 0.51, blue: 0.11))
             .controlSize(.large)
         }
     }
 
     private var purgeControls: some View {
         Group {
-            Picker("Site", selection: Binding(
-                get: { viewModel.selectedSite?.id },
-                set: { newId in
-                    if let id = newId,
-                       let site = viewModel.sites.first(where: { $0.id == id }) {
-                        viewModel.selectSite(site)
-                    }
-                }
-            )) {
-                ForEach(viewModel.sites) { site in
-                    Text(site.name).tag(Optional(site.id))
-                }
-            }
-            .labelsHidden()
+            sitePicker
 
             TextField("URL ou chemin (ex. /page)", text: $viewModel.urlInput)
                 .textFieldStyle(.roundedBorder)
                 .disabled(viewModel.isLoading || viewModel.selectedSite == nil)
 
-            Button("Personnaliser le vidage") {
-                Task { await viewModel.purgeURL() }
+            HStack(spacing: 8) {
+                Button("Personnaliser le vidage") {
+                    Task { await viewModel.purgeURL() }
+                }
+                .disabled(
+                    viewModel.isLoading
+                        || viewModel.selectedSite == nil
+                        || viewModel.urlInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                )
+
+                if viewModel.isLoading {
+                    ProgressView()
+                        .controlSize(.small)
+                }
             }
-            .disabled(viewModel.isLoading || viewModel.selectedSite == nil || viewModel.urlInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
 
             Button("Vider tous les éléments") {
                 confirmPurgeEverything()
@@ -85,29 +111,65 @@ struct MenuBarView: View {
             .tint(.red)
             .disabled(viewModel.isLoading || viewModel.selectedSite == nil)
 
-            if viewModel.isLoading {
-                ProgressView()
-                    .controlSize(.small)
-            }
-
-            if let message = viewModel.status.message {
-                Text(message)
-                    .font(.caption)
-                    .foregroundStyle(statusColor)
-                    .fixedSize(horizontal: false, vertical: true)
+            if viewModel.status.message != nil {
+                PurgeStatusBanner(status: viewModel.status)
             }
 
             Text("Attention : vider tout le cache peut impacter les performances temporairement.")
                 .font(.caption2)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
+
+            if viewModel.dnsManagementEnabled {
+                Divider()
+
+                Button("Gérer le DNS") {
+                    viewModel.openDNS(for: viewModel.selectedSite, openWindow: openWindow)
+                }
+                .disabled(viewModel.selectedSite == nil)
+            }
         }
     }
 
+    private var sitePicker: some View {
+        Menu {
+            ForEach(viewModel.sites) { site in
+                Button {
+                    viewModel.selectSite(site)
+                } label: {
+                    if viewModel.selectedSite?.id == site.id {
+                        Label(site.name, systemImage: "checkmark")
+                    } else {
+                        Text(site.name)
+                    }
+                }
+            }
+        } label: {
+            HStack {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(viewModel.selectedSite?.name ?? "Choisir un site")
+                        .font(.body.weight(.medium))
+                    if let domain = viewModel.selectedSite?.domain {
+                        Text(domain)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                Spacer()
+                Image(systemName: "chevron.up.chevron.down")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
+            }
+            .padding(.horizontal, 10)
+            .padding(.vertical, 8)
+            .background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+        }
+        .menuStyle(.borderlessButton)
+        .disabled(viewModel.sites.isEmpty)
+    }
+
     private func openSettingsPanel() {
-        openSettings()
-        openWindow(id: "settings-window")
-        viewModel.shouldOpenSettings = false
+        SettingsWindowPresenter.present(openWindow: openWindow)
     }
 
     private func confirmPurgeEverything() {
@@ -123,17 +185,6 @@ struct MenuBarView: View {
         guard confirmed else { return }
 
         Task { await viewModel.purgeEverything() }
-    }
-
-    private var statusColor: Color {
-        switch viewModel.status {
-        case .success:
-            return .green
-        case .error:
-            return .red
-        case .loading, .idle:
-            return .secondary
-        }
     }
 }
 

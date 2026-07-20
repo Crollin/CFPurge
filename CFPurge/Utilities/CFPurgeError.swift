@@ -12,6 +12,8 @@ enum CFPurgeError: LocalizedError, Equatable {
     case networkError(String)
     case apiError(String)
     case decodingError
+    case dnsPermissionDenied
+    case recordValidationFailed(String)
 
     var errorDescription: String? {
         switch self {
@@ -37,6 +39,10 @@ enum CFPurgeError: LocalizedError, Equatable {
             return "Erreur Cloudflare : \(message)"
         case .decodingError:
             return "Réponse Cloudflare illisible."
+        case .dnsPermissionDenied:
+            return "Votre token API doit inclure la permission Zone > DNS > Edit."
+        case .recordValidationFailed(let message):
+            return message
         }
     }
 }

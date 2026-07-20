@@ -12,11 +12,18 @@ enum PurgeNotificationService {
     }
 
     @MainActor
-    static func notifySuccess(title: String, message: String) {
+    static func notify(
+        title: String,
+        message: String,
+        soundEnabled: Bool,
+        isFailure: Bool = false
+    ) {
         let content = UNMutableNotificationContent()
         content.title = title
         content.body = message
-        content.sound = .default
+        if soundEnabled, !isFailure {
+            content.sound = .default
+        }
 
         let request = UNNotificationRequest(
             identifier: UUID().uuidString,
@@ -39,10 +46,21 @@ enum PurgeNotificationService {
 
 enum PurgeFeedback {
     @MainActor
-    static func showPurgeSuccess(detail: String) {
-        PurgeNotificationService.notifySuccess(
-            title: "Cache vidé",
-            message: detail
+    static func showPurgeSuccess(siteName: String, detail: String, soundEnabled: Bool) {
+        PurgeNotificationService.notify(
+            title: "Cache vidé — \(siteName)",
+            message: detail,
+            soundEnabled: soundEnabled
+        )
+    }
+
+    @MainActor
+    static func showPurgeFailure(siteName: String, detail: String) {
+        PurgeNotificationService.notify(
+            title: "Échec du vidage — \(siteName)",
+            message: detail,
+            soundEnabled: false,
+            isFailure: true
         )
     }
 }

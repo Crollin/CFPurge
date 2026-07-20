@@ -2,6 +2,7 @@ import Foundation
 
 enum CloudflareService {
     private static let baseURL = "https://api.cloudflare.com/client/v4"
+    private static let dnsRecordsPerPage = 100
 
     static func verifyToken(token: String) async throws {
         let url = try makeURL(path: "/zones", queryItems: [URLQueryItem(name: "per_page", value: "1")])
@@ -41,6 +42,57 @@ enum CloudflareService {
         }
     }
 
+    static func listDNSRecords(zoneId: String, token: String, page: Int = 1) async throws -> (records: [DNSRecord], hasMore: Bool) {
+        let url = try makeURL(
+            path: "/zones/\(zoneId)/dns_records",
+            queryItems: [
+                URLQueryItem(name: "per_page", value: String(dnsRecordsPerPage)),
+                URLQueryItem(name: "page", value: String(page))
+            ]
+        )
+        let request = try makeRequest(url: url, token: token, method: "GET")
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        var listResponse: CloudflareDNSListResponse?
+        try handleResponse(data: data, httpResponse: response, isDNSOperation: true) { data in
+            let decoded = try JSONDecoder().decode(CloudflareDNSListResponse.self, from: data)
+            guard decoded.success else {
+                throw mapAPIErrors(decoded.errors)
+            }
+            listResponse = decoded
+        }
+
+        let records = listResponse?.result ?? []
+        let info = listResponse?.resultInfo
+        let currentPage = info?.page ?? page
+        let totalPages = info?.totalPages ?? currentPage
+        let hasMore = currentPage < totalPages
+
+        return (records, hasMore)
+    }
+
+    static func createDNSRecord(zoneId: String, token: String, record: CreateDNSRecordRequest) async throws -> DNSRecord {
+        let url = try makeURL(path: "/zones/\(zoneId)/dns_records")
+        var request = try makeRequest(url: url, token: token, method: "POST")
+        request.httpBody = try JSONEncoder().encode(record)
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        var createResponse: CloudflareDNSCreateResponse?
+        try handleResponse(data: data, httpResponse: response, isDNSOperation: true) { data in
+            let decoded = try JSONDecoder().decode(CloudflareDNSCreateResponse.self, from: data)
+            guard decoded.success else {
+                throw mapAPIErrors(decoded.errors)
+            }
+            createResponse = decoded
+        }
+
+        guard let created = createResponse?.result else {
+            throw CFPurgeError.decodingError
+        }
+
+        return created
+    }
+
     private static func makeURL(path: String, queryItems: [URLQueryItem] = []) throws -> URL {
         var components = URLComponents(string: baseURL + path)
         if !queryItems.isEmpty {
@@ -63,6 +115,7 @@ enum CloudflareService {
     private static func handleResponse(
         data: Data,
         httpResponse: URLResponse,
+        isDNSOperation: Bool = false,
         decodeSuccess: (Data) throws -> Void
     ) throws {
         guard let response = httpResponse as? HTTPURLResponse else {
@@ -80,15 +133,14 @@ enum CloudflareService {
             }
         case 401:
             throw CFPurgeError.unauthorized
+        case 403:
+            throw isDNSOperation ? CFPurgeError.dnsPermissionDenied : CFPurgeError.apiError("Accès refusé.")
         case 404:
             throw CFPurgeError.zoneNotFound
         case 429:
             throw CFPurgeError.rateLimited
         default:
-            if let decoded = try? JSONDecoder().decode(CloudflarePurgeResponse.self, from: data) {
-                throw mapAPIErrors(decoded.errors)
-            }
-            if let decoded = try? JSONDecoder().decode(CloudflareZonesListResponse.self, from: data) {
+            if let decoded = try? JSONDecoder().decode(CloudflareBaseResponse.self, from: data) {
                 throw mapAPIErrors(decoded.errors)
             }
             throw CFPurgeError.apiError("Code HTTP \(response.statusCode)")
@@ -103,6 +155,10 @@ enum CloudflareService {
         let message = first.message.lowercased()
         if first.code == 1008 || message.contains("rate") || message.contains("limit") {
             return .rateLimited
+        }
+
+        if message.contains("permission") || message.contains("dns") {
+            return .dnsPermissionDenied
         }
 
         return .apiError(first.message)

@@ -41,3 +41,8 @@ struct CloudflarePurgeResponse: Decodable {
     let errors: [CloudflareAPIError]?
     let result: CloudflarePurgeResult?
 }
+
+struct CloudflareBaseResponse: Decodable {
+    let success: Bool
+    let errors: [CloudflareAPIError]?
+}

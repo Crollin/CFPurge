@@ -2,9 +2,79 @@ import SwiftUI
 
 struct SettingsView: View {
     @EnvironmentObject private var viewModel: AppViewModel
+    @Environment(\.openWindow) private var openWindow
+
+    @State private var selectedTab: SettingsTab = .general
+
+    enum SettingsTab: String, CaseIterable, Identifiable {
+        case general = "Général"
+        case token = "Jeton API"
+        case sites = "Sites"
+
+        var id: String { rawValue }
+
+        var icon: String {
+            switch self {
+            case .general: return "slider.horizontal.3"
+            case .token: return "key.fill"
+            case .sites: return "globe"
+            }
+        }
+    }
 
     var body: some View {
+        NavigationSplitView {
+            List(SettingsTab.allCases, selection: $selectedTab) { tab in
+                Label(tab.rawValue, systemImage: tab.icon)
+                    .tag(tab)
+            }
+            .listStyle(.sidebar)
+            .navigationSplitViewColumnWidth(min: 160, ideal: 170, max: 200)
+        } detail: {
+            Group {
+                switch selectedTab {
+                case .general:
+                    generalSettings
+                case .token:
+                    tokenSettings
+                case .sites:
+                    sitesSettings
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .navigationTitle(selectedTab.rawValue)
+        }
+        .frame(minWidth: 640, minHeight: 480)
+        .sheet(isPresented: $viewModel.showingSiteEditor) {
+            SiteEditorView(site: viewModel.editingSite)
+                .environmentObject(viewModel)
+        }
+    }
+
+    private var generalSettings: some View {
         Form {
+            Section("Fonctionnalités") {
+                Toggle("Activer la gestion DNS", isOn: Binding(
+                    get: { viewModel.dnsManagementEnabled },
+                    set: { viewModel.setDNSManagementEnabled($0) }
+                ))
+
+                Text("Nécessite la permission Zone > DNS > Edit sur votre token API Cloudflare, en plus de Cache Purge.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Section("Notifications") {
+                Toggle("Son des notifications de purge", isOn: Binding(
+                    get: { viewModel.soundNotificationsEnabled },
+                    set: { viewModel.setSoundNotificationsEnabled($0) }
+                ))
+
+                Text("Les notifications système restent actives pour confirmer les purges réussies ou signaler les échecs. Seul le son peut être désactivé.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
             Section("Démarrage") {
                 Toggle("Lancer CFPurge à la connexion", isOn: Binding(
                     get: { viewModel.launchAtLoginEnabled },
@@ -21,7 +91,13 @@ struct SettingsView: View {
                         .foregroundStyle(.secondary)
                 }
             }
+        }
+        .formStyle(.grouped)
+        .padding()
+    }
 
+    private var tokenSettings: some View {
+        Form {
             Section("Jeton API Cloudflare") {
                 SecureField("Jeton API", text: $viewModel.tokenInput)
                     .textFieldStyle(.roundedBorder)
@@ -56,45 +132,102 @@ struct SettingsView: View {
                 }
             }
 
-            Section("Sites") {
-                if viewModel.sites.isEmpty {
-                    Text("Aucun site enregistré.")
-                        .foregroundStyle(.secondary)
-                } else {
+            Section {
+                Text("Permissions requises : Zone > Cache Purge > Edit. Ajoutez Zone > DNS > Edit si la gestion DNS est activée.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .formStyle(.grouped)
+        .padding()
+    }
+
+    private var sitesSettings: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            if viewModel.sites.isEmpty {
+                ContentUnavailableView(
+                    "Aucun site",
+                    systemImage: "globe",
+                    description: Text("Ajoutez un site Cloudflare pour commencer à purger le cache.")
+                )
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                List {
                     ForEach(viewModel.sites) { site in
-                        HStack {
-                            VStack(alignment: .leading) {
-                                Text(site.name)
-                                    .font(.headline)
-                                Text(site.domain)
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                                Text("Zone : \(site.zoneId)")
-                                    .font(.caption2)
-                                    .foregroundStyle(.secondary)
-                            }
-                            Spacer()
-                            Button("Modifier") {
-                                viewModel.beginEditSite(site)
-                            }
-                        }
+                        SiteSettingsRow(
+                            site: site,
+                            dnsEnabled: viewModel.dnsManagementEnabled,
+                            onEdit: { viewModel.beginEditSite(site) },
+                            onDNS: { viewModel.openDNS(for: site, openWindow: openWindow) }
+                        )
                     }
+                    .onMove(perform: viewModel.moveSites)
                     .onDelete { indexSet in
                         indexSet.map { viewModel.sites[$0] }.forEach(viewModel.deleteSite)
                     }
                 }
+                .listStyle(.inset(alternatesRowBackgrounds: true))
+            }
+
+            Divider()
+
+            HStack {
+                Text("Glissez-déposez pour définir l'ordre d'affichage dans la barre de menus.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                Spacer()
 
                 Button("Ajouter un site") {
                     viewModel.beginAddSite()
                 }
             }
+            .padding()
         }
-        .formStyle(.grouped)
-        .frame(minWidth: 480, minHeight: 420)
-        .sheet(isPresented: $viewModel.showingSiteEditor) {
-            SiteEditorView(site: viewModel.editingSite)
-                .environmentObject(viewModel)
+    }
+}
+
+private struct SiteSettingsRow: View {
+    let site: Site
+    let dnsEnabled: Bool
+    let onEdit: () -> Void
+    let onDNS: () -> Void
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "line.3.horizontal")
+                .font(.caption)
+                .foregroundStyle(.tertiary)
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(site.name)
+                    .font(.headline)
+
+                Text(site.domain)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+
+                Text("Zone : \(site.zoneId)")
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
+                    .textSelection(.enabled)
+            }
+
+            Spacer()
+
+            HStack(spacing: 8) {
+                if dnsEnabled {
+                    Button("DNS", action: onDNS)
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
+                }
+
+                Button("Modifier", action: onEdit)
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
+            }
         }
+        .padding(.vertical, 4)
     }
 }
 
