@@ -2,12 +2,13 @@
 
 Extension Raycast companion pour purger le cache Cloudflare depuis le lanceur, en réutilisant les sites configurés dans [CFPurge](../README.md).
 
+La purge est **déléguée à l'app CFPurge** via le schéma d'URL `cfpurge://`. Aucun token API n'est stocké dans Raycast — le token reste uniquement dans le Keychain macOS.
+
 ## Prérequis
 
 - [Raycast](https://raycast.com/) installé sur macOS
 - Node.js **22.22+**
-- CFPurge configuré avec au moins un site dans `~/Library/Application Support/CFPurge/sites.json`
-- Un [token API Cloudflare](https://developers.cloudflare.com/fundamentals/api/get-started/create-token/) avec **Zone > Cache Purge > Edit**
+- **CFPurge** installé et configuré (token Keychain + au moins un site dans `~/Library/Application Support/CFPurge/sites.json`)
 
 ## Installation
 
@@ -33,18 +34,23 @@ Puis dans Raycast : **Manage Extensions → + → Import Extension** et sélecti
 
 ## Configuration
 
-1. Ouvrez les préférences de l'extension **CFPurge** dans Raycast
-2. Collez votre **token API Cloudflare** (le même que dans l'app CFPurge)
-3. Assurez-vous que CFPurge contient au moins un site configuré
-
-> Le token est stocké dans les préférences Raycast, pas dans le Keychain CFPurge. Les deux apps utilisent le même token Cloudflare mais le stockent séparément.
+1. Configurez CFPurge (token API + sites) — voir le [README principal](../README.md)
+2. Aucune préférence token dans Raycast
+3. Si vous aviez un ancien token dans les préférences Raycast : vous pouvez le supprimer, il n'est plus utilisé
 
 ## Commandes
 
 | Commande | Description |
 |----------|-------------|
-| **Purger une URL** | Sélectionnez un site, saisissez une URL ou un chemin (`/blog/`), lancez la purge |
-| **Purger tout le cache** | Sélectionnez un site dans la liste, confirmez la purge totale |
+| **Purger une URL** | Sélectionnez un site, saisissez une URL ou un chemin (`/blog/`), CFPurge exécute la purge |
+| **Purger tout le cache** | Sélectionnez un site ; CFPurge demande confirmation avant la purge totale |
+
+### Schéma d'URL
+
+```
+cfpurge://purge?siteId=<UUID>&url=<URL-encodée>
+cfpurge://purge-all?siteId=<UUID>
+```
 
 ### Exemples d'URL
 
@@ -59,8 +65,8 @@ Puis dans Raycast : **Manage Extensions → + → Import Extension** et sélecti
 | Problème | Solution |
 |----------|----------|
 | « Configurez vos sites dans CFPurge d'abord » | Ouvrez CFPurge et ajoutez au moins un site |
-| Token invalide | Vérifiez le token dans les préférences Raycast |
-| Accès refusé | Permission **Cache Purge > Edit** requise sur le token |
+| Rien ne se passe après la commande | Vérifiez que CFPurge.app est installé et que le schéma `cfpurge://` est enregistré |
+| Token invalide | Configurez le token dans CFPurge → Réglages (plus dans Raycast) |
 | Zone introuvable | Vérifiez le Zone ID dans CFPurge |
 | Limite de requêtes | Attendez quelques minutes (rate limit Cloudflare) |
 

@@ -71,7 +71,12 @@ struct SettingsView: View {
                     set: { viewModel.setSoundNotificationsEnabled($0) }
                 ))
 
-                Text("Les notifications système restent actives pour confirmer les purges réussies ou signaler les échecs. Seul le son peut être désactivé.")
+                Toggle("Afficher les URLs dans les notifications", isOn: Binding(
+                    get: { viewModel.showURLsInNotifications },
+                    set: { viewModel.setShowURLsInNotifications($0) }
+                ))
+
+                Text("Par défaut, les notifications n'affichent que le nom du site. Activez l'option pour inclure l'URL purgée (visible dans le Centre de notifications).")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -186,7 +191,7 @@ struct SettingsView: View {
             }
 
             Section {
-                Text("Permissions requises : Zone > Cache Purge > Edit. Ajoutez Zone > DNS > Edit si la gestion DNS est activée.")
+                Text("Permissions requises : Zone > Cache Purge > Edit. Ajoutez Zone > DNS > Edit si la gestion DNS est activée. N'utilisez jamais la Global API Key.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

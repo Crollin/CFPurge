@@ -33,7 +33,12 @@ xcodebuild -project CFPurge.xcodeproj -scheme CFPurge -destination 'platform=mac
 
 # Vérification TypeScript (extension Raycast)
 cd raycast-cfpurge && npx tsc --noEmit
+
+# Audit des dépendances npm (bloque high/critical)
+cd raycast-cfpurge && npm audit --audit-level=high
 ```
+
+La CI GitHub exécute aussi **gitleaks** (scan de secrets) sur chaque PR.
 
 ## Conventions
 
@@ -62,6 +67,8 @@ cd raycast-cfpurge && npx tsc --noEmit
 ## Sécurité
 
 Ne commitez jamais de tokens API, Zone IDs réels ou données client. Voir [SECURITY.md](SECURITY.md).
+
+Pour les builds de distribution (Developer ID / notarisation), voir [docs/SIGNING.md](docs/SIGNING.md).
 
 ## Licence
 

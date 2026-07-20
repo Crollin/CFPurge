@@ -87,12 +87,28 @@ Le workflow GitHub Actions compile, crée le `.dmg` et publie la release automat
 
 ## Configuration
 
+### Créer un token Cloudflare minimal
+
+1. Ouvrez [Cloudflare → My Profile → API Tokens](https://dash.cloudflare.com/profile/api-tokens) → **Create Token**
+2. Choisissez **Create Custom Token**
+3. Permissions :
+   - **Zone → Cache Purge → Edit** (obligatoire)
+   - **Zone → DNS → Edit** uniquement si vous activez la gestion DNS dans CFPurge
+4. **Zone Resources** : limitez à **Specific zone** (vos domaines uniquement), jamais « All zones » sauf nécessité
+5. Créez le token, copiez-le une seule fois, collez-le dans CFPurge → Réglages → Jeton API
+
+> **Ne jamais** utiliser la **Global API Key** (clé de compte). CFPurge la refuse volontairement. Préférez un token API à durée limitée et permissions réduites.
+>
+> **Rotation** : si le token a fuité ou si un appareil est perdu, révoquez-le dans Cloudflare et créez-en un nouveau.
+
+### Première configuration dans l'app
+
 1. Cliquez sur l'icône **nuage** dans la barre de menu
 2. Au premier lancement, la fenêtre **Réglages** s'ouvre automatiquement
 3. Collez votre **token API Cloudflare** → **Enregistrer** → **Tester la connexion**
 4. **Ajoutez un site** :
    - **Nom** : libellé affiché dans l'app
-   - **Zone ID** : visible dans Cloudflare → votre domaine → Aperçu (colonne droite)
+   - **Zone ID** : 32 caractères hexadécimaux (Cloudflare → domaine → Aperçu, colonne droite)
    - **Domaine** : ex. `monsite.com` (sans `https://`)
 5. Optionnel : activez **Lancer CFPurge à la connexion**
 6. Optionnel : activez **Activer la gestion DNS** dans Réglages → Fonctionnalités
@@ -147,9 +163,9 @@ Tests unitaires : normalisation d'URL, validation de domaine, chemins relatifs.
 
 ## Intégration Raycast
 
-Une extension Raycast companion permet de purger le cache directement depuis le lanceur, sans ouvrir CFPurge.
+Une extension Raycast companion délègue la purge à CFPurge via le schéma `cfpurge://` (le token reste dans le Keychain, jamais dans Raycast).
 
-**Prérequis** : Node.js 22.22+ et [Raycast](https://raycast.com/).
+**Prérequis** : Node.js 22.22+, [Raycast](https://raycast.com/), et CFPurge installé/configuré.
 
 ```bash
 cd raycast-cfpurge
@@ -158,7 +174,7 @@ npm install && npm run dev
 
 Documentation complète : [raycast-cfpurge/README.md](raycast-cfpurge/README.md)
 
-L'extension lit les sites depuis `~/Library/Application Support/CFPurge/sites.json` et utilise un token API configuré dans les préférences Raycast.
+L'extension lit les sites depuis `~/Library/Application Support/CFPurge/sites.json` et ouvre `cfpurge://purge…` pour exécuter la purge.
 
 ## Structure du projet
 
@@ -197,6 +213,7 @@ Voir [CONTRIBUTING.md](CONTRIBUTING.md) pour les instructions de développement 
 ## Sécurité
 
 Pour signaler une vulnérabilité, consultez [SECURITY.md](SECURITY.md).
+Pour signer et notariser une release, voir [docs/SIGNING.md](docs/SIGNING.md).
 
 ## Licence
 

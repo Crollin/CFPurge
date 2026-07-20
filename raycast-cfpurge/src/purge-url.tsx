@@ -1,10 +1,10 @@
-import { Action, ActionPanel, Detail, Form, Icon, Toast, openExtensionPreferences, showToast } from "@raycast/api";
+import { Action, ActionPanel, Detail, Form, Icon, Toast, open, showToast } from "@raycast/api";
 import { useState } from "react";
 
-import { purgeURLs } from "./lib/cloudflare";
-import { getErrorMessage, requireAPIToken } from "./lib/preferences";
+import { getErrorMessage } from "./lib/preferences";
 import { useSites } from "./lib/use-sites";
 import { normalizeURL } from "./lib/url-normalizer";
+import { buildPurgeURL } from "./lib/deep-link";
 
 interface FormValues {
   siteId: string;
@@ -21,7 +21,7 @@ export default function Command() {
         markdown={`# Sites non configurés\n\n${errorMessage}\n\n1. Ouvrez **CFPurge** depuis la barre de menus\n2. Ajoutez au moins un site dans les réglages\n3. Relancez cette commande`}
         actions={
           <ActionPanel>
-            <Action title="Ouvrir les préférences Raycast" icon={Icon.Gear} onAction={openExtensionPreferences} />
+            <Action.OpenInBrowser title="Documentation CFPurge" url="https://github.com/Crollin/CFPurge" />
           </ActionPanel>
         }
       />
@@ -32,20 +32,18 @@ export default function Command() {
     setIsLoading(true);
 
     try {
-      const token = requireAPIToken();
       const site = sites.find((entry) => entry.id === values.siteId);
-
       if (!site) {
         throw new Error("Site introuvable.");
       }
 
       const normalizedURL = normalizeURL(values.url, site);
-      await purgeURLs([normalizedURL], site.zoneId, token);
+      await open(buildPurgeURL(site.id, normalizedURL));
 
       await showToast({
         style: Toast.Style.Success,
-        title: "Cache purgé",
-        message: normalizedURL,
+        title: "Purge déléguée à CFPurge",
+        message: site.name,
       });
     } catch (error) {
       await showToast({
@@ -78,6 +76,7 @@ export default function Command() {
         placeholder="/ma-page/ ou https://monsite.com/page/"
         autoFocus
       />
+      <Form.Description text="La purge est exécutée par l'app CFPurge (token Keychain). CFPurge doit être installé." />
     </Form>
   );
 }

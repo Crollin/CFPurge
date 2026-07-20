@@ -18,10 +18,12 @@ final class AppViewModel: ObservableObject {
     @Published var dnsManagementEnabled: Bool
     @Published var dnsSite: Site?
     @Published var soundNotificationsEnabled: Bool
+    @Published var showURLsInNotifications: Bool
 
     private let lastSelectedSiteIdKey = "lastSelectedSiteId"
     private let dnsManagementEnabledKey = "dnsManagementEnabled"
     private let soundNotificationsEnabledKey = "soundNotificationsEnabled"
+    private let showURLsInNotificationsKey = "showURLsInNotifications"
     private var didScheduleInitialSettingsOpen = false
     private var statusDismissTask: Task<Void, Never>?
 
@@ -40,6 +42,8 @@ final class AppViewModel: ObservableObject {
         } else {
             soundNotificationsEnabled = UserDefaults.standard.bool(forKey: soundNotificationsEnabledKey)
         }
+        // Désactivé par défaut : les URLs ne doivent pas apparaître dans le Centre de notifications
+        showURLsInNotifications = UserDefaults.standard.bool(forKey: showURLsInNotificationsKey)
         reloadSites()
         tokenConfigured = KeychainService.loadToken() != nil
         PurgeNotificationService.requestAuthorizationIfNeeded()
@@ -106,13 +110,8 @@ final class AppViewModel: ObservableObject {
     }
 
     func saveToken() {
-        let token = tokenInput.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !token.isEmpty else {
-            connectionTestResult = CFPurgeError.missingToken.localizedDescription
-            return
-        }
-
         do {
+            let token = try SiteValidator.validateAPIToken(tokenInput)
             try KeychainService.saveToken(token)
             tokenConfigured = true
             tokenInput = ""
@@ -165,8 +164,10 @@ final class AppViewModel: ObservableObject {
             setStatus(.success(message))
             PurgeFeedback.showPurgeSuccess(
                 siteName: site.name,
+                siteDomain: site.domain,
                 detail: message,
-                soundEnabled: soundNotificationsEnabled
+                soundEnabled: soundNotificationsEnabled,
+                showURLsInNotifications: showURLsInNotifications
             )
         } catch {
             let message = error.localizedDescription
@@ -194,13 +195,51 @@ final class AppViewModel: ObservableObject {
             setStatus(.success(message))
             PurgeFeedback.showPurgeSuccess(
                 siteName: site.name,
+                siteDomain: site.domain,
                 detail: message,
-                soundEnabled: soundNotificationsEnabled
+                soundEnabled: soundNotificationsEnabled,
+                showURLsInNotifications: showURLsInNotifications
             )
         } catch {
             let message = error.localizedDescription
             setStatus(.error(message))
             PurgeFeedback.showPurgeFailure(siteName: site.name, detail: message)
+        }
+    }
+
+    /// Gère les deep links `cfpurge://` (extension Raycast et autres clients).
+    func handleOpenURL(_ url: URL) async {
+        do {
+            let action = try DeepLinkParser.parse(url)
+            switch action {
+            case .purgeURL(let siteId, let rawURL):
+                guard let site = sites.first(where: { $0.id == siteId }) else {
+                    setStatus(.error(CFPurgeError.noSiteSelected.localizedDescription))
+                    return
+                }
+                selectedSite = site
+                urlInput = rawURL
+                await purgeURL()
+
+            case .purgeEverything(let siteId):
+                guard let site = sites.first(where: { $0.id == siteId }) else {
+                    setStatus(.error(CFPurgeError.noSiteSelected.localizedDescription))
+                    return
+                }
+                selectedSite = site
+
+                let confirmed = ConfirmationAlert.confirm(
+                    title: "Vider tout le cache ?",
+                    message: "Demande reçue via Raycast pour \(site.name) (\(site.domain)).",
+                    confirmTitle: "Vider",
+                    isDestructive: true
+                )
+                guard confirmed else { return }
+                await purgeEverything()
+            }
+        } catch {
+            setStatus(.error(error.localizedDescription))
+            PurgeFeedback.showPurgeFailure(siteName: "CFPurge", detail: error.localizedDescription)
         }
     }
 
@@ -240,6 +279,11 @@ final class AppViewModel: ObservableObject {
     func setSoundNotificationsEnabled(_ enabled: Bool) {
         soundNotificationsEnabled = enabled
         UserDefaults.standard.set(enabled, forKey: soundNotificationsEnabledKey)
+    }
+
+    func setShowURLsInNotifications(_ enabled: Bool) {
+        showURLsInNotifications = enabled
+        UserDefaults.standard.set(enabled, forKey: showURLsInNotificationsKey)
     }
 
     func openDNS(for site: Site?, openWindow: OpenWindowAction) {

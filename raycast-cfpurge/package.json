@@ -10,15 +10,6 @@
   "engines": {
     "node": ">=22.22.2"
   },
-  "preferences": [
-    {
-      "name": "apiToken",
-      "title": "Token API Cloudflare",
-      "description": "Même token que dans CFPurge (Zone > Cache Purge > Edit)",
-      "type": "password",
-      "required": true
-    }
-  ],
   "commands": [
     {
       "name": "purge-url",

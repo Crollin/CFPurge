@@ -27,29 +27,40 @@ Nous nous engageons à accuser réception sous **72 heures** et à proposer un c
 - Créez un [token API Cloudflare](https://developers.cloudflare.com/fundamentals/api/get-started/create-token/) avec le **minimum de permissions** nécessaires :
   - **Zone > Cache Purge > Edit** pour la purge
   - **Zone > DNS > Edit** uniquement si vous utilisez la gestion DNS
-- Limitez le token aux zones concernées, pas à tout le compte
+- Limitez le token aux **zones concernées**, pas à tout le compte
+- **Ne jamais** utiliser la Global API Key (refusée par l'app)
 - Ne partagez jamais votre token API ni le fichier `sites.json`
-- Le token est stocké dans le **Keychain macOS** (app) ou les **préférences Raycast** (extension) — jamais dans le dépôt Git
+- Le token est stocké **uniquement** dans le Keychain macOS (app). L'extension Raycast délègue via le schéma `cfpurge://` — aucun token dans les préférences Raycast
+- Rotation : révoquez et recréez le token après compromission ou perte d'appareil
 
 ## Données stockées localement
 
 | Donnée | Emplacement | Sensibilité | Exposé à |
 |--------|-------------|-------------|----------|
-| Token API | Keychain macOS (`com.creactiveweb.cfpurge`) | **Élevée** | CFPurge uniquement |
-| Token API (Raycast) | Préférences chiffrées Raycast | **Élevée** | Extension Raycast |
-| Zone IDs, domaines | `~/Library/Application Support/CFPurge/sites.json` (permissions `600`) | **Moyenne** | Tout processus de l'utilisateur |
+| Token API | Keychain macOS (`com.creactiveweb.cfpurge`, access group dédié) | **Élevée** | CFPurge uniquement |
+| Zone IDs, domaines | `~/Library/Application Support/CFPurge/sites.json` (permissions `600`) | **Moyenne** | Processus de l'utilisateur (lecture Raycast) |
 | Dossier CFPurge | `~/Library/Application Support/CFPurge/` (permissions `700`) | — | Utilisateur macOS uniquement |
 | Dernier site sélectionné | UserDefaults | Faible | CFPurge |
 
 Le token API **n'est jamais** écrit dans `sites.json` ni dans le dépôt Git.
 
+## Durcissement applicatif
+
+- **App Sandbox** + accès réseau client uniquement
+- Exception sandbox ciblée pour `~/Library/Application Support/CFPurge/` (partage sites avec Raycast)
+- Keychain : `WhenUnlockedThisDeviceOnly`, non synchronisable iCloud, access group
+- Validation stricte : Zone ID (32 hex), domaine, longueur minimale du token
+- Notifications : URLs masquées par défaut
+- CI : gitleaks + `npm audit --audit-level=high`
+
 ## Risques utilisateur à connaître
 
 - **Ne commitez pas** `sites.json` — il contient vos Zone IDs Cloudflare
 - **Token minimal** : limitez les permissions et les zones du token API
-- **Extension Raycast** : le token est stocké séparément du Keychain CFPurge (préférences Raycast)
-- **Notifications macOS** : les URLs purgées peuvent apparaître dans le Centre de notifications
+- **Extension Raycast** : nécessite CFPurge installé ; la purge passe par `cfpurge://` (pas de second token)
+- **Notifications macOS** : activez « Afficher les URLs » uniquement si nécessaire
 - **Gestion DNS** : si activée, un token compromis permet de modifier vos enregistrements DNS
+- **Signature / notarisation** : pour une distribution hors GitHub Actions, utilisez un certificat Developer ID
 
 ## Périmètre
 

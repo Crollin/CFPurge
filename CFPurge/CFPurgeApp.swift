@@ -3,6 +3,7 @@ import SwiftUI
 
 @main
 struct CFPurgeApp: App {
+    @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @StateObject private var viewModel = AppViewModel()
     @StateObject private var dnsViewModel = DNSViewModel()
     @StateObject private var updater = UpdaterManager()
@@ -11,6 +12,9 @@ struct CFPurgeApp: App {
         MenuBarExtra("CFPurge", systemImage: "cloud.fill") {
             MenuBarView()
                 .environmentObject(viewModel)
+                .onAppear {
+                    appDelegate.bind(viewModel: viewModel)
+                }
         }
         .menuBarExtraStyle(.window)
         .commands {
@@ -26,6 +30,9 @@ struct CFPurgeApp: App {
             SettingsView()
                 .environmentObject(viewModel)
                 .environmentObject(updater)
+                .onAppear {
+                    appDelegate.bind(viewModel: viewModel)
+                }
         }
         .windowResizability(.contentSize)
         .defaultSize(width: 680, height: 520)

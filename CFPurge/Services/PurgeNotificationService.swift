@@ -46,10 +46,20 @@ enum PurgeNotificationService {
 
 enum PurgeFeedback {
     @MainActor
-    static func showPurgeSuccess(siteName: String, detail: String, soundEnabled: Bool) {
+    static func showPurgeSuccess(
+        siteName: String,
+        siteDomain: String,
+        detail: String,
+        soundEnabled: Bool,
+        showURLsInNotifications: Bool
+    ) {
+        let notificationBody = showURLsInNotifications
+            ? detail
+            : "Cache Cloudflare vidé pour \(siteDomain)."
+
         PurgeNotificationService.notify(
             title: "Cache vidé — \(siteName)",
-            message: detail,
+            message: notificationBody,
             soundEnabled: soundEnabled
         )
     }
