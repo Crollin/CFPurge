@@ -4,7 +4,7 @@ Toutes les versions notables de CFPurge sont documentées ici.
 
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/).
 
-## [Unreleased]
+## [1.0.2] — 2026-07-20
 
 ### Sécurité
 
