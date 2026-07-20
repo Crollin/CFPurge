@@ -8,16 +8,17 @@
 
 /* Begin PBXBuildFile section */
 		116F1C24591739FD0D6FA40A /* CFPurgeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FE9375F6D6B4A6950CC3B7C /* CFPurgeApp.swift */; };
-		14B8D1F2A6E944A7B8C9D0E1 /* CFPurgeMark.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25C7E3A1B4D849F6A0C2E5B7 /* CFPurgeMark.swift */; };
 		1EDCB63DFFDCF00446CACB73 /* CFPurgeError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AF64C5CB5B8C7A4564DA199 /* CFPurgeError.swift */; };
 		1EF806D3FBEB4151BF344198 /* LaunchAtLoginService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6997074574E961A496E5A2B4 /* LaunchAtLoginService.swift */; };
 		245A87038B82ACB5C6D14281 /* DNSWindowPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBD8F614A2139C4DFABAAF55 /* DNSWindowPresenter.swift */; };
+		270C591449DEB9B5BAF0DCC6 /* cfpurge-mark.svg in Resources */ = {isa = PBXBuildFile; fileRef = 8B937C4E9C243341031E1519 /* cfpurge-mark.svg */; };
 		2733C2EBD08E7660503ED3CE /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECA140196442708E52A5F82D /* KeychainService.swift */; };
 		2FACDB1260E9A005FD331D47 /* CloudflareService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 128C795A5160F9024EC14C7A /* CloudflareService.swift */; };
 		369AAEAD45D35E5A2D08B600 /* AppViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33D5BBB6054DAD8BB7C5D5B2 /* AppViewModel.swift */; };
 		3B928A7E956111AC60C38E98 /* DNSRecordValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0EA8E764AEE53005B555BB9 /* DNSRecordValidator.swift */; };
 		41D6CDD418D5C913E389A7E7 /* SettingsWindowPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6074CAB2890FD6342AA39F3B /* SettingsWindowPresenter.swift */; };
 		5367F0310FF69461035D9B1A /* PurgeStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA79120E6935A97E3E81C62 /* PurgeStatus.swift */; };
+		5E767301002803BCD4EC58D4 /* favicon.svg in Resources */ = {isa = PBXBuildFile; fileRef = 62167ED196AC8BBF01EF1773 /* favicon.svg */; };
 		5F293491F40EBD60266D528D /* ConfirmationAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 908B0EEC7E975A55C3422570 /* ConfirmationAlert.swift */; };
 		607336DEBFA9BD5C1DC87307 /* URLNormalizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 256CDCD8C6B857842A6392F8 /* URLNormalizer.swift */; };
 		63A0CB094C55264F749AF10D /* Site.swift in Sources */ = {isa = PBXBuildFile; fileRef = 674479BCDC849CC90EE593EA /* Site.swift */; };
@@ -31,8 +32,10 @@
 		89816593EDC5579E3081957E /* DeepLinkParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8548D4B68F9DF2DB68DC26A /* DeepLinkParser.swift */; };
 		8A3B4BCFFB31904A0B6FE7DA /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA987433C6EA3EA1CE4EEFA4 /* SettingsView.swift */; };
 		9952F193CF65C1F102966398 /* URLNormalizerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A07BCE5AE9DCEC4C53ED8C7D /* URLNormalizerTests.swift */; };
+		B70BB80ADA567FD50B479E29 /* CFPurgeMark.swift in Sources */ = {isa = PBXBuildFile; fileRef = C87F9528F5F865E232B314FB /* CFPurgeMark.swift */; };
 		BC12CAB94CCEBF40916CEDEA /* DNSRecordValidatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D28FD571C94E583B667EABC2 /* DNSRecordValidatorTests.swift */; };
 		C3D97596DFBC3D7806F0F0BE /* SiteValidatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B63F1A372AE0ACB4E4F6B92 /* SiteValidatorTests.swift */; };
+		C79769DDF1BF63708C32DF43 /* cfpurge-logo.svg in Resources */ = {isa = PBXBuildFile; fileRef = D0B872071ACC3E9E929C5D1D /* cfpurge-logo.svg */; };
 		DAEA267BD277B77049EC6F38 /* PurgeNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC5E204FE5E64726B7FBBE68 /* PurgeNotificationService.swift */; };
 		DAF681176DEC8A1AECD7254D /* UpdaterManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3C372D43855B78BF3E6101E /* UpdaterManagerTests.swift */; };
 		DC302EA7892D08111443BA33 /* DNSRecordEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830814F0CD66C7BB19CA3CEA /* DNSRecordEditorView.swift */; };
@@ -56,7 +59,6 @@
 /* Begin PBXFileReference section */
 		002484D88B77F587D4E0A9D5 /* MenuBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarView.swift; sourceTree = "<group>"; };
 		128C795A5160F9024EC14C7A /* CloudflareService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudflareService.swift; sourceTree = "<group>"; };
-		25C7E3A1B4D849F6A0C2E5B7 /* CFPurgeMark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CFPurgeMark.swift; sourceTree = "<group>"; };
 		1AF64C5CB5B8C7A4564DA199 /* CFPurgeError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CFPurgeError.swift; sourceTree = "<group>"; };
 		1B63F1A372AE0ACB4E4F6B92 /* SiteValidatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiteValidatorTests.swift; sourceTree = "<group>"; };
 		256CDCD8C6B857842A6392F8 /* URLNormalizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLNormalizer.swift; sourceTree = "<group>"; };
@@ -64,6 +66,7 @@
 		3027DC353B92C5D17FFCBF0F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		33D5BBB6054DAD8BB7C5D5B2 /* AppViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppViewModel.swift; sourceTree = "<group>"; };
 		6074CAB2890FD6342AA39F3B /* SettingsWindowPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsWindowPresenter.swift; sourceTree = "<group>"; };
+		62167ED196AC8BBF01EF1773 /* favicon.svg */ = {isa = PBXFileReference; path = favicon.svg; sourceTree = "<group>"; };
 		674479BCDC849CC90EE593EA /* Site.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Site.swift; sourceTree = "<group>"; };
 		6997074574E961A496E5A2B4 /* LaunchAtLoginService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchAtLoginService.swift; sourceTree = "<group>"; };
 		71AC6698707F12E9EB397B99 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -72,6 +75,7 @@
 		830814F0CD66C7BB19CA3CEA /* DNSRecordEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNSRecordEditorView.swift; sourceTree = "<group>"; };
 		8686571C02001AC8A394F0CB /* CFPurge.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CFPurge.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		86B11007BBE3295364042612 /* CFPurgeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CFPurgeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		8B937C4E9C243341031E1519 /* cfpurge-mark.svg */ = {isa = PBXFileReference; path = "cfpurge-mark.svg"; sourceTree = "<group>"; };
 		908B0EEC7E975A55C3422570 /* ConfirmationAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmationAlert.swift; sourceTree = "<group>"; };
 		A07BCE5AE9DCEC4C53ED8C7D /* URLNormalizerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLNormalizerTests.swift; sourceTree = "<group>"; };
 		A0973FCE105B87CF3B2CD29E /* PurgeStatusBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurgeStatusBanner.swift; sourceTree = "<group>"; };
@@ -79,10 +83,12 @@
 		B3C372D43855B78BF3E6101E /* UpdaterManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdaterManagerTests.swift; sourceTree = "<group>"; };
 		BA987433C6EA3EA1CE4EEFA4 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		BFB3E99FC9B6805E4C1A8746 /* SiteValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiteValidator.swift; sourceTree = "<group>"; };
+		C87F9528F5F865E232B314FB /* CFPurgeMark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CFPurgeMark.swift; sourceTree = "<group>"; };
 		CC303B5FD713A3EC5665F3D0 /* CFPurge.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CFPurge.entitlements; sourceTree = "<group>"; };
 		CDFBAF4FCAA631BDAFDE55EF /* UpdaterManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdaterManager.swift; sourceTree = "<group>"; };
 		CE53830EE43B21E39FF6E3AC /* SiteEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiteEditorView.swift; sourceTree = "<group>"; };
 		CF30425491B25AE2F52CD5B9 /* DeepLinkParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepLinkParserTests.swift; sourceTree = "<group>"; };
+		D0B872071ACC3E9E929C5D1D /* cfpurge-logo.svg */ = {isa = PBXFileReference; path = "cfpurge-logo.svg"; sourceTree = "<group>"; };
 		D28FD571C94E583B667EABC2 /* DNSRecordValidatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNSRecordValidatorTests.swift; sourceTree = "<group>"; };
 		DAA25868A61F061A16E39B02 /* DNSRecordsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNSRecordsView.swift; sourceTree = "<group>"; };
 		E0EA8E764AEE53005B555BB9 /* DNSRecordValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNSRecordValidator.swift; sourceTree = "<group>"; };
@@ -154,10 +160,13 @@
 			path = Services;
 			sourceTree = "<group>";
 		};
-		24A1D9E7B3C54F6082E6A1D4 /* Brand */ = {
+		2E2B90CEB5B8613B69FC0481 /* Brand */ = {
 			isa = PBXGroup;
 			children = (
-				25C7E3A1B4D849F6A0C2E5B7 /* CFPurgeMark.swift */,
+				D0B872071ACC3E9E929C5D1D /* cfpurge-logo.svg */,
+				8B937C4E9C243341031E1519 /* cfpurge-mark.svg */,
+				C87F9528F5F865E232B314FB /* CFPurgeMark.swift */,
+				62167ED196AC8BBF01EF1773 /* favicon.svg */,
 			);
 			path = Brand;
 			sourceTree = "<group>";
@@ -195,7 +204,7 @@
 		F064DE6DF848918A13115A66 /* CFPurge */ = {
 			isa = PBXGroup;
 			children = (
-				24A1D9E7B3C54F6082E6A1D4 /* Brand */,
+				2E2B90CEB5B8613B69FC0481 /* Brand */,
 				069967062B7304F1F6B4F536 /* Models */,
 				1F8EF39CA9936E7FCB088569 /* Services */,
 				3A95D12E812F9315730FAFD2 /* Update */,
@@ -245,6 +254,7 @@
 			buildConfigurationList = 2CECA10A569BF2D8A6ADC953 /* Build configuration list for PBXNativeTarget "CFPurge" */;
 			buildPhases = (
 				6D31B6BD578A941E0662718F /* Sources */,
+				F5438E0F8C8A0F4BA0FB65D9 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -295,6 +305,19 @@
 		};
 /* End PBXProject section */
 
+/* Begin PBXResourcesBuildPhase section */
+		F5438E0F8C8A0F4BA0FB65D9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C79769DDF1BF63708C32DF43 /* cfpurge-logo.svg in Resources */,
+				270C591449DEB9B5BAF0DCC6 /* cfpurge-mark.svg in Resources */,
+				5E767301002803BCD4EC58D4 /* favicon.svg in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		6D31B6BD578A941E0662718F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -304,7 +327,7 @@
 				369AAEAD45D35E5A2D08B600 /* AppViewModel.swift in Sources */,
 				116F1C24591739FD0D6FA40A /* CFPurgeApp.swift in Sources */,
 				1EDCB63DFFDCF00446CACB73 /* CFPurgeError.swift in Sources */,
-				14B8D1F2A6E944A7B8C9D0E1 /* CFPurgeMark.swift in Sources */,
+				B70BB80ADA567FD50B479E29 /* CFPurgeMark.swift in Sources */,
 				FABC8ADA3C1EF55C0630D686 /* CloudflareResponse.swift in Sources */,
 				2FACDB1260E9A005FD331D47 /* CloudflareService.swift in Sources */,
 				5F293491F40EBD60266D528D /* ConfirmationAlert.swift in Sources */,
