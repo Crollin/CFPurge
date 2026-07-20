@@ -27,3 +27,7 @@ Package.resolved
 
 # SDD scratch (local progress ledger)
 .superpowers/
+
+# Raycast extension
+raycast-cfpurge/node_modules/
+raycast-cfpurge/dist/

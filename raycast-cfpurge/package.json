@@ -1,0 +1,52 @@
+{
+  "$schema": "https://www.raycast.com/schemas/extension.json",
+  "name": "cfpurge",
+  "title": "CFPurge",
+  "description": "Purger le cache Cloudflare depuis Raycast",
+  "icon": "assets/icon.png",
+  "author": "creactiveweb",
+  "categories": ["Developer Tools"],
+  "license": "MIT",
+  "preferences": [
+    {
+      "name": "apiToken",
+      "title": "Token API Cloudflare",
+      "description": "Même token que dans CFPurge (Zone > Cache Purge > Edit)",
+      "type": "password",
+      "required": true
+    }
+  ],
+  "commands": [
+    {
+      "name": "purge-url",
+      "title": "Purger une URL",
+      "description": "Purge une URL ou un chemin du cache Cloudflare",
+      "mode": "view"
+    },
+    {
+      "name": "purge-all",
+      "title": "Purger tout le cache",
+      "description": "Purge totale du cache d'un site Cloudflare",
+      "mode": "view"
+    }
+  ],
+  "dependencies": {
+    "@raycast/api": "^1.103.6",
+    "@raycast/utils": "^1.19.1"
+  },
+  "devDependencies": {
+    "@raycast/eslint-config": "^2.0.4",
+    "@types/node": "^22.13.10",
+    "@types/react": "^19.0.12",
+    "eslint": "^8.57.1",
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.2"
+  },
+  "scripts": {
+    "build": "ray build -e dist",
+    "dev": "ray develop",
+    "fix-lint": "ray lint --fix",
+    "lint": "ray lint",
+    "publish": "npx @raycast/api@latest publish"
+  }
+}

@@ -16,6 +16,7 @@ Utilitaire macOS en barre de menus pour purger le cache Cloudflare de vos sites 
 - **Démarrage automatique** — option pour lancer CFPurge à la connexion
 - **Gestion DNS** (optionnelle) — consultez et créez des enregistrements DNS Cloudflare
 - **Interface en français**
+- **Intégration Raycast** — purge depuis le lanceur via extension privée (voir [raycast-cfpurge/README.md](raycast-cfpurge/README.md))
 
 ## Prérequis
 
@@ -113,6 +114,19 @@ xcodebuild -project CFPurge.xcodeproj -scheme CFPurge test
 
 Tests unitaires : normalisation d'URL, validation de domaine, chemins relatifs.
 
+## Intégration Raycast
+
+Une extension Raycast privée permet de purger le cache directement depuis le lanceur, sans ouvrir CFPurge.
+
+```bash
+cd raycast-cfpurge
+npm install && npm run dev
+```
+
+Documentation complète : [raycast-cfpurge/README.md](raycast-cfpurge/README.md)
+
+L'extension lit les sites depuis `~/Library/Application Support/CFPurge/sites.json` et utilise un token API configuré dans les préférences Raycast.
+
 ## Structure du projet
 
 ```
@@ -124,6 +138,7 @@ CFPurge/
 │   ├── Views/           # MenuBar, Settings, SiteEditor, DNS
 │   └── Utilities/       # URLNormalizer, erreurs
 ├── CFPurgeTests/
+├── raycast-cfpurge/     # Extension Raycast privée
 ├── project.yml          # Config xcodegen
 └── install.sh           # Script d'installation
 ```
