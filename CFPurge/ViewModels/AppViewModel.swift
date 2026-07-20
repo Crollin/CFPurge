@@ -13,11 +13,18 @@ final class AppViewModel: ObservableObject {
     @Published var showingSiteEditor = false
     @Published var editingSite: Site?
     @Published var connectionTestResult: String?
+    @Published var shouldOpenSettings = false
+    @Published var launchAtLoginEnabled = LaunchAtLoginService.isEnabled
+    @Published var launchAtLoginMessage: String?
 
     private let lastSelectedSiteIdKey = "lastSelectedSiteId"
 
     var isLoading: Bool {
         status.isLoading
+    }
+
+    var needsSetup: Bool {
+        !tokenConfigured || sites.isEmpty
     }
 
     init() {
@@ -157,7 +164,17 @@ final class AppViewModel: ObservableObject {
     }
 
     func openSettings() {
-        NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
+        shouldOpenSettings = true
+    }
+
+    func setLaunchAtLogin(_ enabled: Bool) {
+        do {
+            try LaunchAtLoginService.setEnabled(enabled)
+            launchAtLoginEnabled = LaunchAtLoginService.isEnabled
+            launchAtLoginMessage = LaunchAtLoginService.statusMessage
+        } catch {
+            launchAtLoginMessage = "Impossible de modifier le démarrage automatique : \(error.localizedDescription)"
+        }
     }
 
     func beginAddSite() {

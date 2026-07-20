@@ -24,3 +24,6 @@ Package.resolved
 # Env / secrets
 .env
 *.local
+
+# SDD scratch (local progress ledger)
+.superpowers/

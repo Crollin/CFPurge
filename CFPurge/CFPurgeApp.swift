@@ -8,6 +8,10 @@ struct CFPurgeApp: App {
         MenuBarExtra("CFPurge", systemImage: "cloud.fill") {
             MenuBarView()
                 .environmentObject(viewModel)
+                .background {
+                    SettingsWindowOpener()
+                        .environmentObject(viewModel)
+                }
         }
         .menuBarExtraStyle(.window)
 
@@ -15,5 +19,12 @@ struct CFPurgeApp: App {
             SettingsView()
                 .environmentObject(viewModel)
         }
+
+        Window("Réglages CFPurge", id: "settings-window") {
+            SettingsView()
+                .environmentObject(viewModel)
+        }
+        .windowResizability(.contentSize)
+        .defaultSize(width: 520, height: 500)
     }
 }

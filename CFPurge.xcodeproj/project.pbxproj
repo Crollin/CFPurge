@@ -9,9 +9,11 @@
 /* Begin PBXBuildFile section */
 		116F1C24591739FD0D6FA40A /* CFPurgeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FE9375F6D6B4A6950CC3B7C /* CFPurgeApp.swift */; };
 		1EDCB63DFFDCF00446CACB73 /* CFPurgeError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AF64C5CB5B8C7A4564DA199 /* CFPurgeError.swift */; };
+		1EF806D3FBEB4151BF344198 /* LaunchAtLoginService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6997074574E961A496E5A2B4 /* LaunchAtLoginService.swift */; };
 		2733C2EBD08E7660503ED3CE /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECA140196442708E52A5F82D /* KeychainService.swift */; };
 		2FACDB1260E9A005FD331D47 /* CloudflareService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 128C795A5160F9024EC14C7A /* CloudflareService.swift */; };
 		369AAEAD45D35E5A2D08B600 /* AppViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33D5BBB6054DAD8BB7C5D5B2 /* AppViewModel.swift */; };
+		52EF670023C24CE8EEA925B9 /* SettingsWindowOpener.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD219D954A37C7C92FCCB1F /* SettingsWindowOpener.swift */; };
 		5367F0310FF69461035D9B1A /* PurgeStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA79120E6935A97E3E81C62 /* PurgeStatus.swift */; };
 		607336DEBFA9BD5C1DC87307 /* URLNormalizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 256CDCD8C6B857842A6392F8 /* URLNormalizer.swift */; };
 		63A0CB094C55264F749AF10D /* Site.swift in Sources */ = {isa = PBXBuildFile; fileRef = 674479BCDC849CC90EE593EA /* Site.swift */; };
@@ -35,12 +37,14 @@
 
 /* Begin PBXFileReference section */
 		002484D88B77F587D4E0A9D5 /* MenuBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarView.swift; sourceTree = "<group>"; };
+		0CD219D954A37C7C92FCCB1F /* SettingsWindowOpener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsWindowOpener.swift; sourceTree = "<group>"; };
 		128C795A5160F9024EC14C7A /* CloudflareService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudflareService.swift; sourceTree = "<group>"; };
 		1AF64C5CB5B8C7A4564DA199 /* CFPurgeError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CFPurgeError.swift; sourceTree = "<group>"; };
 		256CDCD8C6B857842A6392F8 /* URLNormalizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLNormalizer.swift; sourceTree = "<group>"; };
 		3027DC353B92C5D17FFCBF0F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		33D5BBB6054DAD8BB7C5D5B2 /* AppViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppViewModel.swift; sourceTree = "<group>"; };
 		674479BCDC849CC90EE593EA /* Site.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Site.swift; sourceTree = "<group>"; };
+		6997074574E961A496E5A2B4 /* LaunchAtLoginService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchAtLoginService.swift; sourceTree = "<group>"; };
 		71D6782A20DA98BEF7794210 /* CloudflareResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudflareResponse.swift; sourceTree = "<group>"; };
 		7FE9375F6D6B4A6950CC3B7C /* CFPurgeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CFPurgeApp.swift; sourceTree = "<group>"; };
 		8686571C02001AC8A394F0CB /* CFPurge.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CFPurge.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -95,6 +99,7 @@
 			children = (
 				128C795A5160F9024EC14C7A /* CloudflareService.swift */,
 				ECA140196442708E52A5F82D /* KeychainService.swift */,
+				6997074574E961A496E5A2B4 /* LaunchAtLoginService.swift */,
 				F00E9DC3377EE53E272168DC /* SiteStore.swift */,
 			);
 			path = Services;
@@ -105,6 +110,7 @@
 			children = (
 				002484D88B77F587D4E0A9D5 /* MenuBarView.swift */,
 				BA987433C6EA3EA1CE4EEFA4 /* SettingsView.swift */,
+				0CD219D954A37C7C92FCCB1F /* SettingsWindowOpener.swift */,
 				CE53830EE43B21E39FF6E3AC /* SiteEditorView.swift */,
 			);
 			path = Views;
@@ -230,9 +236,11 @@
 				FABC8ADA3C1EF55C0630D686 /* CloudflareResponse.swift in Sources */,
 				2FACDB1260E9A005FD331D47 /* CloudflareService.swift in Sources */,
 				2733C2EBD08E7660503ED3CE /* KeychainService.swift in Sources */,
+				1EF806D3FBEB4151BF344198 /* LaunchAtLoginService.swift in Sources */,
 				6F6F3A9DC2E3F43AF6188BC5 /* MenuBarView.swift in Sources */,
 				5367F0310FF69461035D9B1A /* PurgeStatus.swift in Sources */,
 				8A3B4BCFFB31904A0B6FE7DA /* SettingsView.swift in Sources */,
+				52EF670023C24CE8EEA925B9 /* SettingsWindowOpener.swift in Sources */,
 				63A0CB094C55264F749AF10D /* Site.swift in Sources */,
 				E9EEBE79461573BBF87AEAF5 /* SiteEditorView.swift in Sources */,
 				8285643A39603ABB582250EA /* SiteStore.swift in Sources */,

@@ -5,6 +5,23 @@ struct SettingsView: View {
 
     var body: some View {
         Form {
+            Section("Démarrage") {
+                Toggle("Lancer CFPurge à la connexion", isOn: Binding(
+                    get: { viewModel.launchAtLoginEnabled },
+                    set: { viewModel.setLaunchAtLogin($0) }
+                ))
+
+                Text(LaunchAtLoginService.statusMessage)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                if let message = viewModel.launchAtLoginMessage {
+                    Text(message)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
             Section("Jeton API Cloudflare") {
                 SecureField("Jeton API", text: $viewModel.tokenInput)
                     .textFieldStyle(.roundedBorder)
