@@ -6,10 +6,16 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/)
 
 ## [Unreleased]
 
+### Corrigé
+
+- Les mises à jour écrasent toujours `/Applications/CFPurge.app` (plus de doublons Launchpad)
+- Le packaging ne laisse plus de `.app` indexable dans `dist/` ; `install.sh` remplace proprement l'ancienne version
+
 ### Documentation
 
 - Positionnement générique : tout site derrière Cloudflare
 - README recentré sur présentation + installation ; détails dev dans CONTRIBUTING
+- Garde-fous dépôt : `.gitignore` renforcé, `scripts/check-repo-hygiene.sh`, hooks Git et job CI
 
 ## [1.0.3] — 2026-07-20
 
