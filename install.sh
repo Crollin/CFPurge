@@ -2,8 +2,10 @@
 set -euo pipefail
 
 APP_NAME="CFPurge"
+DEST="/Applications/${APP_NAME}.app"
 PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
 DERIVED_DATA="$HOME/Library/Developer/Xcode/DerivedData"
+LSREGISTER="/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister"
 
 echo "→ Compilation Release..."
 cd "$PROJECT_DIR"
@@ -17,14 +19,33 @@ if [[ -z "$APP_PATH" ]]; then
   exit 1
 fi
 
-echo "→ Installation dans /Applications..."
-rm -rf "/Applications/${APP_NAME}.app"
-cp -R "$APP_PATH" "/Applications/${APP_NAME}.app"
+echo "→ Installation dans /Applications (remplacement de l'ancienne version)..."
+# Supprime les doublons Finder éventuels (CFPurge 2.app, etc.)
+find /Applications -maxdepth 1 -name "${APP_NAME} *.app" -exec rm -rf {} +
+rm -rf "${DEST}.update-new" "${DEST}.update-old"
+STAGE="${DEST}.install-new"
+rm -rf "$STAGE"
+ditto --noextattr --noqtn "$APP_PATH" "$STAGE"
+xattr -cr "$STAGE" 2>/dev/null || true
+rm -rf "$DEST"
+mv "$STAGE" "$DEST"
+
+# Empêche Spotlight/Launchpad d'indexer les copies de build locales
+for dir in "$PROJECT_DIR/.build" "$PROJECT_DIR/dist"; do
+  mkdir -p "$dir"
+  touch "$dir/.metadata_never_index" 2>/dev/null || true
+done
+rm -rf "$PROJECT_DIR/dist/release/${APP_NAME}.app"
+
+if [[ -x "$LSREGISTER" ]]; then
+  "$LSREGISTER" -f "$DEST" >/dev/null 2>&1 || true
+fi
 
 echo "→ Lancement..."
-open "/Applications/${APP_NAME}.app"
+open "$DEST"
 
 echo ""
 echo "✓ ${APP_NAME} installé dans /Applications"
 echo "  Cliquez sur l'icône nuage dans la barre de menu."
 echo "  Les réglages s'ouvrent automatiquement au premier lancement."
+echo "  Config conservée : ~/Library/Application Support/CFPurge"

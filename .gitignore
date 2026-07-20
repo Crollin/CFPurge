@@ -1,4 +1,4 @@
-# Xcode
+# Xcode / builds
 build/
 DerivedData/
 *.xcuserstate
@@ -10,32 +10,68 @@ xcuserdata/
 *.ipa
 *.dSYM.zip
 *.dSYM
+*.app/
+*.dmg
+*.pkg
 
-# Swift Package Manager
+# Swift Package Manager / local build cache
 .build/
 .swiftpm/
 Package.resolved
 
-# macOS
+# macOS junk
 .DS_Store
 .AppleDouble
 .LSOverride
+Icon?
+._*
 
-# Env / secrets
+# Env / secrets / local config
 .env
+.env.*
+!.env.example
 *.local
+*.pem
+*.p12
+*.p8
+*.mobileprovision
 **/sites.json
+secrets/
+credentials/
 
-# SDD scratch (local progress ledger)
+# IDE / editors
+.idea/
+.vscode/
+*.swp
+*~
+
+# AI / agent local scratch (ne jamais committer)
 .superpowers/
 docs/superpowers/
-
-# Local tooling
 .serena/
+.cursor/
+.claude/
+.codex/
+.agents/
+agent-transcripts/
 
-# Release artifacts
+# Release / packaging artifacts
 dist/
+*.xcarchive/
+
+# Logs & coverage
+*.log
+coverage/
+.nyc_output/
+tmp/
+temp/
 
 # Raycast extension
 raycast-cfpurge/node_modules/
 raycast-cfpurge/dist/
+raycast-cfpurge/.raycast-swift-build/
+
+# npm noise at repo root (deps only under raycast-cfpurge/)
+/node_modules/
+/package-lock.json
+/package.json

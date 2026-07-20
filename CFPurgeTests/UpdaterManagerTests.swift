@@ -27,4 +27,39 @@ final class UpdaterManagerTests: XCTestCase {
         XCTAssertTrue(UpdaterManager.isNewer("1.0.10", than: "1.0.9"))
         XCTAssertFalse(UpdaterManager.isNewer("1.0.9", than: "1.0.10"))
     }
+
+    func testCanonicalInstallPath() {
+        XCTAssertEqual(
+            UpdaterManager.canonicalInstallURL.path,
+            "/Applications/CFPurge.app"
+        )
+    }
+
+    func testUserInstalledAppIgnoresBuildProducts() {
+        XCTAssertTrue(
+            UpdaterManager.isUserInstalledApp(
+                at: URL(fileURLWithPath: "/Applications/CFPurge.app")
+            )
+        )
+        XCTAssertTrue(
+            UpdaterManager.isUserInstalledApp(
+                at: URL(fileURLWithPath: "/Users/me/Downloads/CFPurge.app")
+            )
+        )
+        XCTAssertFalse(
+            UpdaterManager.isUserInstalledApp(
+                at: URL(fileURLWithPath: "/Users/me/Library/Developer/Xcode/DerivedData/CFPurge/Build/Products/Debug/CFPurge.app")
+            )
+        )
+        XCTAssertFalse(
+            UpdaterManager.isUserInstalledApp(
+                at: URL(fileURLWithPath: "/Users/me/CFPurge/.build/DerivedData/Build/Products/Release/CFPurge.app")
+            )
+        )
+        XCTAssertFalse(
+            UpdaterManager.isUserInstalledApp(
+                at: URL(fileURLWithPath: "/tmp/CFPurge")
+            )
+        )
+    }
 }

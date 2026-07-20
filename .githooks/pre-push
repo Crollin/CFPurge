@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# Empêche de pousser un tag de release si le dépôt n'est pas propre.
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+"$repo_root/scripts/check-repo-hygiene.sh"
+
+while read -r local_ref local_sha remote_ref remote_sha; do
+  if [[ "$local_ref" == refs/tags/v* ]]; then
+    tag="${local_ref#refs/tags/}"
+    version="${tag#v}"
+    if ! grep -Fq "## [$version]" "$repo_root/CHANGELOG.md"; then
+      echo "pre-push: CHANGELOG.md doit contenir « ## [$version] » avant de pousser $tag" >&2
+      exit 1
+    fi
+    if ! grep -Eq "MARKETING_VERSION:[[:space:]]*\"${version}\"" "$repo_root/project.yml"; then
+      echo "pre-push: project.yml MARKETING_VERSION doit être \"$version\" pour le tag $tag" >&2
+      exit 1
+    fi
+    echo "pre-push: tag $tag — changelog et version OK"
+  fi
+done
+
+exit 0

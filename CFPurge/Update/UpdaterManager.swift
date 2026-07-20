@@ -34,6 +34,8 @@ final class UpdaterManager: ObservableObject {
     private static let repo = "Crollin/CFPurge"
     private static let checkInterval: TimeInterval = 12 * 60 * 60
     private static let autoCheckKey = "autoUpdateChecks"
+    /// Emplacement canonique : toute mise à jour écrase ce bundle (évite les doublons Launchpad).
+    static let canonicalInstallURL = URL(fileURLWithPath: "/Applications/CFPurge.app")
 
     private static var archSuffix: String {
         #if arch(arm64)
@@ -88,7 +90,15 @@ final class UpdaterManager: ObservableObject {
     }
 
     private var isPackagedApp: Bool {
-        Bundle.main.bundleURL.pathExtension == "app"
+        Self.isUserInstalledApp(at: Bundle.main.bundleURL)
+    }
+
+    /// Ignore les builds Xcode / .build (sinon Launchpad enregistre une « nouvelle » app à chaque compile).
+    nonisolated static func isUserInstalledApp(at bundleURL: URL) -> Bool {
+        guard bundleURL.pathExtension == "app" else { return false }
+        let path = bundleURL.resolvingSymlinksInPath().path
+        let blockedMarkers = ["/DerivedData/", "/.build/", "/Index.noindex/"]
+        return !blockedMarkers.contains { path.contains($0) }
     }
 
     func checkForUpdates() {
@@ -126,8 +136,7 @@ final class UpdaterManager: ObservableObject {
 
     func installUpdate() {
         guard !isInstalling else { return }
-        let appURL = Bundle.main.bundleURL
-        guard appURL.pathExtension == "app", let assetURL = pendingAssetURL else {
+        guard isPackagedApp, let assetURL = pendingAssetURL else {
             openReleasePage()
             return
         }
@@ -138,7 +147,12 @@ final class UpdaterManager: ObservableObject {
         Task {
             do {
                 let dmgURL = try await Self.download(assetURL)
-                try Self.launchInstallerAndQuit(dmgURL: dmgURL, appURL: appURL)
+                // Toujours écraser /Applications/CFPurge.app, même si l'app tourne ailleurs.
+                try Self.launchInstallerAndQuit(
+                    dmgURL: dmgURL,
+                    runningAppURL: Bundle.main.bundleURL,
+                    installAppURL: Self.canonicalInstallURL
+                )
             } catch {
                 isInstalling = false
                 installError = "\(error)"
@@ -269,24 +283,44 @@ final class UpdaterManager: ObservableObject {
         return dmgURL
     }
 
-    private static func launchInstallerAndQuit(dmgURL: URL, appURL: URL) throws {
+    private static func launchInstallerAndQuit(
+        dmgURL: URL,
+        runningAppURL: URL,
+        installAppURL: URL
+    ) throws {
         let pid = ProcessInfo.processInfo.processIdentifier
         let script = """
         #!/bin/sh
-        APP="$1"; DMG="$2"; PID="$3"
+        # $1 = chemin de l'app en cours (peut différer de DEST)
+        # $2 = DMG téléchargé
+        # $3 = PID à attendre
+        # $4 = destination canonique (/Applications/CFPurge.app)
+        RUNNING="$1"; DMG="$2"; PID="$3"; DEST="$4"
         SCRIPT="$0"
+        LSREGISTER="/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister"
+
+        reopen_fallback() {
+          if [ -d "$DEST" ]; then
+            /usr/bin/open "$DEST"
+          elif [ -d "$RUNNING" ]; then
+            /usr/bin/open "$RUNNING"
+          fi
+        }
+
         while kill -0 "$PID" 2>/dev/null; do sleep 0.3; done
-        MNT="$(/usr/bin/mktemp -d)" || { /usr/bin/open "$APP"; /bin/rm -f "$SCRIPT"; exit 1; }
+
+        MNT="$(/usr/bin/mktemp -d)" || { reopen_fallback; /bin/rm -f "$SCRIPT"; exit 1; }
         if ! /usr/bin/hdiutil attach "$DMG" -nobrowse -quiet -mountpoint "$MNT"; then
           /bin/rmdir "$MNT" 2>/dev/null
           /bin/rm -f "$DMG" "$SCRIPT"
-          /usr/bin/open "$APP"
+          reopen_fallback
           exit 1
         fi
+
         SRC="$(/usr/bin/find "$MNT" -maxdepth 1 -name '*.app' -print -quit)"
-        LAUNCH="$APP"
+        LAUNCH="$DEST"
         if [ -n "$SRC" ]; then
-          DEST="$(/usr/bin/dirname "$APP")/$(/usr/bin/basename "$SRC")"
+          /bin/mkdir -p "$(/usr/bin/dirname "$DEST")"
           STAGE="$DEST.update-new"
           /bin/rm -rf "$STAGE"
           if /usr/bin/ditto "$SRC" "$STAGE"; then
@@ -298,19 +332,39 @@ final class UpdaterManager: ObservableObject {
               /bin/mv "$DEST" "$BACKUP" || OK=0
             fi
             if [ "$OK" = "1" ] && /bin/mv "$STAGE" "$DEST"; then
-              LAUNCH="$DEST"
               /bin/rm -rf "$BACKUP"
-              if [ "$DEST" != "$APP" ]; then /bin/rm -rf "$APP"; fi
+              # Supprime l'ancienne copie si l'app ne tournait pas déjà depuis /Applications
+              if [ "$RUNNING" != "$DEST" ] && [ -d "$RUNNING" ]; then
+                case "$RUNNING" in
+                  */DerivedData/*|*/.build/*|*/Index.noindex/*) ;;
+                  *) /bin/rm -rf "$RUNNING" ;;
+                esac
+              fi
+              # Nettoie les doublons Finder (« CFPurge 2.app », etc.) dans /Applications
+              APPS_DIR="$(/usr/bin/dirname "$DEST")"
+              DEST_BASE="$(/usr/bin/basename "$DEST" .app)"
+              /usr/bin/find "$APPS_DIR" -maxdepth 1 -name "${DEST_BASE} *.app" -exec /bin/rm -rf {} +
+              # Force Launch Services / Launchpad à ne garder que le bundle canonique
+              if [ -x "$LSREGISTER" ]; then
+                "$LSREGISTER" -f "$DEST" >/dev/null 2>&1 || true
+              fi
             else
               if [ -d "$BACKUP" ] && [ ! -d "$DEST" ]; then /bin/mv "$BACKUP" "$DEST"; fi
+              LAUNCH="$DEST"
+              [ -d "$LAUNCH" ] || LAUNCH="$RUNNING"
             fi
           fi
           /bin/rm -rf "$STAGE"
         fi
+
         /usr/bin/hdiutil detach "$MNT" -quiet 2>/dev/null || /usr/bin/hdiutil detach "$MNT" -force -quiet 2>/dev/null || true
         /bin/rmdir "$MNT" 2>/dev/null
         /bin/rm -f "$DMG" "$SCRIPT"
-        /usr/bin/open "$LAUNCH"
+        if [ -d "$LAUNCH" ]; then
+          /usr/bin/open "$LAUNCH"
+        else
+          reopen_fallback
+        fi
         """
 
         let scriptURL = FileManager.default.temporaryDirectory
@@ -319,7 +373,13 @@ final class UpdaterManager: ObservableObject {
 
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/bin/sh")
-        process.arguments = [scriptURL.path, appURL.path, dmgURL.path, "\(pid)"]
+        process.arguments = [
+            scriptURL.path,
+            runningAppURL.path,
+            dmgURL.path,
+            "\(pid)",
+            installAppURL.path,
+        ]
         try process.run()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {

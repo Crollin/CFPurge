@@ -275,12 +275,18 @@ case "$command" in
     sign_app_if_requested "$app_path"
 
     mkdir -p "$dist_dir"
+    # Empêche Spotlight/Launchpad d'indexer les artefacts locaux
+    /usr/bin/touch "$repo_root/.build/.metadata_never_index" 2>/dev/null || true
+    /usr/bin/touch "$repo_root/dist/.metadata_never_index" 2>/dev/null || true
+    # Ne laisse pas un .app indexable par Launchpad/Spotlight dans le repo :
+    # seul le .dmg est l'artefact de distribution.
     rm -rf "$dist_dir/CFPurge.app"
-    /usr/bin/ditto --noextattr --noqtn "$app_path" "$dist_dir/CFPurge.app"
 
     rm -rf "$staging_root"
     mkdir -p "$staging_root"
-    /usr/bin/ditto --noextattr --noqtn "$dist_dir/CFPurge.app" "$staging_root/CFPurge.app"
+    /usr/bin/ditto --noextattr --noqtn "$app_path" "$staging_root/CFPurge.app"
+    # Empêche Spotlight d'indexer le staging temporaire
+    /usr/bin/touch "$staging_root/.metadata_never_index" 2>/dev/null || true
     ln -sf /Applications "$staging_root/Applications"
 
     if [[ "$arch" == "universal" ]]; then
