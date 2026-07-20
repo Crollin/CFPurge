@@ -8,7 +8,8 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/)
 
 ### Documentation
 
-- Positionnement générique : tout site derrière Cloudflare (plus limité à WordPress)
+- Positionnement générique : tout site derrière Cloudflare
+- README recentré sur présentation + installation ; détails dev dans CONTRIBUTING
 
 ## [1.0.2] — 2026-07-20
 
