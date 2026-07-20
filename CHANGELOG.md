@@ -6,11 +6,6 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/)
 
 ## [Unreleased]
 
-### Corrigé
-
-- Les mises à jour écrasent toujours `/Applications/CFPurge.app` (plus de doublons Launchpad)
-- Le packaging ne laisse plus de `.app` indexable dans `dist/` ; `install.sh` remplace proprement l'ancienne version
-
 ### Documentation
 
 - Positionnement générique : tout site derrière Cloudflare
@@ -28,6 +23,11 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/)
 
 - Symbole CFPurge utilisé dans la barre de menus et le panneau de purge
 - Couleurs des actions et états de purge harmonisées
+
+### Corrigé
+
+- Les mises à jour écrasent toujours `/Applications/CFPurge.app` (plus de doublons Launchpad)
+- Le packaging ne laisse plus de `.app` indexable dans `dist/` ; `install.sh` remplace proprement l'ancienne version
 
 ## [1.0.2] — 2026-07-20
 
