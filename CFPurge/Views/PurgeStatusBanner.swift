@@ -65,7 +65,7 @@ struct PurgeStatusBanner: View {
         case .idle:
             return .secondary
         case .loading:
-            return Color(red: 0.96, green: 0.51, blue: 0.11)
+            return CFPurgeBrand.orange
         case .success:
             return .green
         case .error:
@@ -87,7 +87,7 @@ struct PurgeStatusBanner: View {
     private var backgroundColor: Color {
         switch status {
         case .loading:
-            return Color(red: 0.96, green: 0.51, blue: 0.11).opacity(0.08)
+            return CFPurgeBrand.orange.opacity(0.08)
         case .success:
             return Color.green.opacity(0.08)
         case .error:
@@ -100,7 +100,7 @@ struct PurgeStatusBanner: View {
     private var borderColor: Color {
         switch status {
         case .loading:
-            return Color(red: 0.96, green: 0.51, blue: 0.11).opacity(0.25)
+            return CFPurgeBrand.orange.opacity(0.25)
         case .success:
             return Color.green.opacity(0.25)
         case .error:

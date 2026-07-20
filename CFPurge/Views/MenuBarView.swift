@@ -37,12 +37,10 @@ struct MenuBarView: View {
 
     private var header: some View {
         HStack(spacing: 10) {
-            Image(systemName: "cloud.fill")
-                .font(.title3)
-                .foregroundStyle(Color(red: 0.96, green: 0.51, blue: 0.11))
+            CFPurgeMark(size: 28)
 
             Text("CFPurge")
-                .font(.headline)
+                .font(.headline.weight(.semibold))
 
             Spacer()
 
@@ -75,7 +73,7 @@ struct MenuBarView: View {
                 openSettingsPanel()
             }
             .buttonStyle(.borderedProminent)
-            .tint(Color(red: 0.96, green: 0.51, blue: 0.11))
+            .tint(CFPurgeBrand.orange)
             .controlSize(.large)
         }
     }

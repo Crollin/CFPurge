@@ -3,7 +3,7 @@
   "name": "cfpurge",
   "title": "CFPurge",
   "description": "Purger le cache Cloudflare depuis Raycast",
-  "icon": "assets/icon.png",
+  "icon": "icon.svg",
   "author": "creactiveweb",
   "categories": ["Developer Tools"],
   "license": "MIT",
