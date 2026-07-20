@@ -4,6 +4,24 @@ Toutes les versions notables de CFPurge sont documentées ici.
 
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/).
 
+## [1.0.2] — 2026-07-20
+
+### Sécurité
+
+- Validation stricte Zone ID (32 hex), domaine et token API (refus des Global API Keys)
+- Notifications sans URL complète par défaut (option dans Réglages)
+- Permissions `700`/`600` réappliquées à chaque lecture de `sites.json`
+- App Sandbox + exceptions ciblées Application Support / Applications
+- Keychain access group automatique lorsque l'app est signée avec un Team ID
+- Extension Raycast : plus de token en préférences — délégation via `cfpurge://`
+- CI : gitleaks + `npm audit --audit-level=high`
+
+### Ajouté
+
+- Schéma d'URL `cfpurge://purge` et `cfpurge://purge-all`
+- Documentation signature / notarisation (`docs/SIGNING.md`)
+- Guide token Cloudflare minimal dans le README
+
 ## [1.0.1] — 2026-07-20
 
 ### Ajouté

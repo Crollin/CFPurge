@@ -26,5 +26,16 @@
 	<true/>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2026 Creactive Web. All rights reserved.</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.creactiveweb.cfpurge</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>cfpurge</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

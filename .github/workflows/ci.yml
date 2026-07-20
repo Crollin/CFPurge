@@ -7,6 +7,18 @@ on:
     branches: [main]
 
 jobs:
+  secret-scan:
+    name: Scan secrets (gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   swift-tests:
     name: Tests Swift (macOS)
     runs-on: macos-15
@@ -43,6 +55,10 @@ jobs:
       - name: Install dependencies
         working-directory: raycast-cfpurge
         run: npm ci
+
+      - name: Audit dépendances (high+)
+        working-directory: raycast-cfpurge
+        run: npm audit --audit-level=high
 
       - name: TypeScript check
         working-directory: raycast-cfpurge

@@ -2,7 +2,11 @@ import XCTest
 @testable import CFPurge
 
 final class URLNormalizerTests: XCTestCase {
-    private let site = Site(name: "Test", zoneId: "zone", domain: "example.com")
+    private let site = Site(
+        name: "Test",
+        zoneId: "a1b2c3d4e5f6789012345678abcdef01",
+        domain: "example.com"
+    )
 
     func testRelativePath() throws {
         let result = try URLNormalizer.normalize("/about", for: site)

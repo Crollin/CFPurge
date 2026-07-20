@@ -50,36 +50,31 @@ struct SiteEditorView: View {
     }
 
     private func saveSite() {
-        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        let trimmedZoneId = zoneId.trimmingCharacters(in: .whitespacesAndNewlines)
-        let trimmedDomain = domain
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-            .replacingOccurrences(of: "https://", with: "")
-            .replacingOccurrences(of: "http://", with: "")
-            .trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+        do {
+            let trimmedName = try SiteValidator.validateSiteName(name)
+            let trimmedZoneId = try SiteValidator.validateZoneId(zoneId)
+            let trimmedDomain = try SiteValidator.validateDomain(domain)
 
-        guard !trimmedName.isEmpty, !trimmedZoneId.isEmpty, !trimmedDomain.isEmpty else {
-            validationMessage = "Tous les champs sont obligatoires."
-            return
+            if let site {
+                viewModel.updateSite(Site(
+                    id: site.id,
+                    name: trimmedName,
+                    zoneId: trimmedZoneId,
+                    domain: trimmedDomain,
+                    sortOrder: site.sortOrder
+                ))
+            } else {
+                viewModel.addSite(Site(name: trimmedName, zoneId: trimmedZoneId, domain: trimmedDomain))
+            }
+
+            dismiss()
+        } catch {
+            validationMessage = error.localizedDescription
         }
-
-        if let site {
-            viewModel.updateSite(Site(
-                id: site.id,
-                name: trimmedName,
-                zoneId: trimmedZoneId,
-                domain: trimmedDomain,
-                sortOrder: site.sortOrder
-            ))
-        } else {
-            viewModel.addSite(Site(name: trimmedName, zoneId: trimmedZoneId, domain: trimmedDomain))
-        }
-
-        dismiss()
     }
 }
 
 #Preview {
-    SiteEditorView(site: Site(name: "Demo", zoneId: "zone123", domain: "example.com"))
+    SiteEditorView(site: Site(name: "Demo", zoneId: "a1b2c3d4e5f6789012345678abcdef01", domain: "example.com"))
         .environmentObject(AppViewModel())
 }

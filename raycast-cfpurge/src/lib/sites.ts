@@ -1,7 +1,8 @@
+import { chmodSync, existsSync, readFileSync } from "fs";
 import { homedir } from "os";
-import { join } from "path";
-import { readFileSync, existsSync } from "fs";
+import { dirname, join } from "path";
 
+import { isValidStoredSite } from "./site-validator";
 import { Site, SitesNotConfiguredError } from "./types";
 
 const sitesFilePath = join(homedir(), "Library", "Application Support", "CFPurge", "sites.json");
@@ -15,6 +16,8 @@ export function loadSites(): Site[] {
     throw new SitesNotConfiguredError();
   }
 
+  enforcePermissions();
+
   let raw: unknown;
   try {
     raw = JSON.parse(readFileSync(sitesFilePath, "utf8"));
@@ -26,13 +29,34 @@ export function loadSites(): Site[] {
     throw new SitesNotConfiguredError();
   }
 
-  const sites = raw.map(parseSite);
+  const sites = raw
+    .map(parseSite)
+    .filter((site): site is Site => site !== null)
+    .filter((site) => isValidStoredSite(site.zoneId, site.domain));
+
+  if (sites.length === 0) {
+    throw new SitesNotConfiguredError();
+  }
+
   return normalizeSortOrder(sites);
 }
 
-function parseSite(value: unknown): Site {
+function enforcePermissions(): void {
+  try {
+    chmodSync(dirname(sitesFilePath), 0o700);
+  } catch {
+    // Best-effort
+  }
+  try {
+    chmodSync(sitesFilePath, 0o600);
+  } catch {
+    // Best-effort
+  }
+}
+
+function parseSite(value: unknown): Site | null {
   if (!value || typeof value !== "object") {
-    throw new SitesNotConfiguredError();
+    return null;
   }
 
   const site = value as Record<string, unknown>;
@@ -43,7 +67,7 @@ function parseSite(value: unknown): Site {
   const sortOrder = typeof site.sortOrder === "number" ? site.sortOrder : 0;
 
   if (!id || !name || !zoneId || !domain) {
-    throw new SitesNotConfiguredError();
+    return null;
   }
 
   return { id, name, zoneId, domain, sortOrder };

@@ -4,16 +4,44 @@ import Security
 enum KeychainService {
     private static let service = "com.creactiveweb.cfpurge"
     private static let account = "cloudflare-api-token"
+    private static let accessGroupSuffix = "com.creactiveweb.cfpurge"
+
+    /// Access group `TEAMID.com.creactiveweb.cfpurge` lorsque l'app est signée avec un Team ID.
+    /// En signature ad hoc, l'access group est omis (Keychain standard).
+    private static var accessGroup: String? {
+        guard let teamID = signingTeamID(), !teamID.isEmpty else {
+            return nil
+        }
+        return "\(teamID).\(accessGroupSuffix)"
+    }
+
+    private static func signingTeamID() -> String? {
+        var code: SecCode?
+        guard SecCodeCopySelf([], &code) == errSecSuccess, let code else {
+            return nil
+        }
+
+        var staticCode: SecStaticCode?
+        guard SecCodeCopyStaticCode(code, [], &staticCode) == errSecSuccess, let staticCode else {
+            return nil
+        }
+
+        var info: CFDictionary?
+        let flags = SecCSFlags(rawValue: kSecCSSigningInformation)
+        guard SecCodeCopySigningInformation(staticCode, flags, &info) == errSecSuccess,
+              let dict = info as? [String: Any],
+              let teamID = dict[kSecCodeInfoTeamIdentifier as String] as? String,
+              !teamID.isEmpty else {
+            return nil
+        }
+
+        return teamID
+    }
 
     static func saveToken(_ token: String) throws {
         let data = Data(token.utf8)
 
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: service,
-            kSecAttrAccount as String: account
-        ]
-
+        let query = baseQuery()
         SecItemDelete(query as CFDictionary)
 
         var attributes = query
@@ -28,13 +56,9 @@ enum KeychainService {
     }
 
     static func loadToken() -> String? {
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: service,
-            kSecAttrAccount as String: account,
-            kSecReturnData as String: true,
-            kSecMatchLimit as String: kSecMatchLimitOne
-        ]
+        var query = baseQuery()
+        query[kSecReturnData as String] = true
+        query[kSecMatchLimit as String] = kSecMatchLimitOne
 
         var result: AnyObject?
         let status = SecItemCopyMatching(query as CFDictionary, &result)
@@ -50,11 +74,18 @@ enum KeychainService {
     }
 
     static func deleteToken() {
-        let query: [String: Any] = [
+        SecItemDelete(baseQuery() as CFDictionary)
+    }
+
+    private static func baseQuery() -> [String: Any] {
+        var query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
             kSecAttrAccount as String: account
         ]
-        SecItemDelete(query as CFDictionary)
+        if let accessGroup {
+            query[kSecAttrAccessGroup as String] = accessGroup
+        }
+        return query
     }
 }

@@ -1,8 +1,8 @@
-import { Action, ActionPanel, Alert, Detail, Icon, List, Toast, confirmAlert, openExtensionPreferences, showToast } from "@raycast/api";
+import { Action, ActionPanel, Alert, Detail, Icon, List, Toast, confirmAlert, open, showToast } from "@raycast/api";
 import { useState } from "react";
 
-import { purgeEverything } from "./lib/cloudflare";
-import { getErrorMessage, requireAPIToken } from "./lib/preferences";
+import { buildPurgeAllURL } from "./lib/deep-link";
+import { getErrorMessage } from "./lib/preferences";
 import { Site } from "./lib/types";
 import { useSites } from "./lib/use-sites";
 
@@ -16,7 +16,7 @@ export default function Command() {
         markdown={`# Sites non configurés\n\n${errorMessage}\n\n1. Ouvrez **CFPurge** depuis la barre de menus\n2. Ajoutez au moins un site dans les réglages\n3. Relancez cette commande`}
         actions={
           <ActionPanel>
-            <Action title="Ouvrir les préférences Raycast" icon={Icon.Gear} onAction={openExtensionPreferences} />
+            <Action.OpenInBrowser title="Documentation CFPurge" url="https://github.com/Crollin/CFPurge" />
           </ActionPanel>
         }
       />
@@ -26,9 +26,9 @@ export default function Command() {
   async function handlePurgeAll(site: Site) {
     const confirmed = await confirmAlert({
       title: "Purger tout le cache ?",
-      message: `Site : ${site.name} (${site.domain})\n\nCette action vide tout le cache Cloudflare de la zone.`,
+      message: `Site : ${site.name} (${site.domain})\n\nCFPurge confirmera à nouveau avant d'exécuter la purge totale.`,
       primaryAction: {
-        title: "Purger tout",
+        title: "Continuer",
         style: Alert.ActionStyle.Destructive,
       },
     });
@@ -40,12 +40,11 @@ export default function Command() {
     setIsLoading(true);
 
     try {
-      const token = requireAPIToken();
-      await purgeEverything(site.zoneId, token);
+      await open(buildPurgeAllURL(site.id));
 
       await showToast({
         style: Toast.Style.Success,
-        title: "Cache entièrement purgé",
+        title: "Demande envoyée à CFPurge",
         message: site.name,
       });
     } catch (error) {
