@@ -80,13 +80,3 @@ enum CFPurgeMenuBarIcon {
     .padding(24)
     .background(CFPurgeBrand.surface)
 }
-
-#Preview {
-    HStack(spacing: 16) {
-        CFPurgeMark(size: 64)
-        CFPurgeMark(size: 28)
-        CFPurgeMark(size: 18, showsBackground: false)
-    }
-    .padding(24)
-    .background(CFPurgeBrand.surface)
-}
