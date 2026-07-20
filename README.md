@@ -1,6 +1,6 @@
 # CFPurge
 
-Utilitaire macOS en barre de menus pour purger le cache Cloudflare de vos sites WordPress, sans ouvrir le dashboard Cloudflare.
+Utilitaire macOS en barre de menus pour purger le cache Cloudflare de vos sites, sans ouvrir le dashboard Cloudflare.
 
 ![macOS](https://img.shields.io/badge/macOS-14%2B-blue)
 ![Swift](https://img.shields.io/badge/Swift-5.9-orange)
@@ -12,7 +12,7 @@ Utilitaire macOS en barre de menus pour purger le cache Cloudflare de vos sites 
 ## Fonctionnalités
 
 - **Icône barre de menus** — app légère, sans icône dans le Dock
-- **Multi-sites** — gérez tous vos sites WordPress Cloudflare depuis une liste
+- **Multi-sites** — gérez tous vos sites derrière Cloudflare depuis une liste
 - **Purge par URL** — saisissez une URL complète ou un chemin (`/ma-page/`)
 - **Purge totale** — vide tout le cache d'une zone (avec confirmation)
 - **Jeton sécurisé** — stocké dans le Keychain macOS

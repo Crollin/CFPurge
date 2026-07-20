@@ -4,7 +4,7 @@ Extension Raycast privée pour purger le cache Cloudflare depuis le lanceur, en 
 
 ## Contexte
 
-CFPurge est une app macOS barre de menus qui gère la purge cache Cloudflare pour des sites WordPress. L'utilisateur souhaite déclencher une purge sans ouvrir l'app, directement depuis Raycast.
+CFPurge est une app macOS barre de menus qui gère la purge cache Cloudflare pour tout site derrière Cloudflare. L'utilisateur souhaite déclencher une purge sans ouvrir l'app, directement depuis Raycast.
 
 ## Décision d'architecture
 
