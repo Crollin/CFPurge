@@ -32,6 +32,9 @@ Package.resolved
 # Local tooling
 .serena/
 
+# Release artifacts
+dist/
+
 # Raycast extension
 raycast-cfpurge/node_modules/
 raycast-cfpurge/dist/

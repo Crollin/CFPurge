@@ -1,0 +1,201 @@
+name: Release
+
+# Secrets optionnels pour signature et notarisation :
+# APPLE_SIGNING_CERT_P12_BASE64, APPLE_SIGNING_CERT_PASSWORD
+# NOTARY_API_KEY_P8, NOTARY_KEY_ID, NOTARY_ISSUER_ID
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  test:
+    runs-on: macos-15
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install xcodegen
+        run: brew install xcodegen
+
+      - name: Run tests
+        run: ./build.sh test
+
+  build:
+    needs: test
+    runs-on: macos-15
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install xcodegen
+        run: brew install xcodegen
+
+      - name: Import Developer ID certificate
+        env:
+          APPLE_SIGNING_CERT_P12_BASE64: ${{ secrets.APPLE_SIGNING_CERT_P12_BASE64 }}
+          APPLE_SIGNING_CERT_PASSWORD: ${{ secrets.APPLE_SIGNING_CERT_PASSWORD }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${APPLE_SIGNING_CERT_P12_BASE64:-}" || -z "${APPLE_SIGNING_CERT_PASSWORD:-}" ]]; then
+            echo "No signing certificate configured — building ad-hoc signed release"
+            exit 0
+          fi
+          certificate_path="$RUNNER_TEMP/apple-signing-certificate.p12"
+          keychain_path="$RUNNER_TEMP/cfpurge-signing.keychain-db"
+          keychain_password="$(openssl rand -hex 32)"
+
+          printf '%s' "$APPLE_SIGNING_CERT_P12_BASE64" | base64 --decode > "$certificate_path"
+          security create-keychain -p "$keychain_password" "$keychain_path"
+          security set-keychain-settings -lut 21600 "$keychain_path"
+          security unlock-keychain -p "$keychain_password" "$keychain_path"
+          security import "$certificate_path" \
+            -k "$keychain_path" \
+            -P "$APPLE_SIGNING_CERT_PASSWORD" \
+            -A \
+            -t cert \
+            -f pkcs12
+          security set-key-partition-list \
+            -S apple-tool:,apple:,codesign: \
+            -s \
+            -k "$keychain_password" \
+            "$keychain_path"
+          security list-keychains -d user -s "$keychain_path"
+
+          signing_identity="$(
+            security find-identity -v -p codesigning "$keychain_path" |
+              awk '/Developer ID Application:/ && !identity { identity = $2 } END { print identity }'
+          )"
+          if [[ -z "$signing_identity" ]]; then
+            echo "The P12 does not contain a valid Developer ID Application identity" >&2
+            exit 1
+          fi
+
+          echo "CODE_SIGN_IDENTITY=$signing_identity" >> "$GITHUB_ENV"
+
+      - name: Build and package
+        id: package
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+          APPLE_SIGNING_CERT_P12_BASE64: ${{ secrets.APPLE_SIGNING_CERT_P12_BASE64 }}
+          NOTARY_API_KEY_P8: ${{ secrets.NOTARY_API_KEY_P8 }}
+          NOTARY_KEY_ID: ${{ secrets.NOTARY_KEY_ID }}
+          NOTARY_ISSUER_ID: ${{ secrets.NOTARY_ISSUER_ID }}
+        run: |
+          set -euo pipefail
+          package_args=(package universal "$RELEASE_TAG")
+          if [[ -n "${CODE_SIGN_IDENTITY:-}" ]]; then
+            package_args+=(--sign)
+            if [[ -n "${NOTARY_API_KEY_P8:-}" ]]; then
+              package_args+=(--notarize)
+            fi
+          fi
+          ./build.sh "${package_args[@]}"
+          echo "dmg_path=dist/release/CFPurge-${RELEASE_TAG}.dmg" >> "$GITHUB_OUTPUT"
+
+      - name: Verify notarized release
+        env:
+          NOTARY_API_KEY_P8: ${{ secrets.NOTARY_API_KEY_P8 }}
+          DMG_PATH: ${{ steps.package.outputs.dmg_path }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${NOTARY_API_KEY_P8:-}" ]]; then
+            echo "Skipping notarization verification (no NOTARY_API_KEY_P8 secret)"
+            exit 0
+          fi
+          xcrun stapler validate "$DMG_PATH"
+          codesign --verify --strict --verbose=2 "$DMG_PATH"
+
+          mount_point="$(mktemp -d "$RUNNER_TEMP/CFPurge-mount.XXXXXX")"
+          cleanup_mount() {
+            hdiutil detach "$mount_point" >/dev/null 2>&1 || true
+            rmdir "$mount_point" >/dev/null 2>&1 || true
+          }
+          trap cleanup_mount EXIT
+
+          hdiutil attach -nobrowse -readonly -mountpoint "$mount_point" "$DMG_PATH"
+          codesign --verify --deep --strict --verbose=2 "$mount_point/CFPurge.app"
+          xcrun stapler validate "$mount_point/CFPurge.app"
+
+      - name: Create architecture aliases
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+          DMG_PATH: ${{ steps.package.outputs.dmg_path }}
+        run: |
+          set -euo pipefail
+          cp "$DMG_PATH" "dist/release/CFPurge-${RELEASE_TAG}-darwin-arm64.dmg"
+          cp "$DMG_PATH" "dist/release/CFPurge-${RELEASE_TAG}-darwin-x86_64.dmg"
+
+      - name: Remove signing keychain
+        if: always()
+        run: |
+          security delete-keychain "$RUNNER_TEMP/cfpurge-signing.keychain-db" 2>/dev/null || true
+          rm -f "$RUNNER_TEMP/apple-signing-certificate.p12"
+
+      - name: Upload release artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-dmg
+          path: dist/release/*.dmg
+          if-no-files-found: error
+
+  publish:
+    needs: build
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download release artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist/release
+          merge-multiple: true
+
+      - name: Release notes from CHANGELOG
+        id: notes
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+          HAS_NOTARY_SECRET: ${{ secrets.NOTARY_API_KEY_P8 != '' }}
+        run: |
+          set -euo pipefail
+          VERSION="${GITHUB_REF_NAME#v}"
+          if ! grep -Fq "## [$VERSION]" CHANGELOG.md; then
+            echo "CHANGELOG.md has no entry for $VERSION" >&2
+            exit 1
+          fi
+          NOTES="$(awk -v hdr="## [$VERSION]" 'index($0,hdr)==1{g=1;next} /^## \[/&&g{exit} g{print}' CHANGELOG.md)"
+          if [[ -z "${NOTES//[[:space:]]/}" ]]; then
+            echo "CHANGELOG.md entry for $VERSION is empty" >&2
+            exit 1
+          fi
+          {
+            echo "BODY<<__CFPURGE_EOF__"
+            echo "## CFPurge $RELEASE_TAG"
+            echo ""
+            printf '%s\n' "$NOTES"
+            echo ""
+            echo "Téléchargez \`CFPurge-${RELEASE_TAG}.dmg\` — build universel Apple Silicon et Intel."
+            echo ""
+            echo "Requiert **macOS 14 Sonoma ou ultérieur**."
+            echo ""
+            echo "1. Téléchargez \`CFPurge-${RELEASE_TAG}.dmg\`."
+            echo "2. Ouvrez-le et glissez **CFPurge** dans **Applications**."
+            if [[ "$HAS_NOTARY_SECRET" == "true" ]]; then
+              echo "3. CFPurge est signé avec un certificat Developer ID et notarisé par Apple."
+            else
+              echo "3. Au premier lancement : clic droit sur **CFPurge.app** → **Ouvrir**, ou autorisez dans **Réglages Système → Confidentialité et sécurité**."
+            fi
+            echo "__CFPURGE_EOF__"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/release/*.dmg
+          prerelease: false
+          make_latest: true
+          body: ${{ steps.notes.outputs.BODY }}

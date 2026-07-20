@@ -28,7 +28,24 @@ Utilitaire macOS en barre de menus pour purger le cache Cloudflare de vos sites 
 - Un [token API Cloudflare](https://developers.cloudflare.com/fundamentals/api/get-started/create-token/) avec la permission **Zone > Cache Purge** (Edit) sur vos zones
 - Pour la gestion DNS (optionnelle) : ajoutez aussi **Zone > DNS** (Edit)
 
-## Installation rapide
+## Installation
+
+### Téléchargement (recommandé)
+
+1. Téléchargez le dernier `.dmg` depuis la page [Releases](https://github.com/Crollin/CFPurge/releases)
+2. Ouvrez-le et glissez **CFPurge** dans **Applications**
+3. Lancez l'app — les réglages s'ouvrent automatiquement au premier lancement
+
+> **Premier lancement** : si l'app n'est pas notarisée, macOS peut la bloquer. Clic droit → **Ouvrir**, ou autorisez dans **Réglages Système → Confidentialité et sécurité**.
+
+### Mises à jour
+
+CFPurge vérifie automatiquement les nouvelles versions sur GitHub (toutes les 12 h). Depuis **Réglages → Général → Mises à jour**, vous pouvez :
+
+- Vérifier manuellement
+- Installer une mise à jour en un clic (l'app se ferme, remplace le bundle, puis relance)
+
+### Installation rapide (développeurs)
 
 ```bash
 git clone https://github.com/Crollin/CFPurge.git
@@ -38,7 +55,7 @@ cd CFPurge
 
 Le script compile en Release, copie l'app dans `/Applications` et la lance.
 
-## Installation manuelle
+### Build from source
 
 ```bash
 git clone https://github.com/Crollin/CFPurge.git
@@ -50,12 +67,23 @@ open CFPurge.xcodeproj
 Dans Xcode : **Product → Run** (⌘R), ou :
 
 ```bash
-xcodebuild -project CFPurge.xcodeproj -scheme CFPurge -configuration Release build
+./build.sh test
+./build.sh package universal v1.0.0
 ```
 
-Copiez ensuite `CFPurge.app` depuis `DerivedData` vers `/Applications`.
+Le DMG est créé dans `dist/release/`.
 
-> **Premier lancement** : macOS peut bloquer l'app (signature ad hoc). Clic droit → **Ouvrir**, ou autorisez dans **Réglages Système → Confidentialité et sécurité**.
+### Publier une release
+
+```bash
+# 1. Mettre à jour MARKETING_VERSION dans project.yml
+# 2. Ajouter une entrée dans CHANGELOG.md
+# 3. Créer et pousser le tag
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+Le workflow GitHub Actions compile, crée le `.dmg` et publie la release automatiquement.
 
 ## Configuration
 
@@ -145,7 +173,9 @@ CFPurge/
 ├── CFPurgeTests/
 ├── raycast-cfpurge/     # Extension Raycast companion
 ├── project.yml          # Config xcodegen
-└── install.sh           # Script d'installation
+├── build.sh             # Build, tests et packaging DMG
+├── CHANGELOG.md         # Notes de version (obligatoire pour les releases)
+└── install.sh           # Script d'installation (dev)
 ```
 
 ## Dépannage
