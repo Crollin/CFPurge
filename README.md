@@ -1,224 +1,45 @@
 # CFPurge
 
-Utilitaire macOS en barre de menus pour purger le cache Cloudflare de vos sites WordPress, sans ouvrir le dashboard Cloudflare.
+Utilitaire macOS en barre de menus pour purger le cache Cloudflare — page par page ou zone entière — sans ouvrir le dashboard.
 
 ![macOS](https://img.shields.io/badge/macOS-14%2B-blue)
-![Swift](https://img.shields.io/badge/Swift-5.9-orange)
 ![License](https://img.shields.io/badge/License-MIT-green)
-![CI](https://github.com/Crollin/CFPurge/actions/workflows/ci.yml/badge.svg)
-
-> Projet open source sous [licence MIT](LICENSE). Les contributions sont les bienvenues — voir [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Fonctionnalités
 
-- **Icône barre de menus** — app légère, sans icône dans le Dock
-- **Multi-sites** — gérez tous vos sites WordPress Cloudflare depuis une liste
-- **Purge par URL** — saisissez une URL complète ou un chemin (`/ma-page/`)
-- **Purge totale** — vide tout le cache d'une zone (avec confirmation)
-- **Jeton sécurisé** — stocké dans le Keychain macOS
-- **Démarrage automatique** — option pour lancer CFPurge à la connexion
-- **Gestion DNS** (optionnelle) — consultez et créez des enregistrements DNS Cloudflare
-- **Interface en français**
-- **Intégration Raycast** — purge depuis le lanceur via extension companion (voir [raycast-cfpurge/README.md](raycast-cfpurge/README.md))
-
-## Prérequis
-
-- macOS 14 (Sonoma) ou supérieur
-- [Xcode 15+](https://developer.apple.com/xcode/) (pour compiler)
-- Un [token API Cloudflare](https://developers.cloudflare.com/fundamentals/api/get-started/create-token/) avec la permission **Zone > Cache Purge** (Edit) sur vos zones
-- Pour la gestion DNS (optionnelle) : ajoutez aussi **Zone > DNS** (Edit)
+- Purge par URL ou chemin (`/ma-page/`)
+- Purge totale d’une zone (avec confirmation)
+- Multi-sites
+- Token API dans le Keychain macOS
+- Gestion DNS optionnelle
+- Extension [Raycast](raycast-cfpurge/README.md) (délègue à l’app via `cfpurge://`)
 
 ## Installation
 
-### Téléchargement (recommandé)
+1. Téléchargez le `.dmg` sur la page [Releases](https://github.com/Crollin/CFPurge/releases)
+2. Glissez **CFPurge** dans **Applications**
+3. Lancez l’app — les réglages s’ouvrent au premier lancement
 
-1. Téléchargez le dernier `.dmg` depuis la page [Releases](https://github.com/Crollin/CFPurge/releases)
-2. Ouvrez-le et glissez **CFPurge** dans **Applications**
-3. Lancez l'app — les réglages s'ouvrent automatiquement au premier lancement
+> Si macOS bloque l’app : clic droit → **Ouvrir**, ou autorisez dans **Réglages Système → Confidentialité et sécurité**.
 
-> **Premier lancement** : si l'app n'est pas notarisée, macOS peut la bloquer. Clic droit → **Ouvrir**, ou autorisez dans **Réglages Système → Confidentialité et sécurité**.
-
-### Mises à jour
-
-CFPurge vérifie automatiquement les nouvelles versions sur GitHub (toutes les 12 h). Depuis **Réglages → Général → Mises à jour**, vous pouvez :
-
-- Vérifier manuellement
-- Installer une mise à jour en un clic (l'app se ferme, remplace le bundle, puis relance)
-
-### Installation rapide (développeurs)
-
-```bash
-git clone https://github.com/Crollin/CFPurge.git
-cd CFPurge
-./install.sh
-```
-
-Le script compile en Release, copie l'app dans `/Applications` et la lance.
-
-### Build from source
-
-```bash
-git clone https://github.com/Crollin/CFPurge.git
-cd CFPurge
-xcodegen generate
-open CFPurge.xcodeproj
-```
-
-Dans Xcode : **Product → Run** (⌘R), ou :
-
-```bash
-./build.sh test
-./build.sh package universal v1.0.0
-```
-
-Le DMG est créé dans `dist/release/`.
-
-### Publier une release
-
-```bash
-# 1. Mettre à jour MARKETING_VERSION dans project.yml
-# 2. Ajouter une entrée dans CHANGELOG.md
-# 3. Créer et pousser le tag
-git tag v1.0.0
-git push origin v1.0.0
-```
-
-Le workflow GitHub Actions compile, crée le `.dmg` et publie la release automatiquement.
+Les mises à jour se vérifient automatiquement (Réglages → Général → Mises à jour).
 
 ## Configuration
 
-### Créer un token Cloudflare minimal
-
-1. Ouvrez [Cloudflare → My Profile → API Tokens](https://dash.cloudflare.com/profile/api-tokens) → **Create Token**
-2. Choisissez **Create Custom Token**
-3. Permissions :
-   - **Zone → Cache Purge → Edit** (obligatoire)
-   - **Zone → DNS → Edit** uniquement si vous activez la gestion DNS dans CFPurge
-4. **Zone Resources** : limitez à **Specific zone** (vos domaines uniquement), jamais « All zones » sauf nécessité
-5. Créez le token, copiez-le une seule fois, collez-le dans CFPurge → Réglages → Jeton API
-
-> **Ne jamais** utiliser la **Global API Key** (clé de compte). CFPurge la refuse volontairement. Préférez un token API à durée limitée et permissions réduites.
->
-> **Rotation** : si le token a fuité ou si un appareil est perdu, révoquez-le dans Cloudflare et créez-en un nouveau.
-
-### Première configuration dans l'app
-
-1. Cliquez sur l'icône **nuage** dans la barre de menu
-2. Au premier lancement, la fenêtre **Réglages** s'ouvre automatiquement
-3. Collez votre **token API Cloudflare** → **Enregistrer** → **Tester la connexion**
-4. **Ajoutez un site** :
-   - **Nom** : libellé affiché dans l'app
-   - **Zone ID** : 32 caractères hexadécimaux (Cloudflare → domaine → Aperçu, colonne droite)
-   - **Domaine** : ex. `monsite.com` (sans `https://`)
-5. Optionnel : activez **Lancer CFPurge à la connexion**
-6. Optionnel : activez **Activer la gestion DNS** dans Réglages → Fonctionnalités
+1. Créez un [token API Cloudflare](https://dash.cloudflare.com/profile/api-tokens) avec **Zone → Cache Purge → Edit** (et **Zone → DNS → Edit** si vous activez le DNS). Limitez-le à vos zones. N’utilisez **jamais** la Global API Key.
+2. Dans CFPurge → Réglages, collez le token → **Enregistrer** → **Tester la connexion**
+3. Ajoutez un site : **nom**, **Zone ID** (32 caractères hex dans Cloudflare → domaine → Aperçu), **domaine** (`monsite.com`)
 
 ## Utilisation
 
 | Action | Comment |
-|---|---|
-| Purger une page | Sélectionnez le site, saisissez l'URL ou le chemin, cliquez **Personnaliser le vidage** |
-| Purger tout le cache | Sélectionnez le site, cliquez **Vider tous les éléments**, confirmez |
-| Modifier les sites | Engrenage → section **Sites** |
-| Gérer le DNS | Activez l'option DNS dans Réglages, puis **Gérer le DNS** (popover) ou **DNS** (par site) |
-
-### Exemples d'URL
-
-| Saisie | URL envoyée à Cloudflare |
-|---|---|
-| `/contact/` | `https://monsite.com/contact/` |
-| `contact` | `https://monsite.com/contact` |
-| `https://monsite.com/page/` | `https://monsite.com/page/` |
-
-## Où sont stockées les données ?
-
-| Donnée | Emplacement |
-|---|---|
-| Token API | Keychain macOS (`com.creactiveweb.cfpurge`) |
-| Liste des sites | `~/Library/Application Support/CFPurge/sites.json` |
-| Dernier site sélectionné | UserDefaults |
-
-Le token n'est **jamais** écrit dans un fichier.
-
-## API Cloudflare utilisée
-
-```
-GET  /client/v4/zones?per_page=1                    → vérification du token
-POST /client/v4/zones/{zone_id}/purge_cache
-     {"purge_everything": true}                    → purge totale
-     {"files": ["https://..."]}                      → purge par URL
-GET  /client/v4/zones/{zone_id}/dns_records         → liste des enregistrements DNS
-POST /client/v4/zones/{zone_id}/dns_records         → création d'un enregistrement DNS
-```
-
-Documentation : [Purge cache — Cloudflare](https://developers.cloudflare.com/cache/how-to/purge-cache/) · [DNS records — Cloudflare](https://developers.cloudflare.com/dns/manage-dns-records/)
-
-## Tests
-
-```bash
-xcodebuild -project CFPurge.xcodeproj -scheme CFPurge test
-```
-
-Tests unitaires : normalisation d'URL, validation de domaine, chemins relatifs.
-
-## Intégration Raycast
-
-Une extension Raycast companion délègue la purge à CFPurge via le schéma `cfpurge://` (le token reste dans le Keychain, jamais dans Raycast).
-
-**Prérequis** : Node.js 22.22+, [Raycast](https://raycast.com/), et CFPurge installé/configuré.
-
-```bash
-cd raycast-cfpurge
-npm install && npm run dev
-```
-
-Documentation complète : [raycast-cfpurge/README.md](raycast-cfpurge/README.md)
-
-L'extension lit les sites depuis `~/Library/Application Support/CFPurge/sites.json` et ouvre `cfpurge://purge…` pour exécuter la purge.
-
-## Structure du projet
-
-```
-CFPurge/
-├── CFPurge/
-│   ├── Models/          # Site, réponses API, statuts
-│   ├── Services/        # Keychain, SiteStore, Cloudflare API
-│   ├── ViewModels/      # AppViewModel, DNSViewModel
-│   ├── Views/           # MenuBar, Settings, SiteEditor, DNS
-│   └── Utilities/       # URLNormalizer, erreurs
-├── CFPurgeTests/
-├── raycast-cfpurge/     # Extension Raycast companion
-├── project.yml          # Config xcodegen
-├── build.sh             # Build, tests et packaging DMG
-├── CHANGELOG.md         # Notes de version (obligatoire pour les releases)
-└── install.sh           # Script d'installation (dev)
-```
-
-## Dépannage
-
-| Problème | Solution |
-|---|---|
-| L'icône nuage n'apparaît pas | Relancez l'app depuis `/Applications/CFPurge.app` |
-| Les réglages ne s'ouvrent pas | Cliquez l'engrenage ou **Ouvrir les réglages** dans le popover |
-| Token invalide | Vérifiez la permission **Cache Purge** sur toutes vos zones |
-| Erreur DNS / 403 | Ajoutez la permission **Zone > DNS > Edit** à votre token API |
-| Zone introuvable | Vérifiez le Zone ID dans le dashboard Cloudflare |
-| Trop de purges | Cloudflare limite les purges totales, attendez quelques minutes |
-| Démarrage auto ne fonctionne pas | L'app doit être dans `/Applications` |
-
-## Contribuer
-
-Voir [CONTRIBUTING.md](CONTRIBUTING.md) pour les instructions de développement et de test.
-
-## Sécurité
-
-Pour signaler une vulnérabilité, consultez [SECURITY.md](SECURITY.md).
-Pour signer et notariser une release, voir [docs/SIGNING.md](docs/SIGNING.md).
+|--------|---------|
+| Purger une page | Site → URL ou chemin → **Personnaliser le vidage** |
+| Purger tout | Site → **Vider tous les éléments** → confirmer |
+| Sites / DNS | Engrenage → Réglages |
 
 ## Licence
 
-MIT — voir [LICENSE](LICENSE).
+MIT — [LICENSE](LICENSE) · [Creactive Web](https://github.com/Crollin)
 
-## Auteur
-
-[Développé par Creactive Web](https://github.com/Crollin)
+Pour contribuer ou compiler depuis les sources : [CONTRIBUTING.md](CONTRIBUTING.md) · signaler une vulnérabilité : [SECURITY.md](SECURITY.md)

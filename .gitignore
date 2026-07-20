@@ -28,6 +28,7 @@ Package.resolved
 
 # SDD scratch (local progress ledger)
 .superpowers/
+docs/superpowers/
 
 # Local tooling
 .serena/
