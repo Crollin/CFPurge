@@ -11,6 +11,18 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/)
 - Positionnement générique : tout site derrière Cloudflare
 - README recentré sur présentation + installation ; détails dev dans CONTRIBUTING
 
+## [1.0.3] — 2026-07-20
+
+### Ajouté
+
+- Nouvelle identité visuelle CFPurge : logo, favicon et icône Raycast
+- Charte graphique documentée avec palette et règles d'utilisation
+
+### Modifié
+
+- Symbole CFPurge utilisé dans la barre de menus et le panneau de purge
+- Couleurs des actions et états de purge harmonisées
+
 ## [1.0.2] — 2026-07-20
 
 ### Sécurité

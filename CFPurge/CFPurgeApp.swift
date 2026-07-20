@@ -9,12 +9,14 @@ struct CFPurgeApp: App {
     @StateObject private var updater = UpdaterManager()
 
     var body: some Scene {
-        MenuBarExtra("CFPurge", systemImage: "cloud.fill") {
+        MenuBarExtra {
             MenuBarView()
                 .environmentObject(viewModel)
                 .onAppear {
                     appDelegate.bind(viewModel: viewModel)
                 }
+        } label: {
+            CFPurgeMark(size: 18, showsBackground: false)
         }
         .menuBarExtraStyle(.window)
         .commands {
