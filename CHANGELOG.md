@@ -4,6 +4,13 @@ Toutes les versions notables de CFPurge sont documentées ici.
 
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/).
 
+## [Unreleased]
+
+### Documentation
+
+- Positionnement générique : tout site derrière Cloudflare
+- README recentré sur présentation + installation ; détails dev dans CONTRIBUTING
+
 ## [1.0.2] — 2026-07-20
 
 ### Sécurité
@@ -35,12 +42,12 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/)
 
 **CFPurge 1.0.0 — Purgez le cache Cloudflare depuis la barre de menus macOS**
 
-CFPurge est un utilitaire macOS open source pensé pour les développeurs, intégrateurs et agences WordPress qui gèrent des sites derrière Cloudflare. Il permet de purger le cache d'une page ou d'un site entier en quelques clics, directement depuis la barre de menus — sans ouvrir le dashboard Cloudflare.
+CFPurge est un utilitaire macOS open source pour purger le cache Cloudflare de n'importe quel site derrière Cloudflare (CMS, site statique, application web, etc.). Il permet de vider le cache d'une page ou d'une zone entière en quelques clics, directement depuis la barre de menus — sans ouvrir le dashboard Cloudflare.
 
 ### Fonctionnalités
 
 - **Barre de menus** — application légère, discrète, sans icône dans le Dock
-- **Multi-sites** — gérez tous vos sites WordPress / Cloudflare depuis une liste unique
+- **Multi-sites** — gérez tous vos sites derrière Cloudflare depuis une liste unique
 - **Purge par URL** — saisissez une URL complète ou un chemin relatif (`/contact/`, `blog/article`)
 - **Purge totale** — videz tout le cache d'une zone Cloudflare (avec confirmation)
 - **Sécurité** — token API Cloudflare stocké exclusivement dans le Keychain macOS
