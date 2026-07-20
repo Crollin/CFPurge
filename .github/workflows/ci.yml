@@ -9,7 +9,7 @@ on:
 jobs:
   swift-tests:
     name: Tests Swift (macOS)
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
 
@@ -30,7 +30,7 @@ jobs:
 
   raycast-extension:
     name: Extension Raycast (TypeScript)
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
 

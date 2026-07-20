@@ -24,6 +24,7 @@ Package.resolved
 # Env / secrets
 .env
 *.local
+**/sites.json
 
 # SDD scratch (local progress ledger)
 .superpowers/

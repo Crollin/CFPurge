@@ -28,7 +28,11 @@ enum SiteStore {
     }
 
     static func saveSites(_ sites: [Site]) throws {
-        try FileManager.default.createDirectory(at: storageURL, withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(
+            at: storageURL,
+            withIntermediateDirectories: true,
+            attributes: [.posixPermissions: 0o700]
+        )
 
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
