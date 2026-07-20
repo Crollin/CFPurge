@@ -1,0 +1,500 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		116F1C24591739FD0D6FA40A /* CFPurgeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FE9375F6D6B4A6950CC3B7C /* CFPurgeApp.swift */; };
+		1EDCB63DFFDCF00446CACB73 /* CFPurgeError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AF64C5CB5B8C7A4564DA199 /* CFPurgeError.swift */; };
+		2733C2EBD08E7660503ED3CE /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECA140196442708E52A5F82D /* KeychainService.swift */; };
+		2FACDB1260E9A005FD331D47 /* CloudflareService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 128C795A5160F9024EC14C7A /* CloudflareService.swift */; };
+		369AAEAD45D35E5A2D08B600 /* AppViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33D5BBB6054DAD8BB7C5D5B2 /* AppViewModel.swift */; };
+		5367F0310FF69461035D9B1A /* PurgeStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA79120E6935A97E3E81C62 /* PurgeStatus.swift */; };
+		607336DEBFA9BD5C1DC87307 /* URLNormalizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 256CDCD8C6B857842A6392F8 /* URLNormalizer.swift */; };
+		63A0CB094C55264F749AF10D /* Site.swift in Sources */ = {isa = PBXBuildFile; fileRef = 674479BCDC849CC90EE593EA /* Site.swift */; };
+		6F6F3A9DC2E3F43AF6188BC5 /* MenuBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 002484D88B77F587D4E0A9D5 /* MenuBarView.swift */; };
+		8285643A39603ABB582250EA /* SiteStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00E9DC3377EE53E272168DC /* SiteStore.swift */; };
+		8A3B4BCFFB31904A0B6FE7DA /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA987433C6EA3EA1CE4EEFA4 /* SettingsView.swift */; };
+		9952F193CF65C1F102966398 /* URLNormalizerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A07BCE5AE9DCEC4C53ED8C7D /* URLNormalizerTests.swift */; };
+		E9EEBE79461573BBF87AEAF5 /* SiteEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE53830EE43B21E39FF6E3AC /* SiteEditorView.swift */; };
+		FABC8ADA3C1EF55C0630D686 /* CloudflareResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71D6782A20DA98BEF7794210 /* CloudflareResponse.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		8B82B8397F5FFD8A3F8D53D4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 297EE8B2FD35E88C80A874FF /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7541BBF0AB51D2A088C0AAA6;
+			remoteInfo = CFPurge;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		002484D88B77F587D4E0A9D5 /* MenuBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarView.swift; sourceTree = "<group>"; };
+		128C795A5160F9024EC14C7A /* CloudflareService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudflareService.swift; sourceTree = "<group>"; };
+		1AF64C5CB5B8C7A4564DA199 /* CFPurgeError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CFPurgeError.swift; sourceTree = "<group>"; };
+		256CDCD8C6B857842A6392F8 /* URLNormalizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLNormalizer.swift; sourceTree = "<group>"; };
+		3027DC353B92C5D17FFCBF0F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		33D5BBB6054DAD8BB7C5D5B2 /* AppViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppViewModel.swift; sourceTree = "<group>"; };
+		674479BCDC849CC90EE593EA /* Site.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Site.swift; sourceTree = "<group>"; };
+		71D6782A20DA98BEF7794210 /* CloudflareResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudflareResponse.swift; sourceTree = "<group>"; };
+		7FE9375F6D6B4A6950CC3B7C /* CFPurgeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CFPurgeApp.swift; sourceTree = "<group>"; };
+		8686571C02001AC8A394F0CB /* CFPurge.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CFPurge.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		86B11007BBE3295364042612 /* CFPurgeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CFPurgeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A07BCE5AE9DCEC4C53ED8C7D /* URLNormalizerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLNormalizerTests.swift; sourceTree = "<group>"; };
+		AAA79120E6935A97E3E81C62 /* PurgeStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurgeStatus.swift; sourceTree = "<group>"; };
+		BA987433C6EA3EA1CE4EEFA4 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		CC303B5FD713A3EC5665F3D0 /* CFPurge.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CFPurge.entitlements; sourceTree = "<group>"; };
+		CE53830EE43B21E39FF6E3AC /* SiteEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiteEditorView.swift; sourceTree = "<group>"; };
+		ECA140196442708E52A5F82D /* KeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainService.swift; sourceTree = "<group>"; };
+		F00E9DC3377EE53E272168DC /* SiteStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiteStore.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		069967062B7304F1F6B4F536 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				71D6782A20DA98BEF7794210 /* CloudflareResponse.swift */,
+				AAA79120E6935A97E3E81C62 /* PurgeStatus.swift */,
+				674479BCDC849CC90EE593EA /* Site.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		09722BC363BF70C63AE8260B /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				1AF64C5CB5B8C7A4564DA199 /* CFPurgeError.swift */,
+				256CDCD8C6B857842A6392F8 /* URLNormalizer.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		0C53AE8E50F6DC9265A09DDA /* CFPurgeTests */ = {
+			isa = PBXGroup;
+			children = (
+				A07BCE5AE9DCEC4C53ED8C7D /* URLNormalizerTests.swift */,
+			);
+			path = CFPurgeTests;
+			sourceTree = "<group>";
+		};
+		18EAA9C530EF1C1B32907AED /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				33D5BBB6054DAD8BB7C5D5B2 /* AppViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		1F8EF39CA9936E7FCB088569 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				128C795A5160F9024EC14C7A /* CloudflareService.swift */,
+				ECA140196442708E52A5F82D /* KeychainService.swift */,
+				F00E9DC3377EE53E272168DC /* SiteStore.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		80EE576543BC2EE107EA48C2 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				002484D88B77F587D4E0A9D5 /* MenuBarView.swift */,
+				BA987433C6EA3EA1CE4EEFA4 /* SettingsView.swift */,
+				CE53830EE43B21E39FF6E3AC /* SiteEditorView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		C3C5C2A898FCD678E8CD7BD1 = {
+			isa = PBXGroup;
+			children = (
+				F064DE6DF848918A13115A66 /* CFPurge */,
+				0C53AE8E50F6DC9265A09DDA /* CFPurgeTests */,
+				F6CDD523104A32929C164CC5 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		F064DE6DF848918A13115A66 /* CFPurge */ = {
+			isa = PBXGroup;
+			children = (
+				069967062B7304F1F6B4F536 /* Models */,
+				1F8EF39CA9936E7FCB088569 /* Services */,
+				09722BC363BF70C63AE8260B /* Utilities */,
+				18EAA9C530EF1C1B32907AED /* ViewModels */,
+				80EE576543BC2EE107EA48C2 /* Views */,
+				CC303B5FD713A3EC5665F3D0 /* CFPurge.entitlements */,
+				7FE9375F6D6B4A6950CC3B7C /* CFPurgeApp.swift */,
+				3027DC353B92C5D17FFCBF0F /* Info.plist */,
+			);
+			path = CFPurge;
+			sourceTree = "<group>";
+		};
+		F6CDD523104A32929C164CC5 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8686571C02001AC8A394F0CB /* CFPurge.app */,
+				86B11007BBE3295364042612 /* CFPurgeTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		40E0FFE2EE28B5CCD429F18E /* CFPurgeTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9F65A01046DF7437CA766CDE /* Build configuration list for PBXNativeTarget "CFPurgeTests" */;
+			buildPhases = (
+				D1EC5F5DEE52333C16C0598D /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D5E60A54661521ED7B92DFAD /* PBXTargetDependency */,
+			);
+			name = CFPurgeTests;
+			packageProductDependencies = (
+			);
+			productName = CFPurgeTests;
+			productReference = 86B11007BBE3295364042612 /* CFPurgeTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		7541BBF0AB51D2A088C0AAA6 /* CFPurge */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2CECA10A569BF2D8A6ADC953 /* Build configuration list for PBXNativeTarget "CFPurge" */;
+			buildPhases = (
+				6D31B6BD578A941E0662718F /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CFPurge;
+			packageProductDependencies = (
+			);
+			productName = CFPurge;
+			productReference = 8686571C02001AC8A394F0CB /* CFPurge.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		297EE8B2FD35E88C80A874FF /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					40E0FFE2EE28B5CCD429F18E = {
+						ProvisioningStyle = Manual;
+					};
+					7541BBF0AB51D2A088C0AAA6 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Manual;
+					};
+				};
+			};
+			buildConfigurationList = 51A274CA064E00BA63406D37 /* Build configuration list for PBXProject "CFPurge" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = C3C5C2A898FCD678E8CD7BD1;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = F6CDD523104A32929C164CC5 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				7541BBF0AB51D2A088C0AAA6 /* CFPurge */,
+				40E0FFE2EE28B5CCD429F18E /* CFPurgeTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		6D31B6BD578A941E0662718F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				369AAEAD45D35E5A2D08B600 /* AppViewModel.swift in Sources */,
+				116F1C24591739FD0D6FA40A /* CFPurgeApp.swift in Sources */,
+				1EDCB63DFFDCF00446CACB73 /* CFPurgeError.swift in Sources */,
+				FABC8ADA3C1EF55C0630D686 /* CloudflareResponse.swift in Sources */,
+				2FACDB1260E9A005FD331D47 /* CloudflareService.swift in Sources */,
+				2733C2EBD08E7660503ED3CE /* KeychainService.swift in Sources */,
+				6F6F3A9DC2E3F43AF6188BC5 /* MenuBarView.swift in Sources */,
+				5367F0310FF69461035D9B1A /* PurgeStatus.swift in Sources */,
+				8A3B4BCFFB31904A0B6FE7DA /* SettingsView.swift in Sources */,
+				63A0CB094C55264F749AF10D /* Site.swift in Sources */,
+				E9EEBE79461573BBF87AEAF5 /* SiteEditorView.swift in Sources */,
+				8285643A39603ABB582250EA /* SiteStore.swift in Sources */,
+				607336DEBFA9BD5C1DC87307 /* URLNormalizer.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D1EC5F5DEE52333C16C0598D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9952F193CF65C1F102966398 /* URLNormalizerTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		D5E60A54661521ED7B92DFAD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 7541BBF0AB51D2A088C0AAA6 /* CFPurge */;
+			targetProxy = 8B82B8397F5FFD8A3F8D53D4 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		0C2E4C7D26BED000591F4B3C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Debug;
+		};
+		24AA9BE3AD010BEBBEB80904 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Release;
+		};
+		5B6309C59FD14C66E31E44D3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.creactiveweb.CFPurgeTests;
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CFPurge.app/Contents/MacOS/CFPurge";
+			};
+			name = Debug;
+		};
+		5EB92BD9980BC50E9D4FA0DA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.creactiveweb.CFPurgeTests;
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CFPurge.app/Contents/MacOS/CFPurge";
+			};
+			name = Release;
+		};
+		78A3D094BCC8F288DE62C537 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = CFPurge/CFPurge.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = CFPurge/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.creactiveweb.cfpurge;
+				PRODUCT_NAME = CFPurge;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		7A0FD2919364BDC5ED9554F1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = CFPurge/CFPurge.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = CFPurge/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.creactiveweb.cfpurge;
+				PRODUCT_NAME = CFPurge;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		2CECA10A569BF2D8A6ADC953 /* Build configuration list for PBXNativeTarget "CFPurge" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7A0FD2919364BDC5ED9554F1 /* Debug */,
+				78A3D094BCC8F288DE62C537 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		51A274CA064E00BA63406D37 /* Build configuration list for PBXProject "CFPurge" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0C2E4C7D26BED000591F4B3C /* Debug */,
+				24AA9BE3AD010BEBBEB80904 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		9F65A01046DF7437CA766CDE /* Build configuration list for PBXNativeTarget "CFPurgeTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5B6309C59FD14C66E31E44D3 /* Debug */,
+				5EB92BD9980BC50E9D4FA0DA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 297EE8B2FD35E88C80A874FF /* Project object */;
+}
