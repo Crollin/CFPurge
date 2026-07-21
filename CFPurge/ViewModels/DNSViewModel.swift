@@ -8,6 +8,7 @@ final class DNSViewModel: ObservableObject {
     @Published var searchText = ""
     @Published var typeFilter: String = "Tous"
     @Published var showingEditor = false
+    @Published var editingRecord: DNSRecord?
     @Published var currentPage = 1
     @Published var hasMorePages = false
 
@@ -32,6 +33,16 @@ final class DNSViewModel: ObservableObject {
 
     var availableTypeFilters: [String] {
         ["Tous"] + DNSRecordType.allCases.map(\.rawValue)
+    }
+
+    func beginAddRecord() {
+        editingRecord = nil
+        showingEditor = true
+    }
+
+    func beginEditRecord(_ record: DNSRecord) {
+        editingRecord = record
+        showingEditor = true
     }
 
     func loadRecords(for site: Site, reset: Bool = true) async {
@@ -111,6 +122,52 @@ final class DNSViewModel: ObservableObject {
             }
 
             status = .success("Enregistrement \(created.type) créé pour \(created.name).")
+            return true
+        } catch {
+            status = .error(error.localizedDescription)
+            return false
+        }
+    }
+
+    func updateRecord(
+        for site: Site,
+        recordId: String,
+        type: String,
+        name: String,
+        content: String,
+        ttl: Int,
+        proxied: Bool
+    ) async -> Bool {
+        guard let token = KeychainService.loadToken() else {
+            status = .error(CFPurgeError.missingToken.localizedDescription)
+            return false
+        }
+
+        do {
+            let request = try DNSRecordValidator.validateWithOptions(
+                type: type,
+                name: name,
+                content: content,
+                domain: site.domain,
+                ttl: ttl,
+                proxied: proxied
+            )
+
+            status = .loading
+            let updated = try await CloudflareService.updateDNSRecord(
+                zoneId: site.zoneId,
+                token: token,
+                recordId: recordId,
+                record: request
+            )
+
+            withAnimation(.easeInOut(duration: 0.25)) {
+                if let index = records.firstIndex(where: { $0.id == recordId }) {
+                    records[index] = updated
+                }
+            }
+
+            status = .success("Enregistrement \(updated.type) mis à jour pour \(updated.name).")
             return true
         } catch {
             status = .error(error.localizedDescription)

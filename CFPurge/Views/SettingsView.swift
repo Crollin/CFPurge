@@ -63,6 +63,17 @@ struct SettingsView: View {
                 Text("Nécessite la permission Zone > DNS > Edit sur votre token API Cloudflare, en plus de Cache Purge.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+
+                if viewModel.dnsManagementEnabled {
+                    Toggle("Autoriser la modification des enregistrements existants", isOn: Binding(
+                        get: { viewModel.dnsAllowModifyExisting },
+                        set: { viewModel.setDNSAllowModifyExisting($0) }
+                    ))
+
+                    Text("Désactivé par défaut. Une confirmation est demandée à l'activation. Une mauvaise modification DNS peut rendre un site inaccessible.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
             }
 
             Section("Notifications") {

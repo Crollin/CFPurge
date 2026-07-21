@@ -16,12 +16,14 @@ final class AppViewModel: ObservableObject {
     @Published var launchAtLoginEnabled = LaunchAtLoginService.isEnabled
     @Published var launchAtLoginMessage: String?
     @Published var dnsManagementEnabled: Bool
+    @Published var dnsAllowModifyExisting: Bool
     @Published var dnsSite: Site?
     @Published var soundNotificationsEnabled: Bool
     @Published var showURLsInNotifications: Bool
 
     private let lastSelectedSiteIdKey = "lastSelectedSiteId"
     private let dnsManagementEnabledKey = "dnsManagementEnabled"
+    private let dnsAllowModifyExistingKey = "dnsAllowModifyExisting"
     private let soundNotificationsEnabledKey = "soundNotificationsEnabled"
     private let showURLsInNotificationsKey = "showURLsInNotifications"
     private var didScheduleInitialSettingsOpen = false
@@ -37,6 +39,8 @@ final class AppViewModel: ObservableObject {
 
     init() {
         dnsManagementEnabled = UserDefaults.standard.bool(forKey: dnsManagementEnabledKey)
+        // Désactivé par défaut : la modification d'enregistrements DNS existants est risquée
+        dnsAllowModifyExisting = UserDefaults.standard.bool(forKey: dnsAllowModifyExistingKey)
         if UserDefaults.standard.object(forKey: soundNotificationsEnabledKey) == nil {
             soundNotificationsEnabled = true
         } else {
@@ -274,6 +278,32 @@ final class AppViewModel: ObservableObject {
     func setDNSManagementEnabled(_ enabled: Bool) {
         dnsManagementEnabled = enabled
         UserDefaults.standard.set(enabled, forKey: dnsManagementEnabledKey)
+        if !enabled {
+            setDNSAllowModifyExisting(false, skipConfirmation: true)
+        }
+    }
+
+    /// Active ou désactive la modification des enregistrements DNS existants.
+    /// L'activation demande une confirmation explicite (sauf `skipConfirmation`).
+    @discardableResult
+    func setDNSAllowModifyExisting(_ enabled: Bool, skipConfirmation: Bool = false) -> Bool {
+        if enabled && !skipConfirmation {
+            let confirmed = ConfirmationAlert.confirm(
+                title: "Autoriser la modification DNS ?",
+                message: """
+                Vous pourrez modifier des enregistrements DNS déjà présents sur Cloudflare.
+
+                Une erreur peut rendre un site inaccessible. Activez uniquement si vous savez ce que vous faites.
+                """,
+                confirmTitle: "Activer",
+                isDestructive: true
+            )
+            guard confirmed else { return false }
+        }
+
+        dnsAllowModifyExisting = enabled
+        UserDefaults.standard.set(enabled, forKey: dnsAllowModifyExistingKey)
+        return true
     }
 
     func setSoundNotificationsEnabled(_ enabled: Bool) {
