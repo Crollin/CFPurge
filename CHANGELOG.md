@@ -6,8 +6,14 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/)
 
 ## [Unreleased]
 
+### Ajouté
+
+- `./install.sh --raycast` : option pour compiler et déployer l'extension Raycast locale (développeurs)
+- Script `scripts/install-raycast-extension.sh` pour mettre à jour l'extension seule
+
 ### Documentation
 
+- README : mention de `--raycast` pour les développeurs
 - Positionnement générique : tout site derrière Cloudflare
 - README recentré sur présentation + installation ; détails dev dans CONTRIBUTING
 - Garde-fous dépôt : `.gitignore` renforcé, `scripts/check-repo-hygiene.sh`, hooks Git et job CI

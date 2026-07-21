@@ -18,6 +18,8 @@ npm run build
 
 Dans Raycast : **Manage Extensions → + → Import Extension** → dossier `raycast-cfpurge`.
 
+**Développeurs** : après un `./install.sh --raycast` à la racine du repo, l'extension est aussi déployée dans `~/.config/raycast/extensions/cfpurge/`.
+
 En développement : `npm run dev`.
 
 ## Utilisation

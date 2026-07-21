@@ -40,6 +40,7 @@ git clone https://github.com/Crollin/CFPurge.git
 cd CFPurge
 git config core.hooksPath .githooks
 ./install.sh          # écrase /Applications/CFPurge.app (config conservée)
+./install.sh --raycast   # idem + déploie l'extension Raycast (Node 22.22+)
 # Ne pas lancer les .app dans dist/ ou DerivedData (doublons Launchpad).
 # ou :
 xcodegen generate && open CFPurge.xcodeproj
@@ -47,10 +48,26 @@ xcodegen generate && open CFPurge.xcodeproj
 
 ## Extension Raycast
 
+### Installation manuelle (première fois)
+
 ```bash
 cd raycast-cfpurge
-npm install && npm run dev
+npm install && npm run build
 ```
+
+Dans Raycast : **Manage Extensions → + → Import Extension** → dossier `raycast-cfpurge`.
+
+### Mise à jour avec l'app (développeurs)
+
+```bash
+./install.sh --raycast
+# ou seulement l'extension :
+./scripts/install-raycast-extension.sh
+```
+
+Déploie vers `~/.config/raycast/extensions/cfpurge/` et recharge Raycast.
+
+En développement : `cd raycast-cfpurge && npm run dev`.
 
 ## Vérifications avant PR
 

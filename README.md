@@ -43,3 +43,5 @@ Les mises à jour se vérifient automatiquement (Réglages → Général → Mis
 MIT — [LICENSE](LICENSE) · [Creactive Web](https://github.com/Crollin)
 
 Pour contribuer ou compiler depuis les sources : [CONTRIBUTING.md](CONTRIBUTING.md) · signaler une vulnérabilité : [SECURITY.md](SECURITY.md)
+
+**Développeurs** : `./install.sh` installe l’app en local ; ajoutez `--raycast` pour déployer aussi l’extension Raycast (`scripts/install-raycast-extension.sh`). Détails dans [CONTRIBUTING.md](CONTRIBUTING.md).
