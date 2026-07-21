@@ -93,6 +93,33 @@ enum CloudflareService {
         return created
     }
 
+    static func updateDNSRecord(
+        zoneId: String,
+        token: String,
+        recordId: String,
+        record: CreateDNSRecordRequest
+    ) async throws -> DNSRecord {
+        let url = try makeURL(path: "/zones/\(zoneId)/dns_records/\(recordId)")
+        var request = try makeRequest(url: url, token: token, method: "PUT")
+        request.httpBody = try JSONEncoder().encode(record)
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        var updateResponse: CloudflareDNSCreateResponse?
+        try handleResponse(data: data, httpResponse: response, isDNSOperation: true) { data in
+            let decoded = try JSONDecoder().decode(CloudflareDNSCreateResponse.self, from: data)
+            guard decoded.success else {
+                throw mapAPIErrors(decoded.errors)
+            }
+            updateResponse = decoded
+        }
+
+        guard let updated = updateResponse?.result else {
+            throw CFPurgeError.decodingError
+        }
+
+        return updated
+    }
+
     private static func makeURL(path: String, queryItems: [URLQueryItem] = []) throws -> URL {
         var components = URLComponents(string: baseURL + path)
         if !queryItems.isEmpty {

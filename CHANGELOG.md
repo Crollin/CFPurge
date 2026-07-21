@@ -6,10 +6,16 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/)
 
 ## [Unreleased]
 
+## [1.0.5] — 2026-07-21
+
 ### Ajouté
 
-- `./install.sh --raycast` : option pour compiler et déployer l'extension Raycast locale (développeurs)
-- Script `scripts/install-raycast-extension.sh` pour mettre à jour l'extension seule
+- Option (désactivée par défaut) pour **modifier** les enregistrements DNS existants, avec confirmation à l’activation
+- Édition d’un enregistrement depuis la fenêtre DNS (bouton Modifier) via l’API Cloudflare `PUT`
+- **AppIcon** CFPurge pour Finder, Spotlight, Launchpad et le Dock
+- Affichage temporaire dans le **Dock** à l’ouverture des Réglages ou de la fenêtre DNS (retour agent à la fermeture)
+- `./install.sh --raycast` : option pour compiler et déployer l’extension Raycast locale (développeurs)
+- Script `scripts/install-raycast-extension.sh` pour mettre à jour l’extension seule
 
 ### Documentation
 

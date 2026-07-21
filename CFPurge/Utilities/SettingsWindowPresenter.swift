@@ -6,7 +6,7 @@ enum SettingsWindowPresenter {
 
     @MainActor
     static func present(openWindow: OpenWindowAction) {
-        NSApp.activate(ignoringOtherApps: true)
+        DockVisibilityController.showInDock()
 
         let existingWindows = NSApp.windows.filter { $0.title == windowTitle }
 

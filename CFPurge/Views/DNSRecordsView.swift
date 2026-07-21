@@ -4,6 +4,7 @@ struct DNSRecordsView: View {
     let site: Site
 
     @EnvironmentObject private var dnsViewModel: DNSViewModel
+    @EnvironmentObject private var appViewModel: AppViewModel
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -21,8 +22,10 @@ struct DNSRecordsView: View {
         .onChange(of: site.id) { _, _ in
             Task { await dnsViewModel.loadRecords(for: site) }
         }
-        .sheet(isPresented: $dnsViewModel.showingEditor) {
-            DNSRecordEditorView(site: site)
+        .sheet(isPresented: $dnsViewModel.showingEditor, onDismiss: {
+            dnsViewModel.editingRecord = nil
+        }) {
+            DNSRecordEditorView(site: site, existingRecord: dnsViewModel.editingRecord)
                 .environmentObject(dnsViewModel)
         }
     }
@@ -47,7 +50,7 @@ struct DNSRecordsView: View {
             .disabled(dnsViewModel.status.isLoading)
 
             Button("Ajouter un enregistrement") {
-                dnsViewModel.showingEditor = true
+                dnsViewModel.beginAddRecord()
             }
             .buttonStyle(.borderedProminent)
         }
@@ -101,8 +104,12 @@ struct DNSRecordsView: View {
             Spacer()
         } else {
             List(dnsViewModel.filteredRecords) { record in
-                DNSRecordRow(record: record)
-                    .transition(.opacity.combined(with: .move(edge: .top)))
+                DNSRecordRow(
+                    record: record,
+                    canEdit: appViewModel.dnsAllowModifyExisting,
+                    onEdit: { dnsViewModel.beginEditRecord(record) }
+                )
+                .transition(.opacity.combined(with: .move(edge: .top)))
             }
             .listStyle(.inset(alternatesRowBackgrounds: true))
         }
@@ -145,6 +152,8 @@ struct DNSRecordsView: View {
 
 private struct DNSRecordRow: View {
     let record: DNSRecord
+    let canEdit: Bool
+    let onEdit: () -> Void
 
     var body: some View {
         HStack(alignment: .center, spacing: 12) {
@@ -174,6 +183,12 @@ private struct DNSRecordRow: View {
                 Text(ttlLabel)
                     .font(.caption2)
                     .foregroundStyle(.tertiary)
+            }
+
+            if canEdit {
+                Button("Modifier", action: onEdit)
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
             }
         }
         .padding(.vertical, 4)
@@ -218,4 +233,5 @@ struct DNSRecordTypeBadge: View {
 #Preview {
     DNSRecordsView(site: Site(name: "Demo", zoneId: "zone", domain: "example.com"))
         .environmentObject(DNSViewModel())
+        .environmentObject(AppViewModel())
 }
