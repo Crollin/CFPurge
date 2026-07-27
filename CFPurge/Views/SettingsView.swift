@@ -11,27 +11,82 @@ struct SettingsView: View {
         case general = "Général"
         case token = "Jeton API"
         case sites = "Sites"
+        case updates = "Mises à jour"
+        case about = "À propos"
 
         var id: String { rawValue }
 
         var icon: String {
             switch self {
-            case .general: return "slider.horizontal.3"
+            case .general: return "gearshape.fill"
             case .token: return "key.fill"
             case .sites: return "globe"
+            case .updates: return "arrow.triangle.2.circlepath"
+            case .about: return "info.circle.fill"
+            }
+        }
+
+        var iconColor: Color {
+            switch self {
+            case .general: return CFDesignTokens.iconPurple
+            case .token: return CFDesignTokens.iconOrange
+            case .sites: return CFDesignTokens.accent
+            case .updates: return CFDesignTokens.iconGreen
+            case .about: return CFDesignTokens.iconBlue
             }
         }
     }
 
     var body: some View {
-        NavigationSplitView {
-            List(SettingsTab.allCases, selection: $selectedTab) { tab in
-                Label(tab.rawValue, systemImage: tab.icon)
-                    .tag(tab)
+        HStack(spacing: 0) {
+            settingsSidebar
+            Divider().overlay(CFDesignTokens.border)
+            settingsContent
+        }
+        .cfWindowBackground()
+        .cfConfigureWindow()
+        .preferredColorScheme(.dark)
+        .frame(minWidth: 780, minHeight: 560)
+        .sheet(isPresented: $viewModel.showingSiteEditor) {
+            SiteEditorView(site: viewModel.editingSite)
+                .environmentObject(viewModel)
+        }
+    }
+
+    private var settingsSidebar: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text("Réglages")
+                .font(.headline.weight(.semibold))
+                .foregroundStyle(CFDesignTokens.textPrimary)
+                .padding(.horizontal, 16)
+                .padding(.top, 20)
+                .padding(.bottom, 12)
+
+            VStack(spacing: 2) {
+                ForEach(SettingsTab.allCases) { tab in
+                    CFSidebarItem(
+                        title: tab.rawValue,
+                        icon: tab.icon,
+                        iconColor: tab.iconColor,
+                        isSelected: selectedTab == tab
+                    ) {
+                        withAnimation(.easeInOut(duration: CFDesignTokens.animationNormal)) {
+                            selectedTab = tab
+                        }
+                    }
+                }
             }
-            .listStyle(.sidebar)
-            .navigationSplitViewColumnWidth(min: 160, ideal: 170, max: 200)
-        } detail: {
+            .padding(.horizontal, 10)
+
+            Spacer()
+        }
+        .frame(width: 200)
+        .background(CFDesignTokens.sidebar)
+    }
+
+    @ViewBuilder
+    private var settingsContent: some View {
+        ScrollView {
             Group {
                 switch selectedTab {
                 case .general:
@@ -40,245 +95,322 @@ struct SettingsView: View {
                     tokenSettings
                 case .sites:
                     sitesSettings
+                case .updates:
+                    updatesSettings
+                case .about:
+                    aboutSettings
                 }
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .navigationTitle(selectedTab.rawValue)
+            .padding(24)
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .frame(minWidth: 640, minHeight: 480)
-        .sheet(isPresented: $viewModel.showingSiteEditor) {
-            SiteEditorView(site: viewModel.editingSite)
-                .environmentObject(viewModel)
+        .background(CFDesignTokens.background)
+    }
+
+    // MARK: - Général
+
+    private var generalSettings: some View {
+        VStack(alignment: .leading, spacing: 24) {
+            CFSectionHeader("Fonctionnalités")
+            CFCard {
+                CFSettingRow(
+                    title: "Activer la gestion DNS",
+                    subtitle: "Nécessite la permission Zone > DNS > Edit sur votre token API Cloudflare, en plus de Cache Purge."
+                ) {
+                    CFToggle(isOn: Binding(
+                        get: { viewModel.dnsManagementEnabled },
+                        set: { viewModel.setDNSManagementEnabled($0) }
+                    ))
+                }
+
+                if viewModel.dnsManagementEnabled {
+                    CFSettingRowDivider()
+                    CFSettingRow(
+                        title: "Autoriser la modification des enregistrements existants",
+                        subtitle: "Désactivé par défaut. Une confirmation est demandée à l'activation. Une mauvaise modification DNS peut rendre un site inaccessible."
+                    ) {
+                        CFToggle(isOn: Binding(
+                            get: { viewModel.dnsAllowModifyExisting },
+                            set: { viewModel.setDNSAllowModifyExisting($0) }
+                        ))
+                    }
+                }
+            }
+
+            CFSectionHeader("Notifications")
+            CFCard {
+                CFSettingRow(
+                    title: "Son des notifications de purge",
+                    subtitle: "Joue un son lorsque la purge est terminée."
+                ) {
+                    CFToggle(isOn: Binding(
+                        get: { viewModel.soundNotificationsEnabled },
+                        set: { viewModel.setSoundNotificationsEnabled($0) }
+                    ))
+                }
+                CFSettingRowDivider()
+                CFSettingRow(
+                    title: "Afficher les URLs dans les notifications",
+                    subtitle: "Par défaut, les notifications n'affichent que le nom du site."
+                ) {
+                    CFToggle(isOn: Binding(
+                        get: { viewModel.showURLsInNotifications },
+                        set: { viewModel.setShowURLsInNotifications($0) }
+                    ))
+                }
+            }
+
+            CFSectionHeader("Démarrage")
+            CFCard {
+                CFSettingRow(
+                    title: "Lancer CFPurge à la connexion",
+                    subtitle: LaunchAtLoginService.statusMessage
+                ) {
+                    CFToggle(isOn: Binding(
+                        get: { viewModel.launchAtLoginEnabled },
+                        set: { viewModel.setLaunchAtLogin($0) }
+                    ))
+                }
+
+                if let message = viewModel.launchAtLoginMessage {
+                    CFSettingRowDivider()
+                    Text(message)
+                        .font(.caption)
+                        .foregroundStyle(CFDesignTokens.textSecondary)
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, 12)
+                }
+            }
         }
     }
 
-    private var generalSettings: some View {
-        Form {
-            Section("Fonctionnalités") {
-                Toggle("Activer la gestion DNS", isOn: Binding(
-                    get: { viewModel.dnsManagementEnabled },
-                    set: { viewModel.setDNSManagementEnabled($0) }
-                ))
+    // MARK: - Jeton API
 
-                Text("Nécessite la permission Zone > DNS > Edit sur votre token API Cloudflare, en plus de Cache Purge.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+    private var tokenSettings: some View {
+        VStack(alignment: .leading, spacing: 24) {
+            CFSectionHeader("Jeton API Cloudflare")
+            CFCard {
+                VStack(alignment: .leading, spacing: 16) {
+                    CFTextFieldLabel(label: "Jeton API", text: $viewModel.tokenInput, isSecure: true)
 
-                if viewModel.dnsManagementEnabled {
-                    Toggle("Autoriser la modification des enregistrements existants", isOn: Binding(
-                        get: { viewModel.dnsAllowModifyExisting },
-                        set: { viewModel.setDNSAllowModifyExisting($0) }
-                    ))
+                    HStack(spacing: 8) {
+                        CFButton(title: "Enregistrer le jeton", style: .primary) {
+                            viewModel.saveToken()
+                        }
+                        CFButton(title: "Tester la connexion", style: .secondary) {
+                            Task { await viewModel.verifyToken() }
+                        }
+                        .disabled(!viewModel.tokenConfigured)
 
-                    Text("Désactivé par défaut. Une confirmation est demandée à l'activation. Une mauvaise modification DNS peut rendre un site inaccessible.")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-            }
-
-            Section("Notifications") {
-                Toggle("Son des notifications de purge", isOn: Binding(
-                    get: { viewModel.soundNotificationsEnabled },
-                    set: { viewModel.setSoundNotificationsEnabled($0) }
-                ))
-
-                Toggle("Afficher les URLs dans les notifications", isOn: Binding(
-                    get: { viewModel.showURLsInNotifications },
-                    set: { viewModel.setShowURLsInNotifications($0) }
-                ))
-
-                Text("Par défaut, les notifications n'affichent que le nom du site. Activez l'option pour inclure l'URL purgée (visible dans le Centre de notifications).")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-
-            Section("Démarrage") {
-                Toggle("Lancer CFPurge à la connexion", isOn: Binding(
-                    get: { viewModel.launchAtLoginEnabled },
-                    set: { viewModel.setLaunchAtLogin($0) }
-                ))
-
-                Text(LaunchAtLoginService.statusMessage)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-
-                if let message = viewModel.launchAtLoginMessage {
-                    Text(message)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-            }
-
-            Section("Mises à jour") {
-                LabeledContent("Version installée") {
-                    Text(updater.currentVersion)
-                        .foregroundStyle(.secondary)
-                }
-
-                Toggle("Vérifier automatiquement les mises à jour", isOn: Binding(
-                    get: { updater.automaticallyChecksForUpdates },
-                    set: { updater.automaticallyChecksForUpdates = $0 }
-                ))
-
-                HStack {
-                    Button("Vérifier maintenant") {
-                        updater.checkForUpdates()
+                        if viewModel.tokenConfigured {
+                            CFButton(title: "Supprimer", style: .destructive) {
+                                viewModel.deleteToken()
+                            }
+                        }
                     }
-                    .disabled(updater.isChecking || updater.isInstalling)
 
-                    if updater.isChecking {
-                        ProgressView()
-                            .controlSize(.small)
+                    if viewModel.tokenConfigured {
+                        HStack(spacing: 6) {
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundStyle(CFDesignTokens.success)
+                            Text("Jeton configuré")
+                                .font(.caption)
+                                .foregroundStyle(CFDesignTokens.success)
+                        }
+                    }
+
+                    if let result = viewModel.connectionTestResult {
+                        Text(result)
+                            .font(.caption)
+                            .foregroundStyle(CFDesignTokens.textSecondary)
+                    }
+                }
+                .padding(16)
+            }
+
+            Text("Permissions requises : Zone > Cache Purge > Edit. Ajoutez Zone > DNS > Edit si la gestion DNS est activée. N'utilisez jamais la Global API Key.")
+                .font(.caption)
+                .foregroundStyle(CFDesignTokens.textSecondary)
+        }
+    }
+
+    // MARK: - Sites
+
+    private var sitesSettings: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                CFSectionHeader("Sites Cloudflare")
+                Spacer()
+                CFButton(title: "Ajouter un site", icon: "plus", style: .primary) {
+                    viewModel.beginAddSite()
+                }
+            }
+
+            if viewModel.sites.isEmpty {
+                CFCard {
+                    VStack(spacing: 12) {
+                        Image(systemName: "globe")
+                            .font(.title)
+                            .foregroundStyle(CFDesignTokens.textTertiary)
+                        Text("Aucun site")
+                            .font(.headline)
+                            .foregroundStyle(CFDesignTokens.textPrimary)
+                        Text("Ajoutez un site Cloudflare pour commencer à purger le cache.")
+                            .font(.caption)
+                            .foregroundStyle(CFDesignTokens.textSecondary)
+                            .multilineTextAlignment(.center)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(32)
+                }
+            } else {
+                ForEach(viewModel.sites) { site in
+                    SiteSettingsCard(
+                        site: site,
+                        dnsEnabled: viewModel.dnsManagementEnabled,
+                        onEdit: { viewModel.beginEditSite(site) },
+                        onDNS: { viewModel.openDNS(for: site, openWindow: openWindow) }
+                    )
+                }
+
+                Text("Glissez-déposez pour définir l'ordre d'affichage dans la barre de menus.")
+                    .font(.caption)
+                    .foregroundStyle(CFDesignTokens.textTertiary)
+            }
+        }
+    }
+
+    // MARK: - Mises à jour
+
+    private var updatesSettings: some View {
+        VStack(alignment: .leading, spacing: 24) {
+            CFSectionHeader("Mises à jour")
+            CFCard {
+                CFSettingRow(
+                    title: "Vérifier automatiquement les mises à jour",
+                    subtitle: "Recherche de nouvelles versions en arrière-plan."
+                ) {
+                    CFToggle(isOn: Binding(
+                        get: { updater.automaticallyChecksForUpdates },
+                        set: { updater.automaticallyChecksForUpdates = $0 }
+                    ))
+                }
+                CFSettingRowDivider()
+                CFSettingRow(
+                    title: "Version installée",
+                    subtitle: updater.currentVersion
+                ) {
+                    HStack(spacing: 8) {
+                        CFButton(title: "Vérifier maintenant", style: .secondary) {
+                            updater.checkForUpdates()
+                        }
+                        .disabled(updater.isChecking || updater.isInstalling)
+
+                        if updater.isChecking {
+                            ProgressView()
+                                .controlSize(.small)
+                        }
                     }
                 }
 
                 if updater.updateAvailable, let latestVersion = updater.latestVersion {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Label("Version \(latestVersion) disponible", systemImage: "arrow.down.circle.fill")
-                            .foregroundStyle(.blue)
+                    CFSettingRowDivider()
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack(spacing: 6) {
+                            Image(systemName: "arrow.down.circle.fill")
+                                .foregroundStyle(CFDesignTokens.accent)
+                            Text("Version \(latestVersion) disponible")
+                                .font(.body.weight(.medium))
+                                .foregroundStyle(CFDesignTokens.textPrimary)
+                        }
 
-                        HStack {
-                            Button(updater.isInstalling ? "Installation…" : "Installer la mise à jour") {
+                        HStack(spacing: 8) {
+                            CFButton(
+                                title: updater.isInstalling ? "Installation…" : "Installer la mise à jour",
+                                style: .primary
+                            ) {
                                 updater.installUpdate()
                             }
                             .disabled(updater.isInstalling)
 
-                            Button("Voir la release") {
+                            CFButton(title: "Voir la release", style: .secondary) {
                                 updater.openReleasePage()
                             }
                         }
                     }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 12)
                 }
 
                 if let installError = updater.installError {
+                    CFSettingRowDivider()
                     Text(installError)
                         .font(.caption)
-                        .foregroundStyle(.red)
+                        .foregroundStyle(CFDesignTokens.destructive)
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, 12)
                 }
-
-                Text("Les mises à jour sont téléchargées depuis GitHub Releases. L'app se ferme brièvement pendant l'installation.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
             }
+
+            Text("Les mises à jour sont téléchargées depuis GitHub Releases. L'app se ferme brièvement pendant l'installation.")
+                .font(.caption)
+                .foregroundStyle(CFDesignTokens.textSecondary)
         }
-        .formStyle(.grouped)
-        .padding()
     }
 
-    private var tokenSettings: some View {
-        Form {
-            Section("Jeton API Cloudflare") {
-                SecureField("Jeton API", text: $viewModel.tokenInput)
-                    .textFieldStyle(.roundedBorder)
+    // MARK: - À propos
 
-                HStack {
-                    Button("Enregistrer le jeton") {
-                        viewModel.saveToken()
-                    }
-
-                    Button("Tester la connexion") {
-                        Task { await viewModel.verifyToken() }
-                    }
-                    .disabled(!viewModel.tokenConfigured)
-
-                    if viewModel.tokenConfigured {
-                        Button("Supprimer", role: .destructive) {
-                            viewModel.deleteToken()
+    private var aboutSettings: some View {
+        VStack(alignment: .leading, spacing: 24) {
+            CFSectionHeader("À propos")
+            CFCard {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack(spacing: 12) {
+                        CFPurgeMark(size: 40)
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("CFPurge")
+                                .font(.title3.weight(.semibold))
+                                .foregroundStyle(CFDesignTokens.textPrimary)
+                            Text("Purge de cache Cloudflare pour macOS")
+                                .font(.caption)
+                                .foregroundStyle(CFDesignTokens.textSecondary)
                         }
                     }
                 }
-
-                if viewModel.tokenConfigured {
-                    Label("Jeton configuré", systemImage: "checkmark.circle.fill")
-                        .foregroundStyle(.green)
-                        .font(.caption)
-                }
-
-                if let result = viewModel.connectionTestResult {
-                    Text(result)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
+                .padding(20)
             }
-
-            Section {
-                Text("Permissions requises : Zone > Cache Purge > Edit. Ajoutez Zone > DNS > Edit si la gestion DNS est activée. N'utilisez jamais la Global API Key.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-        }
-        .formStyle(.grouped)
-        .padding()
-    }
-
-    private var sitesSettings: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            if viewModel.sites.isEmpty {
-                ContentUnavailableView(
-                    "Aucun site",
-                    systemImage: "globe",
-                    description: Text("Ajoutez un site Cloudflare pour commencer à purger le cache.")
-                )
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else {
-                List {
-                    ForEach(viewModel.sites) { site in
-                        SiteSettingsRow(
-                            site: site,
-                            dnsEnabled: viewModel.dnsManagementEnabled,
-                            onEdit: { viewModel.beginEditSite(site) },
-                            onDNS: { viewModel.openDNS(for: site, openWindow: openWindow) }
-                        )
-                    }
-                    .onMove(perform: viewModel.moveSites)
-                    .onDelete { indexSet in
-                        indexSet.map { viewModel.sites[$0] }.forEach(viewModel.deleteSite)
-                    }
-                }
-                .listStyle(.inset(alternatesRowBackgrounds: true))
-            }
-
-            Divider()
-
-            HStack {
-                Text("Glissez-déposez pour définir l'ordre d'affichage dans la barre de menus.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-
-                Spacer()
-
-                Button("Ajouter un site") {
-                    viewModel.beginAddSite()
-                }
-            }
-            .padding()
         }
     }
 }
 
-private struct SiteSettingsRow: View {
+// MARK: - Site Card
+
+private struct SiteSettingsCard: View {
     let site: Site
     let dnsEnabled: Bool
     let onEdit: () -> Void
     let onDNS: () -> Void
 
+    @State private var isHovered = false
+
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: "line.3.horizontal")
                 .font(.caption)
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(CFDesignTokens.textTertiary)
+
+            CFIconBadge(icon: "globe", color: CFDesignTokens.accent, size: 32)
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(site.name)
-                    .font(.headline)
-
+                    .font(.body.weight(.semibold))
+                    .foregroundStyle(CFDesignTokens.textPrimary)
                 Text(site.domain)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-
+                    .font(.caption)
+                    .foregroundStyle(CFDesignTokens.textSecondary)
                 Text("Zone : \(site.zoneId)")
                     .font(.caption2)
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(CFDesignTokens.textTertiary)
                     .textSelection(.enabled)
             }
 
@@ -286,17 +418,18 @@ private struct SiteSettingsRow: View {
 
             HStack(spacing: 8) {
                 if dnsEnabled {
-                    Button("DNS", action: onDNS)
-                        .buttonStyle(.bordered)
-                        .controlSize(.small)
+                    CFButton(title: "DNS", style: .secondary, action: onDNS)
                 }
-
-                Button("Modifier", action: onEdit)
-                    .buttonStyle(.bordered)
-                    .controlSize(.small)
+                CFButton(title: "Modifier", style: .secondary, action: onEdit)
             }
         }
-        .padding(.vertical, 4)
+        .padding(14)
+        .cfHoverable(isHovered: isHovered)
+        .overlay {
+            RoundedRectangle(cornerRadius: CFDesignTokens.radiusCard, style: .continuous)
+                .strokeBorder(CFDesignTokens.border, lineWidth: 1)
+        }
+        .onHover { isHovered = $0 }
     }
 }
 

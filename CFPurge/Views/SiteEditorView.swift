@@ -12,36 +12,41 @@ struct SiteEditorView: View {
     @State private var validationMessage: String?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 20) {
             Text(site == nil ? "Ajouter un site" : "Modifier le site")
-                .font(.title2)
+                .font(.title2.weight(.semibold))
+                .foregroundStyle(CFDesignTokens.textPrimary)
 
-            Form {
-                TextField("Nom", text: $name)
-                TextField("Zone ID", text: $zoneId)
-                TextField("Domaine", text: $domain)
+            CFCard {
+                VStack(alignment: .leading, spacing: 14) {
+                    CFTextFieldLabel(label: "Nom", text: $name)
+                    CFTextFieldLabel(label: "Zone ID", text: $zoneId)
+                    CFTextFieldLabel(label: "Domaine", text: $domain)
+                }
+                .padding(16)
             }
-            .formStyle(.grouped)
 
             if let validationMessage {
                 Text(validationMessage)
                     .font(.caption)
-                    .foregroundStyle(.red)
+                    .foregroundStyle(CFDesignTokens.destructive)
             }
 
             HStack {
                 Spacer()
-                Button("Annuler") {
+                CFButton(title: "Annuler", style: .secondary) {
                     dismiss()
                 }
-                Button(site == nil ? "Ajouter" : "Enregistrer") {
+                CFButton(title: site == nil ? "Ajouter" : "Enregistrer", style: .primary) {
                     saveSite()
                 }
-                .keyboardShortcut(.defaultAction)
             }
         }
-        .padding(20)
-        .frame(width: 420)
+        .padding(24)
+        .frame(width: 440)
+        .cfWindowBackground()
+        .cfConfigureWindow()
+        .preferredColorScheme(.dark)
         .onAppear {
             name = site?.name ?? ""
             zoneId = site?.zoneId ?? ""

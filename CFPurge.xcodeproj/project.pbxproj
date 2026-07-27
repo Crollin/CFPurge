@@ -7,44 +7,58 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		05983826571CE52EFD54859D /* CFWindowAppearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BEFF2912ACBBA3ECD8194A0 /* CFWindowAppearance.swift */; };
 		116F1C24591739FD0D6FA40A /* CFPurgeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FE9375F6D6B4A6950CC3B7C /* CFPurgeApp.swift */; };
 		1EDCB63DFFDCF00446CACB73 /* CFPurgeError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AF64C5CB5B8C7A4564DA199 /* CFPurgeError.swift */; };
 		1EF806D3FBEB4151BF344198 /* LaunchAtLoginService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6997074574E961A496E5A2B4 /* LaunchAtLoginService.swift */; };
+		22F90F8BE3A6AE31670E7E5D /* CFCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAA10C57741DC6009344508E /* CFCard.swift */; };
 		245A87038B82ACB5C6D14281 /* DNSWindowPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBD8F614A2139C4DFABAAF55 /* DNSWindowPresenter.swift */; };
 		270C591449DEB9B5BAF0DCC6 /* cfpurge-mark.svg in Resources */ = {isa = PBXBuildFile; fileRef = 8B937C4E9C243341031E1519 /* cfpurge-mark.svg */; };
 		2733C2EBD08E7660503ED3CE /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECA140196442708E52A5F82D /* KeychainService.swift */; };
+		2E2D6E21CADA9B9E5405B8C4 /* CFDesignTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A65C55906A23C539E8D03D3 /* CFDesignTokens.swift */; };
 		2FACDB1260E9A005FD331D47 /* CloudflareService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 128C795A5160F9024EC14C7A /* CloudflareService.swift */; };
 		369AAEAD45D35E5A2D08B600 /* AppViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33D5BBB6054DAD8BB7C5D5B2 /* AppViewModel.swift */; };
 		3B928A7E956111AC60C38E98 /* DNSRecordValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0EA8E764AEE53005B555BB9 /* DNSRecordValidator.swift */; };
 		41D6CDD418D5C913E389A7E7 /* SettingsWindowPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6074CAB2890FD6342AA39F3B /* SettingsWindowPresenter.swift */; };
+		4BC78F08AF0C61B42F34AA27 /* MainWindowPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC6A42F67E38DE15B2E3C894 /* MainWindowPresenter.swift */; };
 		4E236A2369047FC74ABCCF3C /* CFPurgeMenuBarIconTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2841B008289668D1FF32DACA /* CFPurgeMenuBarIconTests.swift */; };
 		5367F0310FF69461035D9B1A /* PurgeStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA79120E6935A97E3E81C62 /* PurgeStatus.swift */; };
+		594099EA99EED4196DDB948E /* CFSectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 556958284D66D2E5483AECC9 /* CFSectionHeader.swift */; };
 		5E767301002803BCD4EC58D4 /* favicon.svg in Resources */ = {isa = PBXBuildFile; fileRef = 62167ED196AC8BBF01EF1773 /* favicon.svg */; };
 		5EE65B33FEB26AFA7C0540BF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 86404BDC2155E97CC8BB2AF1 /* Assets.xcassets */; };
 		5F293491F40EBD60266D528D /* ConfirmationAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 908B0EEC7E975A55C3422570 /* ConfirmationAlert.swift */; };
 		607336DEBFA9BD5C1DC87307 /* URLNormalizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 256CDCD8C6B857842A6392F8 /* URLNormalizer.swift */; };
+		611D89F14799F65B43F8AC64 /* CFTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08945C753B6C1CCEBD73BFDD /* CFTextField.swift */; };
 		63A0CB094C55264F749AF10D /* Site.swift in Sources */ = {isa = PBXBuildFile; fileRef = 674479BCDC849CC90EE593EA /* Site.swift */; };
 		6F6F3A9DC2E3F43AF6188BC5 /* MenuBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 002484D88B77F587D4E0A9D5 /* MenuBarView.swift */; };
 		6F774D2740F63CC2639B66BC /* DNSRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = E862031E67353E1CB6B45872 /* DNSRecord.swift */; };
 		73729F7D89AA2B72FB7EB1DA /* DNSViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DBEA32CA7912D27166553D3 /* DNSViewModel.swift */; };
 		7BCB1D3CF0CCC38ABFB83DE7 /* UpdaterManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDFBAF4FCAA631BDAFDE55EF /* UpdaterManager.swift */; };
+		7C6B09D02ED609E55CB03845 /* CFStatusBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79D3558AB83F99CCC5111909 /* CFStatusBadge.swift */; };
 		80E81AE8283B862FD2E60E52 /* SiteValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFB3E99FC9B6805E4C1A8746 /* SiteValidator.swift */; };
 		8285643A39603ABB582250EA /* SiteStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00E9DC3377EE53E272168DC /* SiteStore.swift */; };
 		87E3B6D4619A0A25D639360A /* DNSRecordsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAA25868A61F061A16E39B02 /* DNSRecordsView.swift */; };
 		89816593EDC5579E3081957E /* DeepLinkParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8548D4B68F9DF2DB68DC26A /* DeepLinkParser.swift */; };
 		8A3B4BCFFB31904A0B6FE7DA /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA987433C6EA3EA1CE4EEFA4 /* SettingsView.swift */; };
+		98FC437AB67FA0E5EBC668E9 /* CFToggle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8E35C2540D2BF0930F186F /* CFToggle.swift */; };
 		9952F193CF65C1F102966398 /* URLNormalizerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A07BCE5AE9DCEC4C53ED8C7D /* URLNormalizerTests.swift */; };
+		AD66CC5F984A4C32151EE6B0 /* CFSettingRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 856367AAD23AF62AC5D6D244 /* CFSettingRow.swift */; };
+		B3F9BC56A56FAF08485C2446 /* CFModifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AFF9F6D2494DD826C67E400 /* CFModifiers.swift */; };
+		B629D91C727C916AB1EC75EB /* MainWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63C6C01CD200135F129B4559 /* MainWindowView.swift */; };
 		B70BB80ADA567FD50B479E29 /* CFPurgeMark.swift in Sources */ = {isa = PBXBuildFile; fileRef = C87F9528F5F865E232B314FB /* CFPurgeMark.swift */; };
 		BC12CAB94CCEBF40916CEDEA /* DNSRecordValidatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D28FD571C94E583B667EABC2 /* DNSRecordValidatorTests.swift */; };
 		BF55B2A039B59399E76D1F77 /* DockVisibilityController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AFEF2DE8F420CE13FAF7CCE /* DockVisibilityController.swift */; };
 		C3D97596DFBC3D7806F0F0BE /* SiteValidatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B63F1A372AE0ACB4E4F6B92 /* SiteValidatorTests.swift */; };
 		C79769DDF1BF63708C32DF43 /* cfpurge-logo.svg in Resources */ = {isa = PBXBuildFile; fileRef = D0B872071ACC3E9E929C5D1D /* cfpurge-logo.svg */; };
+		CA5E1BA8A8F0B12D00CAB1F9 /* CFIconBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0F2E78C1D853218565DB45A /* CFIconBadge.swift */; };
+		D948231590F11823025257CD /* CFButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C92454623D642A2400BF05B /* CFButton.swift */; };
 		DAEA267BD277B77049EC6F38 /* PurgeNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC5E204FE5E64726B7FBBE68 /* PurgeNotificationService.swift */; };
 		DAF681176DEC8A1AECD7254D /* UpdaterManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3C372D43855B78BF3E6101E /* UpdaterManagerTests.swift */; };
 		DC302EA7892D08111443BA33 /* DNSRecordEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830814F0CD66C7BB19CA3CEA /* DNSRecordEditorView.swift */; };
 		E9EEBE79461573BBF87AEAF5 /* SiteEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE53830EE43B21E39FF6E3AC /* SiteEditorView.swift */; };
 		EC57FFE5EF5AABBFA1F0BCFC /* DeepLinkParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF30425491B25AE2F52CD5B9 /* DeepLinkParserTests.swift */; };
 		ED187057F70F2923E38B1DFD /* PurgeStatusBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0973FCE105B87CF3B2CD29E /* PurgeStatusBanner.swift */; };
+		F4B55950C25DF4AFE4C1E07A /* CFSidebarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 035A9DFB11FFFDEB3F9DD610 /* CFSidebarItem.swift */; };
 		F4E68DA28AB6C46F0E2C4DFC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71AC6698707F12E9EB397B99 /* AppDelegate.swift */; };
 		FABC8ADA3C1EF55C0630D686 /* CloudflareResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71D6782A20DA98BEF7794210 /* CloudflareResponse.swift */; };
 /* End PBXBuildFile section */
@@ -61,33 +75,46 @@
 
 /* Begin PBXFileReference section */
 		002484D88B77F587D4E0A9D5 /* MenuBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarView.swift; sourceTree = "<group>"; };
+		035A9DFB11FFFDEB3F9DD610 /* CFSidebarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CFSidebarItem.swift; sourceTree = "<group>"; };
+		08945C753B6C1CCEBD73BFDD /* CFTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CFTextField.swift; sourceTree = "<group>"; };
 		128C795A5160F9024EC14C7A /* CloudflareService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudflareService.swift; sourceTree = "<group>"; };
 		1AF64C5CB5B8C7A4564DA199 /* CFPurgeError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CFPurgeError.swift; sourceTree = "<group>"; };
 		1B63F1A372AE0ACB4E4F6B92 /* SiteValidatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiteValidatorTests.swift; sourceTree = "<group>"; };
 		256CDCD8C6B857842A6392F8 /* URLNormalizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLNormalizer.swift; sourceTree = "<group>"; };
 		2841B008289668D1FF32DACA /* CFPurgeMenuBarIconTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CFPurgeMenuBarIconTests.swift; sourceTree = "<group>"; };
+		2AFF9F6D2494DD826C67E400 /* CFModifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CFModifiers.swift; sourceTree = "<group>"; };
 		2DBEA32CA7912D27166553D3 /* DNSViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNSViewModel.swift; sourceTree = "<group>"; };
 		3027DC353B92C5D17FFCBF0F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		33D5BBB6054DAD8BB7C5D5B2 /* AppViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppViewModel.swift; sourceTree = "<group>"; };
+		556958284D66D2E5483AECC9 /* CFSectionHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CFSectionHeader.swift; sourceTree = "<group>"; };
 		6074CAB2890FD6342AA39F3B /* SettingsWindowPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsWindowPresenter.swift; sourceTree = "<group>"; };
 		62167ED196AC8BBF01EF1773 /* favicon.svg */ = {isa = PBXFileReference; path = favicon.svg; sourceTree = "<group>"; };
+		63C6C01CD200135F129B4559 /* MainWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainWindowView.swift; sourceTree = "<group>"; };
 		674479BCDC849CC90EE593EA /* Site.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Site.swift; sourceTree = "<group>"; };
 		6997074574E961A496E5A2B4 /* LaunchAtLoginService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchAtLoginService.swift; sourceTree = "<group>"; };
 		6AFEF2DE8F420CE13FAF7CCE /* DockVisibilityController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DockVisibilityController.swift; sourceTree = "<group>"; };
+		6BEFF2912ACBBA3ECD8194A0 /* CFWindowAppearance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CFWindowAppearance.swift; sourceTree = "<group>"; };
 		71AC6698707F12E9EB397B99 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		71D6782A20DA98BEF7794210 /* CloudflareResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudflareResponse.swift; sourceTree = "<group>"; };
+		79D3558AB83F99CCC5111909 /* CFStatusBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CFStatusBadge.swift; sourceTree = "<group>"; };
+		7C92454623D642A2400BF05B /* CFButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CFButton.swift; sourceTree = "<group>"; };
 		7FE9375F6D6B4A6950CC3B7C /* CFPurgeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CFPurgeApp.swift; sourceTree = "<group>"; };
 		830814F0CD66C7BB19CA3CEA /* DNSRecordEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNSRecordEditorView.swift; sourceTree = "<group>"; };
+		856367AAD23AF62AC5D6D244 /* CFSettingRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CFSettingRow.swift; sourceTree = "<group>"; };
 		86404BDC2155E97CC8BB2AF1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		8686571C02001AC8A394F0CB /* CFPurge.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CFPurge.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		86B11007BBE3295364042612 /* CFPurgeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CFPurgeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		8A65C55906A23C539E8D03D3 /* CFDesignTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CFDesignTokens.swift; sourceTree = "<group>"; };
 		8B937C4E9C243341031E1519 /* cfpurge-mark.svg */ = {isa = PBXFileReference; path = "cfpurge-mark.svg"; sourceTree = "<group>"; };
 		908B0EEC7E975A55C3422570 /* ConfirmationAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmationAlert.swift; sourceTree = "<group>"; };
+		9B8E35C2540D2BF0930F186F /* CFToggle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CFToggle.swift; sourceTree = "<group>"; };
 		A07BCE5AE9DCEC4C53ED8C7D /* URLNormalizerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLNormalizerTests.swift; sourceTree = "<group>"; };
 		A0973FCE105B87CF3B2CD29E /* PurgeStatusBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurgeStatusBanner.swift; sourceTree = "<group>"; };
 		AAA79120E6935A97E3E81C62 /* PurgeStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurgeStatus.swift; sourceTree = "<group>"; };
+		AC6A42F67E38DE15B2E3C894 /* MainWindowPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainWindowPresenter.swift; sourceTree = "<group>"; };
 		B3C372D43855B78BF3E6101E /* UpdaterManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdaterManagerTests.swift; sourceTree = "<group>"; };
 		BA987433C6EA3EA1CE4EEFA4 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		BAA10C57741DC6009344508E /* CFCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CFCard.swift; sourceTree = "<group>"; };
 		BFB3E99FC9B6805E4C1A8746 /* SiteValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiteValidator.swift; sourceTree = "<group>"; };
 		C87F9528F5F865E232B314FB /* CFPurgeMark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CFPurgeMark.swift; sourceTree = "<group>"; };
 		CC303B5FD713A3EC5665F3D0 /* CFPurge.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CFPurge.entitlements; sourceTree = "<group>"; };
@@ -95,6 +122,7 @@
 		CE53830EE43B21E39FF6E3AC /* SiteEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiteEditorView.swift; sourceTree = "<group>"; };
 		CF30425491B25AE2F52CD5B9 /* DeepLinkParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepLinkParserTests.swift; sourceTree = "<group>"; };
 		D0B872071ACC3E9E929C5D1D /* cfpurge-logo.svg */ = {isa = PBXFileReference; path = "cfpurge-logo.svg"; sourceTree = "<group>"; };
+		D0F2E78C1D853218565DB45A /* CFIconBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CFIconBadge.swift; sourceTree = "<group>"; };
 		D28FD571C94E583B667EABC2 /* DNSRecordValidatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNSRecordValidatorTests.swift; sourceTree = "<group>"; };
 		DAA25868A61F061A16E39B02 /* DNSRecordsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNSRecordsView.swift; sourceTree = "<group>"; };
 		E0EA8E764AEE53005B555BB9 /* DNSRecordValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNSRecordValidator.swift; sourceTree = "<group>"; };
@@ -127,6 +155,7 @@
 				E0EA8E764AEE53005B555BB9 /* DNSRecordValidator.swift */,
 				EBD8F614A2139C4DFABAAF55 /* DNSWindowPresenter.swift */,
 				6AFEF2DE8F420CE13FAF7CCE /* DockVisibilityController.swift */,
+				AC6A42F67E38DE15B2E3C894 /* MainWindowPresenter.swift */,
 				6074CAB2890FD6342AA39F3B /* SettingsWindowPresenter.swift */,
 				BFB3E99FC9B6805E4C1A8746 /* SiteValidator.swift */,
 				256CDCD8C6B857842A6392F8 /* URLNormalizer.swift */,
@@ -192,6 +221,7 @@
 			children = (
 				830814F0CD66C7BB19CA3CEA /* DNSRecordEditorView.swift */,
 				DAA25868A61F061A16E39B02 /* DNSRecordsView.swift */,
+				63C6C01CD200135F129B4559 /* MainWindowView.swift */,
 				002484D88B77F587D4E0A9D5 /* MenuBarView.swift */,
 				A0973FCE105B87CF3B2CD29E /* PurgeStatusBanner.swift */,
 				BA987433C6EA3EA1CE4EEFA4 /* SettingsView.swift */,
@@ -209,10 +239,30 @@
 			);
 			sourceTree = "<group>";
 		};
+		F011AC8E97B41B8A39BF06C7 /* DesignSystem */ = {
+			isa = PBXGroup;
+			children = (
+				7C92454623D642A2400BF05B /* CFButton.swift */,
+				BAA10C57741DC6009344508E /* CFCard.swift */,
+				8A65C55906A23C539E8D03D3 /* CFDesignTokens.swift */,
+				D0F2E78C1D853218565DB45A /* CFIconBadge.swift */,
+				2AFF9F6D2494DD826C67E400 /* CFModifiers.swift */,
+				556958284D66D2E5483AECC9 /* CFSectionHeader.swift */,
+				856367AAD23AF62AC5D6D244 /* CFSettingRow.swift */,
+				035A9DFB11FFFDEB3F9DD610 /* CFSidebarItem.swift */,
+				79D3558AB83F99CCC5111909 /* CFStatusBadge.swift */,
+				08945C753B6C1CCEBD73BFDD /* CFTextField.swift */,
+				9B8E35C2540D2BF0930F186F /* CFToggle.swift */,
+				6BEFF2912ACBBA3ECD8194A0 /* CFWindowAppearance.swift */,
+			);
+			path = DesignSystem;
+			sourceTree = "<group>";
+		};
 		F064DE6DF848918A13115A66 /* CFPurge */ = {
 			isa = PBXGroup;
 			children = (
 				2E2B90CEB5B8613B69FC0481 /* Brand */,
+				F011AC8E97B41B8A39BF06C7 /* DesignSystem */,
 				069967062B7304F1F6B4F536 /* Models */,
 				1F8EF39CA9936E7FCB088569 /* Services */,
 				3A95D12E812F9315730FAFD2 /* Update */,
@@ -335,9 +385,21 @@
 			files = (
 				F4E68DA28AB6C46F0E2C4DFC /* AppDelegate.swift in Sources */,
 				369AAEAD45D35E5A2D08B600 /* AppViewModel.swift in Sources */,
+				D948231590F11823025257CD /* CFButton.swift in Sources */,
+				22F90F8BE3A6AE31670E7E5D /* CFCard.swift in Sources */,
+				2E2D6E21CADA9B9E5405B8C4 /* CFDesignTokens.swift in Sources */,
+				CA5E1BA8A8F0B12D00CAB1F9 /* CFIconBadge.swift in Sources */,
+				B3F9BC56A56FAF08485C2446 /* CFModifiers.swift in Sources */,
 				116F1C24591739FD0D6FA40A /* CFPurgeApp.swift in Sources */,
 				1EDCB63DFFDCF00446CACB73 /* CFPurgeError.swift in Sources */,
 				B70BB80ADA567FD50B479E29 /* CFPurgeMark.swift in Sources */,
+				594099EA99EED4196DDB948E /* CFSectionHeader.swift in Sources */,
+				AD66CC5F984A4C32151EE6B0 /* CFSettingRow.swift in Sources */,
+				F4B55950C25DF4AFE4C1E07A /* CFSidebarItem.swift in Sources */,
+				7C6B09D02ED609E55CB03845 /* CFStatusBadge.swift in Sources */,
+				611D89F14799F65B43F8AC64 /* CFTextField.swift in Sources */,
+				98FC437AB67FA0E5EBC668E9 /* CFToggle.swift in Sources */,
+				05983826571CE52EFD54859D /* CFWindowAppearance.swift in Sources */,
 				FABC8ADA3C1EF55C0630D686 /* CloudflareResponse.swift in Sources */,
 				2FACDB1260E9A005FD331D47 /* CloudflareService.swift in Sources */,
 				5F293491F40EBD60266D528D /* ConfirmationAlert.swift in Sources */,
@@ -351,6 +413,8 @@
 				BF55B2A039B59399E76D1F77 /* DockVisibilityController.swift in Sources */,
 				2733C2EBD08E7660503ED3CE /* KeychainService.swift in Sources */,
 				1EF806D3FBEB4151BF344198 /* LaunchAtLoginService.swift in Sources */,
+				4BC78F08AF0C61B42F34AA27 /* MainWindowPresenter.swift in Sources */,
+				B629D91C727C916AB1EC75EB /* MainWindowView.swift in Sources */,
 				6F6F3A9DC2E3F43AF6188BC5 /* MenuBarView.swift in Sources */,
 				DAEA267BD277B77049EC6F38 /* PurgeNotificationService.swift in Sources */,
 				5367F0310FF69461035D9B1A /* PurgeStatus.swift in Sources */,

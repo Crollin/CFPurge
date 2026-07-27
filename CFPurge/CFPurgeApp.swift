@@ -9,7 +9,6 @@ struct CFPurgeApp: App {
     @StateObject private var updater = UpdaterManager()
 
     var body: some Scene {
-        // Label = Image (pas un View Canvas) : sinon pas d'icône barre de menus.
         MenuBarExtra {
             MenuBarView()
                 .environmentObject(viewModel)
@@ -29,6 +28,15 @@ struct CFPurgeApp: App {
             }
         }
 
+        Window("CFPurge", id: "main-window") {
+            MainWindowView()
+                .environmentObject(viewModel)
+                .onAppear {
+                    appDelegate.bind(viewModel: viewModel)
+                }
+        }
+        .defaultSize(width: 900, height: 600)
+
         Window("Réglages CFPurge", id: "settings-window") {
             SettingsView()
                 .environmentObject(viewModel)
@@ -38,7 +46,7 @@ struct CFPurgeApp: App {
                 }
         }
         .windowResizability(.contentSize)
-        .defaultSize(width: 680, height: 520)
+        .defaultSize(width: 780, height: 560)
 
         Window("DNS", id: "dns-window") {
             Group {
@@ -46,8 +54,9 @@ struct CFPurgeApp: App {
                     DNSRecordsView(site: site)
                 } else {
                     Text("Aucun site sélectionné.")
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(CFDesignTokens.textSecondary)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .cfWindowBackground()
                 }
             }
             .environmentObject(dnsViewModel)

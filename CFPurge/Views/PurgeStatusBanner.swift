@@ -18,16 +18,16 @@ struct PurgeStatusBanner: View {
 
                     Text(message)
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(CFDesignTokens.textSecondary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
 
                 Spacer(minLength: 0)
             }
-            .padding(10)
-            .background(backgroundColor, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .padding(12)
+            .background(backgroundColor, in: RoundedRectangle(cornerRadius: CFDesignTokens.radiusCard, style: .continuous))
             .overlay {
-                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                RoundedRectangle(cornerRadius: CFDesignTokens.radiusCard, style: .continuous)
                     .strokeBorder(borderColor, lineWidth: 1)
             }
             .transition(.opacity.combined(with: .move(edge: .top)))
@@ -63,35 +63,35 @@ struct PurgeStatusBanner: View {
     private var iconColor: Color {
         switch status {
         case .idle:
-            return .secondary
+            return CFDesignTokens.textSecondary
         case .loading:
-            return CFPurgeBrand.orange
+            return CFDesignTokens.accentOrange
         case .success:
-            return .green
+            return CFDesignTokens.success
         case .error:
-            return .red
+            return CFDesignTokens.destructive
         }
     }
 
     private var titleColor: Color {
         switch status {
         case .success:
-            return .green
+            return CFDesignTokens.success
         case .error:
-            return .red
+            return CFDesignTokens.destructive
         default:
-            return .primary
+            return CFDesignTokens.textPrimary
         }
     }
 
     private var backgroundColor: Color {
         switch status {
         case .loading:
-            return CFPurgeBrand.orange.opacity(0.08)
+            return CFDesignTokens.accentOrange.opacity(0.08)
         case .success:
-            return Color.green.opacity(0.08)
+            return CFDesignTokens.success.opacity(0.08)
         case .error:
-            return Color.red.opacity(0.08)
+            return CFDesignTokens.destructive.opacity(0.08)
         case .idle:
             return .clear
         }
@@ -100,11 +100,11 @@ struct PurgeStatusBanner: View {
     private var borderColor: Color {
         switch status {
         case .loading:
-            return CFPurgeBrand.orange.opacity(0.25)
+            return CFDesignTokens.accentOrange.opacity(0.25)
         case .success:
-            return Color.green.opacity(0.25)
+            return CFDesignTokens.success.opacity(0.25)
         case .error:
-            return Color.red.opacity(0.25)
+            return CFDesignTokens.destructive.opacity(0.25)
         case .idle:
             return .clear
         }
