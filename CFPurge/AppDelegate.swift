@@ -49,6 +49,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
         let managed = NSApp.windows.filter { window in
             guard window.isVisible || window.isMiniaturized else { return false }
+            if window.title == "CFPurge" { return true }
             if window.title == "Réglages CFPurge" { return true }
             return window.title.hasPrefix("DNS")
         }

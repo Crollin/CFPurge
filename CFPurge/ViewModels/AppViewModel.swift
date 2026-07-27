@@ -2,6 +2,11 @@ import AppKit
 import Foundation
 import SwiftUI
 
+enum MainWindowPanel: String, CaseIterable {
+    case cache = "Cache"
+    case dns = "DNS"
+}
+
 @MainActor
 final class AppViewModel: ObservableObject {
     @Published var sites: [Site] = []
@@ -18,6 +23,7 @@ final class AppViewModel: ObservableObject {
     @Published var dnsManagementEnabled: Bool
     @Published var dnsAllowModifyExisting: Bool
     @Published var dnsSite: Site?
+    @Published var mainWindowPanel: MainWindowPanel = .cache
     @Published var soundNotificationsEnabled: Bool
     @Published var showURLsInNotifications: Bool
 
@@ -318,8 +324,9 @@ final class AppViewModel: ObservableObject {
 
     func openDNS(for site: Site?, openWindow: OpenWindowAction) {
         guard let site else { return }
-        dnsSite = site
-        DNSWindowPresenter.present(openWindow: openWindow)
+        selectSite(site)
+        mainWindowPanel = .dns
+        MainWindowPresenter.present(openWindow: openWindow)
     }
 
     func clearStatus() {

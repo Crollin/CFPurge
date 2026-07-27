@@ -6,28 +6,24 @@ struct MenuBarView: View {
     @Environment(\.openWindow) private var openWindow
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: 12) {
             header
 
             if viewModel.needsSetup {
                 setupPrompt
             } else {
-                purgeControls
+                quickActions
             }
 
-            Divider()
+            Divider().overlay(CFDesignTokens.border)
 
-            Button("Quitter CFPurge") {
-                NSApplication.shared.terminate(nil)
-            }
-            .buttonStyle(.borderless)
-            .foregroundStyle(.secondary)
-            .font(.caption)
-            .frame(maxWidth: .infinity, alignment: .trailing)
+            footer
         }
-        .padding(16)
-        .frame(width: 340)
-        .animation(.easeInOut(duration: 0.2), value: viewModel.status)
+        .padding(14)
+        .frame(width: 320)
+        .cfWindowBackground()
+        .preferredColorScheme(.dark)
+        .animation(.easeInOut(duration: CFDesignTokens.animationNormal), value: viewModel.status)
         .onAppear {
             viewModel.openSettingsIfNeeded {
                 SettingsWindowPresenter.present(openWindow: openWindow)
@@ -37,20 +33,17 @@ struct MenuBarView: View {
 
     private var header: some View {
         HStack(spacing: 10) {
-            CFPurgeMark(size: 28)
-
-            Text("CFPurge")
-                .font(.headline.weight(.semibold))
-
-            Spacer()
-
-            Button {
-                openSettingsPanel()
-            } label: {
-                Image(systemName: "gearshape")
+            CFPurgeMark(size: 24)
+            VStack(alignment: .leading, spacing: 1) {
+                Text("CFPurge")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(CFDesignTokens.textPrimary)
+                Text("Cache Cloudflare")
+                    .font(.caption2)
+                    .foregroundStyle(CFDesignTokens.textSecondary)
             }
-            .buttonStyle(.borderless)
-            .help("Réglages")
+            Spacer()
+            CFStatusBadge(style: viewModel.needsSetup ? .warning : .active)
         }
     }
 
@@ -58,36 +51,34 @@ struct MenuBarView: View {
         VStack(alignment: .leading, spacing: 10) {
             Label("Configuration requise", systemImage: "exclamationmark.circle")
                 .font(.subheadline.weight(.semibold))
-                .foregroundStyle(.orange)
+                .foregroundStyle(CFDesignTokens.accentOrange)
 
             if !viewModel.tokenConfigured {
                 Text("1. Ajoutez votre token API Cloudflare")
                     .font(.caption)
+                    .foregroundStyle(CFDesignTokens.textSecondary)
             }
             if viewModel.sites.isEmpty {
-                Text("2. Ajoutez au moins un site (nom, Zone ID, domaine)")
+                Text("2. Ajoutez au moins un site")
                     .font(.caption)
+                    .foregroundStyle(CFDesignTokens.textSecondary)
             }
 
-            Button("Ouvrir les réglages") {
+            CFButton(title: "Ouvrir les réglages", style: .primary) {
                 openSettingsPanel()
             }
-            .buttonStyle(.borderedProminent)
-            .tint(CFPurgeBrand.orange)
-            .controlSize(.large)
         }
     }
 
-    private var purgeControls: some View {
-        Group {
+    private var quickActions: some View {
+        VStack(alignment: .leading, spacing: 10) {
             sitePicker
 
-            TextField("URL ou chemin (ex. /page)", text: $viewModel.urlInput)
-                .textFieldStyle(.roundedBorder)
+            CFTextField(placeholder: "URL ou chemin (ex. /page)", text: $viewModel.urlInput)
                 .disabled(viewModel.isLoading || viewModel.selectedSite == nil)
 
             HStack(spacing: 8) {
-                Button("Personnaliser le vidage") {
+                CFButton(title: "Purger URL", icon: "bolt.fill", style: .primary, size: .compact, expands: true) {
                     Task { await viewModel.purgeURL() }
                 }
                 .disabled(
@@ -96,32 +87,23 @@ struct MenuBarView: View {
                         || viewModel.urlInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
                 )
 
+                CFButton(title: "Vider tout", icon: "trash", style: .destructive, size: .compact, expands: true) {
+                    confirmPurgeEverything()
+                }
+                .disabled(viewModel.isLoading || viewModel.selectedSite == nil)
+
                 if viewModel.isLoading {
                     ProgressView()
                         .controlSize(.small)
                 }
             }
 
-            Button("Vider tous les éléments") {
-                confirmPurgeEverything()
-            }
-            .buttonStyle(.borderedProminent)
-            .tint(.red)
-            .disabled(viewModel.isLoading || viewModel.selectedSite == nil)
-
             if viewModel.status.message != nil {
                 PurgeStatusBanner(status: viewModel.status)
             }
 
-            Text("Attention : vider tout le cache peut impacter les performances temporairement.")
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
-
             if viewModel.dnsManagementEnabled {
-                Divider()
-
-                Button("Gérer le DNS") {
+                CFButton(title: "Gérer le DNS", icon: "network", style: .secondary, size: .compact) {
                     viewModel.openDNS(for: viewModel.selectedSite, openWindow: openWindow)
                 }
                 .disabled(viewModel.selectedSite == nil)
@@ -147,23 +129,64 @@ struct MenuBarView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(viewModel.selectedSite?.name ?? "Choisir un site")
                         .font(.body.weight(.medium))
+                        .foregroundStyle(CFDesignTokens.textPrimary)
                     if let domain = viewModel.selectedSite?.domain {
                         Text(domain)
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(CFDesignTokens.textSecondary)
                     }
                 }
                 Spacer()
                 Image(systemName: "chevron.up.chevron.down")
                     .font(.caption.weight(.semibold))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(CFDesignTokens.textSecondary)
             }
-            .padding(.horizontal, 10)
-            .padding(.vertical, 8)
-            .background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .padding(.horizontal, 12)
+            .padding(.vertical, 9)
+            .background(CFDesignTokens.surface, in: RoundedRectangle(cornerRadius: CFDesignTokens.radiusButton, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: CFDesignTokens.radiusButton, style: .continuous)
+                    .strokeBorder(CFDesignTokens.border, lineWidth: 1)
+            }
         }
         .menuStyle(.borderlessButton)
         .disabled(viewModel.sites.isEmpty)
+    }
+
+    private var footer: some View {
+        VStack(spacing: 6) {
+            Button {
+                MainWindowPresenter.present(openWindow: openWindow)
+            } label: {
+                HStack {
+                    Image(systemName: "macwindow")
+                        .font(.caption)
+                    Text("Ouvrir CFPurge")
+                        .font(.caption.weight(.medium))
+                    Spacer()
+                }
+                .foregroundStyle(CFDesignTokens.accent)
+            }
+            .buttonStyle(.plain)
+
+            HStack {
+                Button("Réglages") {
+                    openSettingsPanel()
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(CFDesignTokens.textSecondary)
+                .font(.caption)
+
+                Spacer()
+
+                Button("Quitter") {
+                    NSApplication.shared.terminate(nil)
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(CFDesignTokens.textTertiary)
+                .font(.caption)
+            }
+        }
     }
 
     private func openSettingsPanel() {
@@ -181,7 +204,6 @@ struct MenuBarView: View {
         )
 
         guard confirmed else { return }
-
         Task { await viewModel.purgeEverything() }
     }
 }

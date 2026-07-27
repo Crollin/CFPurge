@@ -1,21 +1,31 @@
 import SwiftUI
 
+enum DNSRecordsPresentation {
+    case window
+    case embedded
+}
+
 struct DNSRecordsView: View {
     let site: Site
+    var presentation: DNSRecordsPresentation = .window
 
     @EnvironmentObject private var dnsViewModel: DNSViewModel
     @EnvironmentObject private var appViewModel: AppViewModel
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            header
-            Divider()
-            filters
-            Divider()
+            if presentation == .window {
+                windowHeader
+                Divider().overlay(CFDesignTokens.border)
+                filters
+            } else {
+                embeddedToolbar
+            }
+            Divider().overlay(CFDesignTokens.border)
             recordList
             footer
         }
-        .frame(minWidth: 640, minHeight: 480)
+        .modifier(DNSRecordsChrome(presentation: presentation))
         .onAppear {
             Task { await dnsViewModel.loadRecords(for: site) }
         }
@@ -30,37 +40,62 @@ struct DNSRecordsView: View {
         }
     }
 
-    private var header: some View {
+    private var windowHeader: some View {
         HStack(alignment: .center, spacing: 12) {
+            CFIconBadge(icon: "network", color: CFDesignTokens.accent, size: 36)
+
             VStack(alignment: .leading, spacing: 2) {
-                Text("DNS — \(site.name)")
+                Text("DNS - \(site.name)")
                     .font(.title2.weight(.semibold))
+                    .foregroundStyle(CFDesignTokens.textPrimary)
                 Text(site.domain)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(CFDesignTokens.textSecondary)
             }
 
             Spacer()
 
-            Button {
+            CFButton(title: "Actualiser", icon: "arrow.clockwise", style: .secondary, size: .compact) {
                 Task { await dnsViewModel.refresh(for: site) }
-            } label: {
-                Label("Actualiser", systemImage: "arrow.clockwise")
             }
             .disabled(dnsViewModel.status.isLoading)
 
-            Button("Ajouter un enregistrement") {
+            CFButton(title: "Ajouter", icon: "plus", style: .primary, size: .compact) {
                 dnsViewModel.beginAddRecord()
             }
-            .buttonStyle(.borderedProminent)
         }
         .padding(16)
+        .background(CFDesignTokens.sidebar)
+    }
+
+    private var embeddedToolbar: some View {
+        HStack(spacing: 10) {
+            CFTextField(placeholder: "Rechercher…", text: $dnsViewModel.searchText)
+
+            Picker("Type", selection: $dnsViewModel.typeFilter) {
+                ForEach(dnsViewModel.availableTypeFilters, id: \.self) { type in
+                    Text(type).tag(type)
+                }
+            }
+            .pickerStyle(.menu)
+            .frame(width: 100)
+
+            CFButton(title: "Actualiser", icon: "arrow.clockwise", style: .secondary, size: .compact) {
+                Task { await dnsViewModel.refresh(for: site) }
+            }
+            .disabled(dnsViewModel.status.isLoading)
+
+            CFButton(title: "Ajouter", icon: "plus", style: .primary, size: .compact) {
+                dnsViewModel.beginAddRecord()
+            }
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 12)
     }
 
     private var filters: some View {
         HStack(spacing: 12) {
-            TextField("Rechercher…", text: $dnsViewModel.searchText)
-                .textFieldStyle(.roundedBorder)
+            CFTextField(placeholder: "Rechercher…", text: $dnsViewModel.searchText)
 
             Picker("Type", selection: $dnsViewModel.typeFilter) {
                 ForEach(dnsViewModel.availableTypeFilters, id: \.self) { type in
@@ -79,6 +114,7 @@ struct DNSRecordsView: View {
         if dnsViewModel.status.isLoading && dnsViewModel.records.isEmpty {
             Spacer()
             ProgressView("Chargement des enregistrements…")
+                .foregroundStyle(CFDesignTokens.textSecondary)
                 .frame(maxWidth: .infinity)
             Spacer()
         } else if let message = dnsViewModel.status.message,
@@ -88,10 +124,10 @@ struct DNSRecordsView: View {
             VStack(spacing: 8) {
                 Image(systemName: "exclamationmark.triangle")
                     .font(.title)
-                    .foregroundStyle(.orange)
+                    .foregroundStyle(CFDesignTokens.accentOrange)
                 Text(message)
                     .multilineTextAlignment(.center)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(CFDesignTokens.textSecondary)
             }
             .padding()
             .frame(maxWidth: .infinity)
@@ -99,26 +135,30 @@ struct DNSRecordsView: View {
         } else if dnsViewModel.filteredRecords.isEmpty {
             Spacer()
             Text(dnsViewModel.records.isEmpty ? "Aucun enregistrement DNS." : "Aucun résultat pour ce filtre.")
-                .foregroundStyle(.secondary)
+                .foregroundStyle(CFDesignTokens.textSecondary)
                 .frame(maxWidth: .infinity)
             Spacer()
         } else {
-            List(dnsViewModel.filteredRecords) { record in
-                DNSRecordRow(
-                    record: record,
-                    canEdit: appViewModel.dnsAllowModifyExisting,
-                    onEdit: { dnsViewModel.beginEditRecord(record) }
-                )
-                .transition(.opacity.combined(with: .move(edge: .top)))
+            ScrollView {
+                LazyVStack(spacing: 8) {
+                    ForEach(dnsViewModel.filteredRecords) { record in
+                        DNSRecordCard(
+                            record: record,
+                            canEdit: appViewModel.dnsAllowModifyExisting,
+                            onEdit: { dnsViewModel.beginEditRecord(record) }
+                        )
+                        .transition(.opacity.combined(with: .move(edge: .top)))
+                    }
+                }
+                .padding(presentation == .embedded ? 20 : 16)
             }
-            .listStyle(.inset(alternatesRowBackgrounds: true))
         }
     }
 
     private var footer: some View {
         VStack(spacing: 8) {
             if dnsViewModel.hasMorePages {
-                Button("Charger plus") {
+                CFButton(title: "Charger plus", style: .secondary, size: .compact) {
                     Task { await dnsViewModel.loadMore(for: site) }
                 }
                 .disabled(dnsViewModel.status.isLoading)
@@ -136,24 +176,48 @@ struct DNSRecordsView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
-        .padding(16)
+        .padding(presentation == .embedded ? EdgeInsets(top: 12, leading: 20, bottom: 16, trailing: 20) : EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
     }
 
     private var footerColor: Color {
         if case .success = dnsViewModel.status {
-            return .green
+            return CFDesignTokens.success
         }
         if case .error = dnsViewModel.status {
-            return .red
+            return CFDesignTokens.destructive
         }
-        return .secondary
+        return CFDesignTokens.textSecondary
     }
 }
 
-private struct DNSRecordRow: View {
+// MARK: - Presentation chrome
+
+private struct DNSRecordsChrome: ViewModifier {
+    let presentation: DNSRecordsPresentation
+
+    func body(content: Content) -> some View {
+        switch presentation {
+        case .window:
+            content
+                .cfWindowBackground()
+                .cfConfigureWindow()
+                .preferredColorScheme(.dark)
+                .frame(minWidth: 640, minHeight: 480)
+        case .embedded:
+            content
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+    }
+}
+
+// MARK: - DNS Record Card
+
+private struct DNSRecordCard: View {
     let record: DNSRecord
     let canEdit: Bool
     let onEdit: () -> Void
+
+    @State private var isHovered = false
 
     var body: some View {
         HStack(alignment: .center, spacing: 12) {
@@ -162,10 +226,11 @@ private struct DNSRecordRow: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(record.name)
                     .font(.body.weight(.medium))
+                    .foregroundStyle(CFDesignTokens.textPrimary)
                     .lineLimit(1)
                 Text(record.content)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(CFDesignTokens.textSecondary)
                     .lineLimit(2)
             }
 
@@ -174,24 +239,28 @@ private struct DNSRecordRow: View {
             VStack(alignment: .trailing, spacing: 4) {
                 HStack(spacing: 4) {
                     Image(systemName: record.proxied == true ? "cloud.fill" : "cloud")
-                        .foregroundStyle(record.proxied == true ? .orange : .secondary)
+                        .foregroundStyle(record.proxied == true ? CFDesignTokens.accentOrange : CFDesignTokens.textTertiary)
                     Text(record.proxied == true ? "Proxied" : "DNS only")
                         .font(.caption2)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(CFDesignTokens.textSecondary)
                 }
 
                 Text(ttlLabel)
                     .font(.caption2)
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(CFDesignTokens.textTertiary)
             }
 
             if canEdit {
-                Button("Modifier", action: onEdit)
-                    .buttonStyle(.bordered)
-                    .controlSize(.small)
+                CFIconButton(icon: "pencil", tint: CFDesignTokens.textSecondary, action: onEdit)
             }
         }
-        .padding(.vertical, 4)
+        .padding(14)
+        .cfHoverable(isHovered: isHovered)
+        .overlay {
+            RoundedRectangle(cornerRadius: CFDesignTokens.radiusCard, style: .continuous)
+                .strokeBorder(CFDesignTokens.border, lineWidth: 1)
+        }
+        .onHover { isHovered = $0 }
     }
 
     private var ttlLabel: String {

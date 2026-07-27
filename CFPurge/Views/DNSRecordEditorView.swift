@@ -27,58 +27,79 @@ struct DNSRecordEditorView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 20) {
             Text(isEditing ? "Modifier l'enregistrement DNS" : "Nouvel enregistrement DNS")
-                .font(.title2)
+                .font(.title2.weight(.semibold))
+                .foregroundStyle(CFDesignTokens.textPrimary)
 
-            Form {
-                Picker("Type", selection: $recordType) {
-                    ForEach(DNSRecordType.allCases) { type in
-                        Text(type.rawValue).tag(type.rawValue)
+            CFCard {
+                VStack(alignment: .leading, spacing: 14) {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("Type")
+                            .font(.caption.weight(.medium))
+                            .foregroundStyle(CFDesignTokens.textSecondary)
+                        Picker("Type", selection: $recordType) {
+                            ForEach(DNSRecordType.allCases) { type in
+                                Text(type.rawValue).tag(type.rawValue)
+                            }
+                        }
+                        .labelsHidden()
+                        .disabled(isEditing)
                     }
-                }
-                .disabled(isEditing)
 
-                TextField("Nom (@, www, sous-domaine)", text: $name)
+                    CFTextFieldLabel(label: "Nom (@, www, sous-domaine)", text: $name)
+                    CFTextFieldLabel(label: contentPlaceholder, text: $content)
 
-                TextField(contentPlaceholder, text: $content)
-
-                Picker("TTL", selection: $ttl) {
-                    ForEach(ttlOptions, id: \.value) { option in
-                        Text(option.label).tag(option.value)
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("TTL")
+                            .font(.caption.weight(.medium))
+                            .foregroundStyle(CFDesignTokens.textSecondary)
+                        Picker("TTL", selection: $ttl) {
+                            ForEach(ttlOptions, id: \.value) { option in
+                                Text(option.label).tag(option.value)
+                            }
+                        }
+                        .labelsHidden()
                     }
-                }
 
-                if selectedType.isProxiable {
-                    Toggle("Proxied (nuage orange)", isOn: $proxied)
-                }
+                    if selectedType.isProxiable {
+                        CFSettingRow(
+                            title: "Proxied (nuage orange)",
+                            subtitle: "Active le proxy Cloudflare pour cet enregistrement."
+                        ) {
+                            CFToggle(isOn: $proxied)
+                        }
+                    }
 
-                Text("Nom complet : \(DNSRecordValidator.fullRecordName(name, domain: site.domain))")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                    Text("Nom complet : \(DNSRecordValidator.fullRecordName(name, domain: site.domain))")
+                        .font(.caption)
+                        .foregroundStyle(CFDesignTokens.textSecondary)
+                }
+                .padding(16)
             }
-            .formStyle(.grouped)
 
             if let validationMessage {
                 Text(validationMessage)
                     .font(.caption)
-                    .foregroundStyle(.red)
+                    .foregroundStyle(CFDesignTokens.destructive)
             }
 
             HStack {
                 Spacer()
-                Button("Annuler") {
+                CFButton(title: "Annuler", style: .secondary) {
                     dismiss()
                 }
-                Button(isEditing ? "Enregistrer" : "Créer") {
+                CFButton(title: isEditing ? "Enregistrer" : "Créer", style: .primary) {
                     Task { await saveRecord() }
                 }
-                .keyboardShortcut(.defaultAction)
                 .disabled(isSaving)
             }
         }
-        .padding(20)
-        .frame(width: 460)
+        .padding(24)
+        .frame(width: 480)
+        .cfWindowBackground()
+        .cfConfigureWindow()
+        .preferredColorScheme(.dark)
         .onAppear {
             prefillIfEditing()
         }
@@ -113,7 +134,6 @@ struct DNSRecordEditorView: View {
         proxied = record.proxied ?? false
     }
 
-    /// Affiche `@` / sous-domaine plutôt que le FQDN renvoyé par Cloudflare.
     private func relativeName(for fullName: String) -> String {
         let domain = site.domain
             .trimmingCharacters(in: .whitespacesAndNewlines)
