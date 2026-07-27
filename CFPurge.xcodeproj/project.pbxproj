@@ -42,6 +42,7 @@
 		8A3B4BCFFB31904A0B6FE7DA /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA987433C6EA3EA1CE4EEFA4 /* SettingsView.swift */; };
 		98FC437AB67FA0E5EBC668E9 /* CFToggle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8E35C2540D2BF0930F186F /* CFToggle.swift */; };
 		9952F193CF65C1F102966398 /* URLNormalizerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A07BCE5AE9DCEC4C53ED8C7D /* URLNormalizerTests.swift */; };
+		AB4BCD150382EA80F355766B /* CFSegmentPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BA67D8D2F803C567F76060D /* CFSegmentPicker.swift */; };
 		AD66CC5F984A4C32151EE6B0 /* CFSettingRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 856367AAD23AF62AC5D6D244 /* CFSettingRow.swift */; };
 		B3F9BC56A56FAF08485C2446 /* CFModifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AFF9F6D2494DD826C67E400 /* CFModifiers.swift */; };
 		B629D91C727C916AB1EC75EB /* MainWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63C6C01CD200135F129B4559 /* MainWindowView.swift */; };
@@ -77,6 +78,7 @@
 		002484D88B77F587D4E0A9D5 /* MenuBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarView.swift; sourceTree = "<group>"; };
 		035A9DFB11FFFDEB3F9DD610 /* CFSidebarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CFSidebarItem.swift; sourceTree = "<group>"; };
 		08945C753B6C1CCEBD73BFDD /* CFTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CFTextField.swift; sourceTree = "<group>"; };
+		0BA67D8D2F803C567F76060D /* CFSegmentPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CFSegmentPicker.swift; sourceTree = "<group>"; };
 		128C795A5160F9024EC14C7A /* CloudflareService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudflareService.swift; sourceTree = "<group>"; };
 		1AF64C5CB5B8C7A4564DA199 /* CFPurgeError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CFPurgeError.swift; sourceTree = "<group>"; };
 		1B63F1A372AE0ACB4E4F6B92 /* SiteValidatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiteValidatorTests.swift; sourceTree = "<group>"; };
@@ -248,6 +250,7 @@
 				D0F2E78C1D853218565DB45A /* CFIconBadge.swift */,
 				2AFF9F6D2494DD826C67E400 /* CFModifiers.swift */,
 				556958284D66D2E5483AECC9 /* CFSectionHeader.swift */,
+				0BA67D8D2F803C567F76060D /* CFSegmentPicker.swift */,
 				856367AAD23AF62AC5D6D244 /* CFSettingRow.swift */,
 				035A9DFB11FFFDEB3F9DD610 /* CFSidebarItem.swift */,
 				79D3558AB83F99CCC5111909 /* CFStatusBadge.swift */,
@@ -394,6 +397,7 @@
 				1EDCB63DFFDCF00446CACB73 /* CFPurgeError.swift in Sources */,
 				B70BB80ADA567FD50B479E29 /* CFPurgeMark.swift in Sources */,
 				594099EA99EED4196DDB948E /* CFSectionHeader.swift in Sources */,
+				AB4BCD150382EA80F355766B /* CFSegmentPicker.swift in Sources */,
 				AD66CC5F984A4C32151EE6B0 /* CFSettingRow.swift in Sources */,
 				F4B55950C25DF4AFE4C1E07A /* CFSidebarItem.swift in Sources */,
 				7C6B09D02ED609E55CB03845 /* CFStatusBadge.swift in Sources */,

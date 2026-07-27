@@ -31,6 +31,7 @@ struct CFPurgeApp: App {
         Window("CFPurge", id: "main-window") {
             MainWindowView()
                 .environmentObject(viewModel)
+                .environmentObject(dnsViewModel)
                 .onAppear {
                     appDelegate.bind(viewModel: viewModel)
                 }
@@ -47,21 +48,5 @@ struct CFPurgeApp: App {
         }
         .windowResizability(.contentSize)
         .defaultSize(width: 780, height: 560)
-
-        Window("DNS", id: "dns-window") {
-            Group {
-                if let site = viewModel.dnsSite {
-                    DNSRecordsView(site: site)
-                } else {
-                    Text("Aucun site sélectionné.")
-                        .foregroundStyle(CFDesignTokens.textSecondary)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .cfWindowBackground()
-                }
-            }
-            .environmentObject(dnsViewModel)
-            .environmentObject(viewModel)
-        }
-        .defaultSize(width: 720, height: 560)
     }
 }

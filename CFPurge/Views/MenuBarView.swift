@@ -78,7 +78,7 @@ struct MenuBarView: View {
                 .disabled(viewModel.isLoading || viewModel.selectedSite == nil)
 
             HStack(spacing: 8) {
-                CFButton(title: "Purger URL", icon: "bolt.fill", style: .primary) {
+                CFButton(title: "Purger URL", icon: "bolt.fill", style: .primary, size: .compact, expands: true) {
                     Task { await viewModel.purgeURL() }
                 }
                 .disabled(
@@ -87,23 +87,23 @@ struct MenuBarView: View {
                         || viewModel.urlInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
                 )
 
+                CFButton(title: "Vider tout", icon: "trash", style: .destructive, size: .compact, expands: true) {
+                    confirmPurgeEverything()
+                }
+                .disabled(viewModel.isLoading || viewModel.selectedSite == nil)
+
                 if viewModel.isLoading {
                     ProgressView()
                         .controlSize(.small)
                 }
             }
 
-            CFButton(title: "Vider tous les éléments", style: .destructive) {
-                confirmPurgeEverything()
-            }
-            .disabled(viewModel.isLoading || viewModel.selectedSite == nil)
-
             if viewModel.status.message != nil {
                 PurgeStatusBanner(status: viewModel.status)
             }
 
             if viewModel.dnsManagementEnabled {
-                CFButton(title: "Gérer le DNS", icon: "network", style: .secondary) {
+                CFButton(title: "Gérer le DNS", icon: "network", style: .secondary, size: .compact) {
                     viewModel.openDNS(for: viewModel.selectedSite, openWindow: openWindow)
                 }
                 .disabled(viewModel.selectedSite == nil)

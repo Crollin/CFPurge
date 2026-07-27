@@ -6,10 +6,31 @@ enum CFButtonStyle {
     case destructive
 }
 
+enum CFButtonSize {
+    case regular
+    case compact
+
+    var horizontalPadding: CGFloat {
+        switch self {
+        case .regular: return 14
+        case .compact: return 10
+        }
+    }
+
+    var verticalPadding: CGFloat {
+        switch self {
+        case .regular: return 8
+        case .compact: return 6
+        }
+    }
+}
+
 struct CFButton: View {
     let title: String
     var icon: String?
     var style: CFButtonStyle = .primary
+    var size: CFButtonSize = .regular
+    var expands: Bool = false
     var isDisabled: Bool = false
     let action: () -> Void
 
@@ -18,13 +39,15 @@ struct CFButton: View {
             HStack(spacing: 6) {
                 if let icon {
                     Image(systemName: icon)
-                        .font(.caption.weight(.semibold))
+                        .font(size == .compact ? .caption2.weight(.semibold) : .caption.weight(.semibold))
                 }
                 Text(title)
-                    .font(.body.weight(.medium))
+                    .font(size == .compact ? .caption.weight(.medium) : .body.weight(.medium))
+                    .lineLimit(1)
             }
-            .padding(.horizontal, 14)
-            .padding(.vertical, 8)
+            .padding(.horizontal, size.horizontalPadding)
+            .padding(.vertical, size.verticalPadding)
+            .frame(maxWidth: expands ? .infinity : nil)
             .foregroundStyle(foregroundColor)
             .background(backgroundColor, in: RoundedRectangle(cornerRadius: CFDesignTokens.radiusButton, style: .continuous))
             .overlay {

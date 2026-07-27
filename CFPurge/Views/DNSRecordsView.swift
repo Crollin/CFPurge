@@ -1,24 +1,31 @@
 import SwiftUI
 
+enum DNSRecordsPresentation {
+    case window
+    case embedded
+}
+
 struct DNSRecordsView: View {
     let site: Site
+    var presentation: DNSRecordsPresentation = .window
 
     @EnvironmentObject private var dnsViewModel: DNSViewModel
     @EnvironmentObject private var appViewModel: AppViewModel
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            header
-            Divider().overlay(CFDesignTokens.border)
-            filters
+            if presentation == .window {
+                windowHeader
+                Divider().overlay(CFDesignTokens.border)
+                filters
+            } else {
+                embeddedToolbar
+            }
             Divider().overlay(CFDesignTokens.border)
             recordList
             footer
         }
-        .cfWindowBackground()
-        .cfConfigureWindow()
-        .preferredColorScheme(.dark)
-        .frame(minWidth: 640, minHeight: 480)
+        .modifier(DNSRecordsChrome(presentation: presentation))
         .onAppear {
             Task { await dnsViewModel.loadRecords(for: site) }
         }
@@ -33,12 +40,12 @@ struct DNSRecordsView: View {
         }
     }
 
-    private var header: some View {
+    private var windowHeader: some View {
         HStack(alignment: .center, spacing: 12) {
             CFIconBadge(icon: "network", color: CFDesignTokens.accent, size: 36)
 
             VStack(alignment: .leading, spacing: 2) {
-                Text("DNS — \(site.name)")
+                Text("DNS - \(site.name)")
                     .font(.title2.weight(.semibold))
                     .foregroundStyle(CFDesignTokens.textPrimary)
                 Text(site.domain)
@@ -48,17 +55,42 @@ struct DNSRecordsView: View {
 
             Spacer()
 
-            CFButton(title: "Actualiser", icon: "arrow.clockwise", style: .secondary) {
+            CFButton(title: "Actualiser", icon: "arrow.clockwise", style: .secondary, size: .compact) {
                 Task { await dnsViewModel.refresh(for: site) }
             }
             .disabled(dnsViewModel.status.isLoading)
 
-            CFButton(title: "Ajouter", icon: "plus", style: .primary) {
+            CFButton(title: "Ajouter", icon: "plus", style: .primary, size: .compact) {
                 dnsViewModel.beginAddRecord()
             }
         }
         .padding(16)
         .background(CFDesignTokens.sidebar)
+    }
+
+    private var embeddedToolbar: some View {
+        HStack(spacing: 10) {
+            CFTextField(placeholder: "Rechercher…", text: $dnsViewModel.searchText)
+
+            Picker("Type", selection: $dnsViewModel.typeFilter) {
+                ForEach(dnsViewModel.availableTypeFilters, id: \.self) { type in
+                    Text(type).tag(type)
+                }
+            }
+            .pickerStyle(.menu)
+            .frame(width: 100)
+
+            CFButton(title: "Actualiser", icon: "arrow.clockwise", style: .secondary, size: .compact) {
+                Task { await dnsViewModel.refresh(for: site) }
+            }
+            .disabled(dnsViewModel.status.isLoading)
+
+            CFButton(title: "Ajouter", icon: "plus", style: .primary, size: .compact) {
+                dnsViewModel.beginAddRecord()
+            }
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 12)
     }
 
     private var filters: some View {
@@ -118,7 +150,7 @@ struct DNSRecordsView: View {
                         .transition(.opacity.combined(with: .move(edge: .top)))
                     }
                 }
-                .padding(16)
+                .padding(presentation == .embedded ? 20 : 16)
             }
         }
     }
@@ -126,7 +158,7 @@ struct DNSRecordsView: View {
     private var footer: some View {
         VStack(spacing: 8) {
             if dnsViewModel.hasMorePages {
-                CFButton(title: "Charger plus", style: .secondary) {
+                CFButton(title: "Charger plus", style: .secondary, size: .compact) {
                     Task { await dnsViewModel.loadMore(for: site) }
                 }
                 .disabled(dnsViewModel.status.isLoading)
@@ -144,7 +176,7 @@ struct DNSRecordsView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
-        .padding(16)
+        .padding(presentation == .embedded ? EdgeInsets(top: 12, leading: 20, bottom: 16, trailing: 20) : EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
     }
 
     private var footerColor: Color {
@@ -155,6 +187,26 @@ struct DNSRecordsView: View {
             return CFDesignTokens.destructive
         }
         return CFDesignTokens.textSecondary
+    }
+}
+
+// MARK: - Presentation chrome
+
+private struct DNSRecordsChrome: ViewModifier {
+    let presentation: DNSRecordsPresentation
+
+    func body(content: Content) -> some View {
+        switch presentation {
+        case .window:
+            content
+                .cfWindowBackground()
+                .cfConfigureWindow()
+                .preferredColorScheme(.dark)
+                .frame(minWidth: 640, minHeight: 480)
+        case .embedded:
+            content
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
     }
 }
 

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct MainWindowView: View {
     @EnvironmentObject private var viewModel: AppViewModel
+    @EnvironmentObject private var dnsViewModel: DNSViewModel
     @Environment(\.openWindow) private var openWindow
 
     var body: some View {
@@ -17,6 +18,11 @@ struct MainWindowView: View {
         .onAppear {
             viewModel.openSettingsIfNeeded {
                 SettingsWindowPresenter.present(openWindow: openWindow)
+            }
+        }
+        .onChange(of: viewModel.dnsManagementEnabled) { _, enabled in
+            if !enabled, viewModel.mainWindowPanel == .dns {
+                viewModel.mainWindowPanel = .cache
             }
         }
         .sheet(isPresented: $viewModel.showingSiteEditor) {
@@ -127,7 +133,7 @@ struct MainWindowView: View {
         if viewModel.needsSetup {
             setupContent
         } else {
-            purgeContent
+            siteContent
         }
     }
 
@@ -164,7 +170,7 @@ struct MainWindowView: View {
         .background(CFDesignTokens.background)
     }
 
-    private var purgeContent: some View {
+    private var siteContent: some View {
         VStack(alignment: .leading, spacing: 0) {
             contentHeader
             Divider().overlay(CFDesignTokens.border)
@@ -172,6 +178,7 @@ struct MainWindowView: View {
         }
         .background(CFDesignTokens.background)
         .animation(.easeInOut(duration: CFDesignTokens.animationNormal), value: viewModel.selectedSite?.id)
+        .animation(.easeInOut(duration: CFDesignTokens.animationNormal), value: viewModel.mainWindowPanel)
     }
 
     private var contentHeader: some View {
@@ -195,73 +202,98 @@ struct MainWindowView: View {
 
             Spacer()
 
-            HStack(spacing: 8) {
-                CFButton(title: "Purger URL", icon: "bolt.fill", style: .primary) {
-                    Task { await viewModel.purgeURL() }
-                }
-                .disabled(
-                    viewModel.isLoading
-                        || viewModel.selectedSite == nil
-                        || viewModel.urlInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-                )
-
-                CFButton(title: "Vider tout", icon: "trash", style: .destructive) {
-                    confirmPurgeEverything()
-                }
-                .disabled(viewModel.isLoading || viewModel.selectedSite == nil)
-
-                if viewModel.dnsManagementEnabled {
-                    CFButton(title: "DNS", icon: "network", style: .secondary) {
-                        viewModel.openDNS(for: viewModel.selectedSite, openWindow: openWindow)
-                    }
-                    .disabled(viewModel.selectedSite == nil)
-                }
+            if viewModel.dnsManagementEnabled {
+                CFSegmentPicker(selection: $viewModel.mainWindowPanel)
             }
         }
         .padding(20)
     }
 
+    @ViewBuilder
     private var contentBody: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                CFCard {
-                    VStack(alignment: .leading, spacing: 14) {
-                        Text("URL ou chemin")
-                            .font(.caption.weight(.medium))
-                            .foregroundStyle(CFDesignTokens.textSecondary)
-
-                        CFTextField(placeholder: "ex. /page ou https://…", text: $viewModel.urlInput)
-                            .disabled(viewModel.isLoading || viewModel.selectedSite == nil)
-
-                        HStack(spacing: 8) {
-                            CFButton(title: "Personnaliser le vidage", style: .primary) {
-                                Task { await viewModel.purgeURL() }
-                            }
-                            .disabled(
-                                viewModel.isLoading
-                                    || viewModel.selectedSite == nil
-                                    || viewModel.urlInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-                            )
-
-                            if viewModel.isLoading {
-                                ProgressView()
-                                    .controlSize(.small)
-                            }
-                        }
-
-                        if viewModel.status.message != nil {
-                            PurgeStatusBanner(status: viewModel.status)
-                        }
-
-                        Text("Attention : vider tout le cache peut impacter les performances temporairement.")
-                            .font(.caption2)
-                            .foregroundStyle(CFDesignTokens.textTertiary)
-                    }
-                    .padding(20)
+        if viewModel.selectedSite == nil {
+            noSiteSelected
+        } else {
+            switch viewModel.mainWindowPanel {
+            case .cache:
+                cachePanel
+            case .dns:
+                if let site = viewModel.selectedSite {
+                    DNSRecordsView(site: site, presentation: .embedded)
+                        .environmentObject(dnsViewModel)
+                        .id(site.id)
                 }
             }
-            .padding(20)
         }
+    }
+
+    private var noSiteSelected: some View {
+        VStack {
+            Spacer()
+            Text("Sélectionnez un site dans la barre latérale.")
+                .foregroundStyle(CFDesignTokens.textSecondary)
+            Spacer()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    private var cachePanel: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            CFCard {
+                VStack(alignment: .leading, spacing: 14) {
+                    Text("URL ou chemin")
+                        .font(.caption.weight(.medium))
+                        .foregroundStyle(CFDesignTokens.textSecondary)
+
+                    CFTextField(placeholder: "ex. /page ou https://…", text: $viewModel.urlInput)
+                        .disabled(viewModel.isLoading || viewModel.selectedSite == nil)
+
+                    HStack(spacing: 8) {
+                        CFButton(
+                            title: "Purger URL",
+                            icon: "bolt.fill",
+                            style: .primary,
+                            expands: true
+                        ) {
+                            Task { await viewModel.purgeURL() }
+                        }
+                        .disabled(
+                            viewModel.isLoading
+                                || viewModel.selectedSite == nil
+                                || viewModel.urlInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                        )
+
+                        CFButton(
+                            title: "Vider tout",
+                            icon: "trash",
+                            style: .destructive,
+                            expands: true
+                        ) {
+                            confirmPurgeEverything()
+                        }
+                        .disabled(viewModel.isLoading || viewModel.selectedSite == nil)
+                    }
+
+                    if viewModel.isLoading {
+                        ProgressView()
+                            .controlSize(.small)
+                    }
+
+                    if viewModel.status.message != nil {
+                        PurgeStatusBanner(status: viewModel.status)
+                    }
+
+                    Text("Attention : vider tout le cache peut impacter les performances temporairement.")
+                        .font(.caption2)
+                        .foregroundStyle(CFDesignTokens.textTertiary)
+                }
+                .padding(20)
+            }
+
+            Spacer(minLength: 0)
+        }
+        .padding(20)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 
     private func confirmPurgeEverything() {
@@ -332,4 +364,5 @@ private struct SiteSidebarRow: View {
 #Preview {
     MainWindowView()
         .environmentObject(AppViewModel())
+        .environmentObject(DNSViewModel())
 }

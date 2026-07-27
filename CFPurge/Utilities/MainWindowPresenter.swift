@@ -5,7 +5,8 @@ enum MainWindowPresenter {
     private static let windowTitle = "CFPurge"
 
     @MainActor
-    static func present(openWindow: OpenWindowAction) {
+    static func present(openWindow: OpenWindowAction, panel: MainWindowPanel = .cache, viewModel: AppViewModel? = nil) {
+        viewModel?.mainWindowPanel = panel
         DockVisibilityController.showInDock()
 
         let existingWindows = NSApp.windows.filter { $0.title == windowTitle }
