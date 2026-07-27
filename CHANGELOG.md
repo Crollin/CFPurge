@@ -19,7 +19,7 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/)
 
 ### Modifié
 
-- Refonte graphique complète de l'interface (style Forel, dark-first)
+- Refonte graphique complète de l'interface (thème sombre, composants natifs macOS)
 - Boutons d'action optimisés : Purger URL et Vider tout sur une même ligne (fenêtre principale et popover)
 - « Gérer le DNS » ouvre la fenêtre principale directement sur l'onglet DNS
 - Éditeurs DNS et sites, bannière de statut purge harmonisés au nouveau design
