@@ -75,3 +75,7 @@ raycast-cfpurge/.raycast-swift-build/
 /node_modules/
 /package-lock.json
 /package.json
+
+# Local tooling
+.venv-img/
+.venv/
