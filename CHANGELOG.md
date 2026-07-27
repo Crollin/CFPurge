@@ -6,6 +6,24 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/)
 
 ## [Unreleased]
 
+## [1.1.0] — 2026-07-27
+
+### Ajouté
+
+- **Fenêtre principale** CFPurge : sidebar sites, zone de purge et accès aux réglages
+- **Design system** sombre (tokens, cartes, boutons, champs, badges, sidebar)
+- Sélecteur **Cache | DNS** dans la fenêtre principale
+- Gestion DNS **intégrée** au panneau principal (plus de fenêtre DNS séparée)
+- Popover barre de menus compact avec lien « Ouvrir CFPurge »
+- Réglages refondus : sidebar à icônes, onglets Général, Jeton API, Sites, Mises à jour et À propos
+
+### Modifié
+
+- Refonte graphique complète de l'interface (style Forel, dark-first)
+- Boutons d'action optimisés : Purger URL et Vider tout sur une même ligne (fenêtre principale et popover)
+- « Gérer le DNS » ouvre la fenêtre principale directement sur l'onglet DNS
+- Éditeurs DNS et sites, bannière de statut purge harmonisés au nouveau design
+
 ## [1.0.5] — 2026-07-21
 
 ### Ajouté
