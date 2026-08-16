@@ -4,16 +4,49 @@ enum CloudflareService {
     private static let baseURL = "https://api.cloudflare.com/client/v4"
     private static let dnsRecordsPerPage = 100
 
-    static func verifyToken(token: String) async throws {
+    /// Ouvre le flux de création d’un jeton API utilisateur (permissions Cache Purge préremplies).
+    static let createAPITokenURL = URL(
+        string: "https://dash.cloudflare.com/profile/api-tokens?permissionGroupKeys=%5B%7B%22key%22%3A%22cache_purge%22%2C%22type%22%3A%22edit%22%7D%2C%7B%22key%22%3A%22zone%22%2C%22type%22%3A%22read%22%7D%5D&name=CFPurge"
+    )!
+
+    /// Vérifie le jeton et retourne l'Account ID si l'API le fournit.
+    @discardableResult
+    static func verifyToken(token: String) async throws -> String? {
         let url = try makeURL(path: "/zones", queryItems: [URLQueryItem(name: "per_page", value: "1")])
         let request = try makeRequest(url: url, token: token, method: "GET")
         let (data, response) = try await URLSession.shared.data(for: request)
+
+        var accountId: String?
         try handleResponse(data: data, httpResponse: response) { data in
             let decoded = try JSONDecoder().decode(CloudflareZonesListResponse.self, from: data)
             guard decoded.success else {
                 throw mapAPIErrors(decoded.errors)
             }
+            accountId = decoded.result?.first?.account?.id
         }
+
+        if accountId == nil {
+            accountId = try? await fetchAccountId(token: token)
+        }
+
+        return accountId
+    }
+
+    /// Récupère l'Account ID via `/accounts` (permissions Account Settings Read).
+    static func fetchAccountId(token: String) async throws -> String? {
+        let url = try makeURL(path: "/accounts", queryItems: [URLQueryItem(name: "per_page", value: "1")])
+        let request = try makeRequest(url: url, token: token, method: "GET")
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        var accountId: String?
+        try handleResponse(data: data, httpResponse: response) { data in
+            let decoded = try JSONDecoder().decode(CloudflareAccountsListResponse.self, from: data)
+            guard decoded.success else {
+                throw mapAPIErrors(decoded.errors)
+            }
+            accountId = decoded.result?.first?.id
+        }
+        return accountId
     }
 
     static func purgeEverything(zoneId: String, token: String) async throws {

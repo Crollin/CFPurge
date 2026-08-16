@@ -18,6 +18,8 @@ final class AppViewModel: ObservableObject {
     @Published var showingSiteEditor = false
     @Published var editingSite: Site?
     @Published var connectionTestResult: String?
+    @Published var cloudflareAccountId: String = ""
+    @Published var accountIdCopyFeedback: String?
     @Published var launchAtLoginEnabled = LaunchAtLoginService.isEnabled
     @Published var launchAtLoginMessage: String?
     @Published var dnsManagementEnabled: Bool
@@ -28,10 +30,12 @@ final class AppViewModel: ObservableObject {
     @Published var showURLsInNotifications: Bool
 
     private let lastSelectedSiteIdKey = "lastSelectedSiteId"
+    private let cloudflareAccountIdKey = "cloudflareAccountId"
     private let dnsManagementEnabledKey = "dnsManagementEnabled"
     private let dnsAllowModifyExistingKey = "dnsAllowModifyExisting"
     private let soundNotificationsEnabledKey = "soundNotificationsEnabled"
     private let showURLsInNotificationsKey = "showURLsInNotifications"
+    private var accountIdCopyFeedbackTask: Task<Void, Never>?
     private var didScheduleInitialSettingsOpen = false
     private var statusDismissTask: Task<Void, Never>?
 
@@ -54,9 +58,52 @@ final class AppViewModel: ObservableObject {
         }
         // Désactivé par défaut : les URLs ne doivent pas apparaître dans le Centre de notifications
         showURLsInNotifications = UserDefaults.standard.bool(forKey: showURLsInNotificationsKey)
+        cloudflareAccountId = UserDefaults.standard.string(forKey: cloudflareAccountIdKey) ?? ""
         reloadSites()
         tokenConfigured = KeychainService.loadToken() != nil
         PurgeNotificationService.requestAuthorizationIfNeeded()
+    }
+
+    func saveCloudflareAccountId(_ value: String? = nil) {
+        let trimmed = (value ?? cloudflareAccountId).trimmingCharacters(in: .whitespacesAndNewlines)
+        cloudflareAccountId = trimmed
+        if trimmed.isEmpty {
+            UserDefaults.standard.removeObject(forKey: cloudflareAccountIdKey)
+        } else {
+            UserDefaults.standard.set(trimmed, forKey: cloudflareAccountIdKey)
+        }
+    }
+
+    func copyCloudflareAccountId() {
+        saveCloudflareAccountId()
+        let trimmed = cloudflareAccountId
+        guard !trimmed.isEmpty else { return }
+
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(trimmed, forType: .string)
+        accountIdCopyFeedback = "Account ID copié"
+        accountIdCopyFeedbackTask?.cancel()
+        accountIdCopyFeedbackTask = Task {
+            try? await Task.sleep(nanoseconds: 2_000_000_000)
+            guard !Task.isCancelled else { return }
+            accountIdCopyFeedback = nil
+        }
+    }
+
+    func openCreateAPITokenPage() {
+        NSWorkspace.shared.open(CloudflareService.createAPITokenURL)
+    }
+
+    func refreshCloudflareAccountId() async {
+        guard let token = KeychainService.loadToken() else { return }
+
+        do {
+            if let accountId = try await CloudflareService.verifyToken(token: token), !accountId.isEmpty {
+                saveCloudflareAccountId(accountId)
+            }
+        } catch {
+            // L'Account ID reste éditable manuellement si l'API ne le renvoie pas.
+        }
     }
 
     func reloadSites() {
@@ -126,6 +173,7 @@ final class AppViewModel: ObservableObject {
             tokenConfigured = true
             tokenInput = ""
             connectionTestResult = "Jeton enregistré."
+            Task { await refreshCloudflareAccountId() }
         } catch {
             connectionTestResult = error.localizedDescription
         }
@@ -147,7 +195,10 @@ final class AppViewModel: ObservableObject {
         connectionTestResult = "Test en cours…"
 
         do {
-            try await CloudflareService.verifyToken(token: token)
+            let accountId = try await CloudflareService.verifyToken(token: token)
+            if let accountId, !accountId.isEmpty {
+                saveCloudflareAccountId(accountId)
+            }
             connectionTestResult = "Connexion réussie."
         } catch {
             connectionTestResult = error.localizedDescription

@@ -25,15 +25,32 @@ struct CloudflareZonesResult: Decodable {
     let zones: [CloudflareZone]?
 }
 
+struct CloudflareAccountRef: Decodable {
+    let id: String
+    let name: String?
+}
+
 struct CloudflareZone: Decodable {
     let id: String
     let name: String
+    let account: CloudflareAccountRef?
 }
 
 struct CloudflareZonesListResponse: Decodable {
     let success: Bool
     let errors: [CloudflareAPIError]?
     let result: [CloudflareZone]?
+}
+
+struct CloudflareAccount: Decodable {
+    let id: String
+    let name: String?
+}
+
+struct CloudflareAccountsListResponse: Decodable {
+    let success: Bool
+    let errors: [CloudflareAPIError]?
+    let result: [CloudflareAccount]?
 }
 
 struct CloudflarePurgeResponse: Decodable {

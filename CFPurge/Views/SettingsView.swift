@@ -188,9 +188,61 @@ struct SettingsView: View {
 
     private var tokenSettings: some View {
         VStack(alignment: .leading, spacing: 24) {
+            CFSectionHeader("Compte Cloudflare")
+            CFCard {
+                VStack(alignment: .leading, spacing: 16) {
+                    CFTextFieldLabel(label: "Account ID", text: $viewModel.cloudflareAccountId)
+
+                    HStack(spacing: 8) {
+                        CFButton(
+                            title: viewModel.accountIdCopyFeedback ?? "Copier",
+                            icon: "doc.on.doc",
+                            style: .secondary
+                        ) {
+                            viewModel.copyCloudflareAccountId()
+                        }
+                        .disabled(viewModel.cloudflareAccountId.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+
+                        if viewModel.tokenConfigured {
+                            CFButton(title: "Détecter", icon: "arrow.clockwise", style: .secondary) {
+                                Task { await viewModel.refreshCloudflareAccountId() }
+                            }
+                        }
+                    }
+
+                    Text("Affiché pour copie rapide (scripts, wrangler, R2…). Détecté automatiquement après un test de connexion réussi.")
+                        .font(.caption)
+                        .foregroundStyle(CFDesignTokens.textTertiary)
+                }
+                .padding(16)
+            }
+
             CFSectionHeader("Jeton API Cloudflare")
             CFCard {
                 VStack(alignment: .leading, spacing: 16) {
+                    Button {
+                        viewModel.openCreateAPITokenPage()
+                    } label: {
+                        HStack(spacing: 8) {
+                            Image(systemName: "arrow.up.right.square")
+                                .font(.caption.weight(.semibold))
+                            Text("Créer un jeton API sur Cloudflare")
+                                .font(.body.weight(.medium))
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(CFDesignTokens.textTertiary)
+                        }
+                        .foregroundStyle(CFDesignTokens.accent)
+                        .padding(12)
+                        .background(CFDesignTokens.surfaceElevated, in: RoundedRectangle(cornerRadius: CFDesignTokens.radiusButton, style: .continuous))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: CFDesignTokens.radiusButton, style: .continuous)
+                                .strokeBorder(CFDesignTokens.border, lineWidth: 1)
+                        }
+                    }
+                    .buttonStyle(.plain)
+
                     CFTextFieldLabel(label: "Jeton API", text: $viewModel.tokenInput, isSecure: true)
 
                     HStack(spacing: 8) {
@@ -231,6 +283,14 @@ struct SettingsView: View {
             Text("Permissions requises : Zone > Cache Purge > Edit. Ajoutez Zone > DNS > Edit si la gestion DNS est activée. N'utilisez jamais la Global API Key.")
                 .font(.caption)
                 .foregroundStyle(CFDesignTokens.textSecondary)
+        }
+        .onAppear {
+            if viewModel.tokenConfigured, viewModel.cloudflareAccountId.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                Task { await viewModel.refreshCloudflareAccountId() }
+            }
+        }
+        .onDisappear {
+            viewModel.saveCloudflareAccountId()
         }
     }
 
