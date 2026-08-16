@@ -6,6 +6,17 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/)
 
 ## [Unreleased]
 
+## [1.1.1] — 2026-08-16
+
+### Ajouté
+
+- Affichage de l’**Account ID** Cloudflare dans Réglages → Jeton API (copie rapide, détection via l’API)
+- Lien direct vers la **création d’un jeton API** Cloudflare (permissions Cache Purge préremplies)
+
+### Documentation
+
+- README : configuration précisée (Account ID, lien de création de jeton)
+
 ## [1.1.0] — 2026-07-27
 
 ### Ajouté

@@ -23,7 +23,7 @@ Utilitaire macOS en barre de menus pour purger le cache Cloudflare — page par 
 - Multi-sites avec sidebar
 - Gestion DNS intégrée (onglet Cache | DNS)
 - Token API dans le Keychain macOS
-- Réglages modernisés (token, sites, mises à jour)
+- Réglages modernisés (token, Account ID, sites, mises à jour)
 - Extension [Raycast](raycast-cfpurge/README.md) (délègue à l'app via `cfpurge://`)
 
 ## Installation
@@ -38,8 +38,8 @@ Les mises à jour se vérifient automatiquement (Réglages → Général → Mis
 
 ## Configuration
 
-1. Créez un [token API Cloudflare](https://dash.cloudflare.com/profile/api-tokens) avec **Zone → Cache Purge → Edit** (et **Zone → DNS → Edit** si vous activez le DNS). Limitez-le à vos zones. N'utilisez **jamais** la Global API Key.
-2. Dans CFPurge → Réglages, collez le token → **Enregistrer** → **Tester la connexion**
+1. Dans CFPurge → **Réglages → Jeton API**, ouvrez **Créer un jeton API sur Cloudflare** (ou le [dashboard](https://dash.cloudflare.com/profile/api-tokens)). Permissions : **Zone → Cache Purge → Edit** (et **Zone → DNS → Edit** si vous activez le DNS). Limitez le jeton à vos zones. N'utilisez **jamais** la Global API Key.
+2. Collez le jeton → **Enregistrer** → **Tester la connexion**. L’**Account ID** est détecté automatiquement (copie rapide pour scripts / wrangler).
 3. Ajoutez un site : **nom**, **Zone ID** (32 caractères hex dans Cloudflare → domaine → Aperçu), **domaine** (`monsite.com`)
 
 ## Utilisation
