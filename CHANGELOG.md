@@ -6,6 +6,8 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/)
 
 ## [Unreleased]
 
+## [1.2.0] — 2026-09-03
+
 ### Ajouté
 
 - Support **Hostinger** : jeton API dédié (Keychain), sites Hostinger, purge cache complète (serveur + CDN)
