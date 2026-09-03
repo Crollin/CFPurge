@@ -51,7 +51,7 @@ struct MainWindowView: View {
                 Text("CFPurge")
                     .font(.headline.weight(.semibold))
                     .foregroundStyle(CFDesignTokens.textPrimary)
-                Text("Cache Cloudflare")
+                Text("Cache Cloudflare & Hostinger")
                     .font(.caption)
                     .foregroundStyle(CFDesignTokens.textSecondary)
             }
@@ -150,12 +150,12 @@ struct MainWindowView: View {
 
             VStack(alignment: .leading, spacing: 6) {
                 if !viewModel.tokenConfigured {
-                    Text("1. Ajoutez votre token API Cloudflare")
+                    Text("1. Ajoutez un jeton API Cloudflare et/ou Hostinger")
                         .font(.caption)
                         .foregroundStyle(CFDesignTokens.textSecondary)
                 }
                 if viewModel.sites.isEmpty {
-                    Text("2. Ajoutez au moins un site (nom, Zone ID, domaine)")
+                    Text("2. Ajoutez au moins un site")
                         .font(.caption)
                         .foregroundStyle(CFDesignTokens.textSecondary)
                 }
@@ -190,9 +190,17 @@ struct MainWindowView: View {
                     Text(site.name)
                         .font(.title2.weight(.semibold))
                         .foregroundStyle(CFDesignTokens.textPrimary)
-                    Text(site.domain)
-                        .font(.caption)
-                        .foregroundStyle(CFDesignTokens.textSecondary)
+                    HStack(spacing: 6) {
+                        Text(site.domain)
+                            .font(.caption)
+                            .foregroundStyle(CFDesignTokens.textSecondary)
+                        Text("·")
+                            .font(.caption)
+                            .foregroundStyle(CFDesignTokens.textTertiary)
+                        Text(site.provider.displayName)
+                            .font(.caption.weight(.medium))
+                            .foregroundStyle(CFDesignTokens.textSecondary)
+                    }
                 }
             } else {
                 Text("Sélectionnez un site")
@@ -241,27 +249,43 @@ struct MainWindowView: View {
         VStack(alignment: .leading, spacing: 16) {
             CFCard {
                 VStack(alignment: .leading, spacing: 14) {
-                    Text("URL ou chemin")
-                        .font(.caption.weight(.medium))
-                        .foregroundStyle(CFDesignTokens.textSecondary)
+                    if viewModel.selectedSite?.provider.supportsURLPurge != false {
+                        Text("URL ou chemin")
+                            .font(.caption.weight(.medium))
+                            .foregroundStyle(CFDesignTokens.textSecondary)
 
-                    CFTextField(placeholder: "ex. /page ou https://…", text: $viewModel.urlInput)
-                        .disabled(viewModel.isLoading || viewModel.selectedSite == nil)
+                        CFTextField(placeholder: "ex. /page ou https://…", text: $viewModel.urlInput)
+                            .disabled(viewModel.isLoading || viewModel.selectedSite == nil)
 
-                    HStack(spacing: 8) {
-                        CFButton(
-                            title: "Purger URL",
-                            icon: "bolt.fill",
-                            style: .primary,
-                            expands: true
-                        ) {
-                            Task { await viewModel.purgeURL() }
+                        HStack(spacing: 8) {
+                            CFButton(
+                                title: "Purger URL",
+                                icon: "bolt.fill",
+                                style: .primary,
+                                expands: true
+                            ) {
+                                Task { await viewModel.purgeURL() }
+                            }
+                            .disabled(
+                                viewModel.isLoading
+                                    || viewModel.selectedSite == nil
+                                    || viewModel.urlInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                            )
+
+                            CFButton(
+                                title: "Vider tout",
+                                icon: "trash",
+                                style: .destructive,
+                                expands: true
+                            ) {
+                                confirmPurgeEverything()
+                            }
+                            .disabled(viewModel.isLoading || viewModel.selectedSite == nil)
                         }
-                        .disabled(
-                            viewModel.isLoading
-                                || viewModel.selectedSite == nil
-                                || viewModel.urlInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-                        )
+                    } else {
+                        Text("Hostinger ne prend pas en charge la purge par URL. Utilisez « Vider tout » pour purger le cache serveur et CDN.")
+                            .font(.caption)
+                            .foregroundStyle(CFDesignTokens.textSecondary)
 
                         CFButton(
                             title: "Vider tout",
@@ -299,9 +323,10 @@ struct MainWindowView: View {
     private func confirmPurgeEverything() {
         guard let site = viewModel.selectedSite else { return }
 
+        let providerLabel = site.provider.displayName
         let confirmed = ConfirmationAlert.confirm(
             title: "Vider tout le cache ?",
-            message: "Cette action purgera l'intégralité du cache Cloudflare pour \(site.name).",
+            message: "Cette action purgera l'intégralité du cache \(providerLabel) pour \(site.name).",
             confirmTitle: "Vider",
             isDestructive: true
         )
@@ -334,10 +359,15 @@ private struct SiteSidebarRow: View {
                         .font(.body.weight(.medium))
                         .foregroundStyle(CFDesignTokens.textPrimary)
                         .lineLimit(1)
-                    Text(site.domain)
-                        .font(.caption2)
-                        .foregroundStyle(CFDesignTokens.textSecondary)
-                        .lineLimit(1)
+                    HStack(spacing: 4) {
+                        Text(site.domain)
+                            .lineLimit(1)
+                        Text("·")
+                        Text(site.provider.displayName)
+                            .lineLimit(1)
+                    }
+                    .font(.caption2)
+                    .foregroundStyle(CFDesignTokens.textSecondary)
                 }
 
                 Spacer()

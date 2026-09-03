@@ -2,7 +2,7 @@ import { chmodSync, existsSync, readFileSync } from "fs";
 import { homedir } from "os";
 import { dirname, join } from "path";
 
-import { isValidStoredSite } from "./site-validator";
+import { isValidStoredSite, parseProvider } from "./site-validator";
 import { Site, SitesNotConfiguredError } from "./types";
 
 const sitesFilePath = join(homedir(), "Library", "Application Support", "CFPurge", "sites.json");
@@ -32,7 +32,7 @@ export function loadSites(): Site[] {
   const sites = raw
     .map(parseSite)
     .filter((site): site is Site => site !== null)
-    .filter((site) => isValidStoredSite(site.zoneId, site.domain));
+    .filter((site) => isValidStoredSite(site));
 
   if (sites.length === 0) {
     throw new SitesNotConfiguredError();
@@ -65,12 +65,25 @@ function parseSite(value: unknown): Site | null {
   const zoneId = String(site.zoneId ?? "");
   const domain = String(site.domain ?? "");
   const sortOrder = typeof site.sortOrder === "number" ? site.sortOrder : 0;
+  const provider = parseProvider(site.provider);
+  const hostingUsername =
+    typeof site.hostingUsername === "string" && site.hostingUsername.trim()
+      ? site.hostingUsername.trim()
+      : undefined;
 
-  if (!id || !name || !zoneId || !domain) {
+  if (!id || !name || !domain) {
     return null;
   }
 
-  return { id, name, zoneId, domain, sortOrder };
+  if (provider === "cloudflare" && !zoneId) {
+    return null;
+  }
+
+  if (provider === "hostinger" && !hostingUsername) {
+    return null;
+  }
+
+  return { id, name, zoneId, domain, sortOrder, provider, hostingUsername };
 }
 
 function normalizeSortOrder(sites: Site[]): Site[] {

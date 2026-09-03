@@ -3,7 +3,8 @@ import Security
 
 enum KeychainService {
     private static let service = "com.creactiveweb.cfpurge"
-    private static let account = "cloudflare-api-token"
+    private static let cloudflareAccount = "cloudflare-api-token"
+    private static let hostingerAccount = "hostinger-api-token"
     private static let accessGroupSuffix = "com.creactiveweb.cfpurge"
 
     /// Access group `TEAMID.com.creactiveweb.cfpurge` lorsque l'app est signée avec un Team ID.
@@ -38,10 +39,25 @@ enum KeychainService {
         return teamID
     }
 
-    static func saveToken(_ token: String) throws {
-        let data = Data(token.utf8)
+    // MARK: - Cloudflare (compatibilité API existante)
 
-        let query = baseQuery()
+    static func saveToken(_ token: String) throws {
+        try saveToken(token, for: .cloudflare)
+    }
+
+    static func loadToken() -> String? {
+        loadToken(for: .cloudflare)
+    }
+
+    static func deleteToken() {
+        deleteToken(for: .cloudflare)
+    }
+
+    // MARK: - Provider
+
+    static func saveToken(_ token: String, for provider: CDNProvider) throws {
+        let data = Data(token.utf8)
+        let query = baseQuery(account: account(for: provider))
         SecItemDelete(query as CFDictionary)
 
         var attributes = query
@@ -55,8 +71,8 @@ enum KeychainService {
         }
     }
 
-    static func loadToken() -> String? {
-        var query = baseQuery()
+    static func loadToken(for provider: CDNProvider) -> String? {
+        var query = baseQuery(account: account(for: provider))
         query[kSecReturnData as String] = true
         query[kSecMatchLimit as String] = kSecMatchLimitOne
 
@@ -73,11 +89,22 @@ enum KeychainService {
         return token
     }
 
-    static func deleteToken() {
-        SecItemDelete(baseQuery() as CFDictionary)
+    static func deleteToken(for provider: CDNProvider) {
+        SecItemDelete(baseQuery(account: account(for: provider)) as CFDictionary)
     }
 
-    private static func baseQuery() -> [String: Any] {
+    static func isConfigured(for provider: CDNProvider) -> Bool {
+        loadToken(for: provider) != nil
+    }
+
+    private static func account(for provider: CDNProvider) -> String {
+        switch provider {
+        case .cloudflare: return cloudflareAccount
+        case .hostinger: return hostingerAccount
+        }
+    }
+
+    private static func baseQuery(account: String) -> [String: Any] {
         var query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,

@@ -1,6 +1,6 @@
 # CFPurge
 
-Utilitaire macOS en barre de menus pour purger le cache Cloudflare — page par page ou zone entière — sans ouvrir le dashboard.
+Utilitaire macOS en barre de menus pour purger le cache **Cloudflare** et **Hostinger** — page par page (Cloudflare) ou zone/site entier — sans ouvrir le dashboard.
 
 ![macOS](https://img.shields.io/badge/macOS-14%2B-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
@@ -18,12 +18,13 @@ Utilitaire macOS en barre de menus pour purger le cache Cloudflare — page par 
 ## Fonctionnalités
 
 - Popover compact dans la barre de menus + fenêtre principale complète
-- Purge par URL ou chemin (`/ma-page/`)
-- Purge totale d'une zone (avec confirmation)
-- Multi-sites avec sidebar
-- Gestion DNS intégrée (onglet Cache | DNS)
-- Token API dans le Keychain macOS
-- Réglages modernisés (token, Account ID, sites, mises à jour)
+- Multi-fournisseurs : **Cloudflare** et **Hostinger**
+- Purge par URL ou chemin (`/ma-page/`) — Cloudflare uniquement
+- Purge totale d'une zone / d'un site (avec confirmation)
+- Multi-sites avec sidebar (badge fournisseur)
+- Gestion DNS intégrée (onglet Cache | DNS) pour Cloudflare et Hostinger
+- Jetons API dans le Keychain macOS (un par fournisseur)
+- Réglages : jetons, Account ID Cloudflare, import des sites Hostinger, mises à jour
 - Extension [Raycast](raycast-cfpurge/README.md) (délègue à l'app via `cfpurge://`)
 
 ## Installation
@@ -38,19 +39,29 @@ Les mises à jour se vérifient automatiquement (Réglages → Général → Mis
 
 ## Configuration
 
+### Cloudflare
+
 1. Dans CFPurge → **Réglages → Jeton API**, ouvrez **Créer un jeton API sur Cloudflare** (ou le [dashboard](https://dash.cloudflare.com/profile/api-tokens)). Permissions : **Zone → Cache Purge → Edit** (et **Zone → DNS → Edit** si vous activez le DNS). Limitez le jeton à vos zones. N'utilisez **jamais** la Global API Key.
-2. Collez le jeton → **Enregistrer** → **Tester la connexion**. L’**Account ID** est détecté automatiquement (copie rapide pour scripts / wrangler).
-3. Ajoutez un site : **nom**, **Zone ID** (32 caractères hex dans Cloudflare → domaine → Aperçu), **domaine** (`monsite.com`)
+2. Collez le jeton → **Enregistrer** → **Tester la connexion**. L’**Account ID** est détecté automatiquement.
+3. Ajoutez un site : fournisseur **Cloudflare**, **nom**, **Zone ID** (32 caractères hex), **domaine**.
+
+### Hostinger
+
+1. Dans CFPurge → **Réglages → Jeton API**, ouvrez **Créer un jeton API sur Hostinger** ([hPanel → API](https://hpanel.hostinger.com/api)).
+2. Collez le jeton → **Enregistrer** → **Tester la connexion**.
+3. Ajoutez un site manuellement (fournisseur **Hostinger**, utilisateur hébergement + domaine) **ou** utilisez **Importer Hostinger** dans l’onglet Sites.
+
+> Hostinger ne propose pas de purge par URL : utilisez **Vider tout** (cache serveur + CDN Hostinger si activé).
 
 ## Utilisation
 
 | Action | Comment |
 |--------|---------|
-| Purger une page | Popover ou fenêtre → URL ou chemin → **Purger URL** |
-| Purger tout | **Vider tout** → confirmer |
+| Purger une page | Popover ou fenêtre → URL ou chemin → **Purger URL** (Cloudflare) |
+| Purger tout | **Vider tout** → confirmer (Cloudflare & Hostinger) |
 | Gérer le DNS | Fenêtre principale → onglet **DNS** (ou **Gérer le DNS** depuis le popover) |
 | Ouvrir la fenêtre complète | Popover → **Ouvrir CFPurge** |
-| Sites / token / mises à jour | **Réglages** (engrenage) |
+| Sites / jetons / mises à jour | **Réglages** (engrenage) |
 
 ## Licence
 

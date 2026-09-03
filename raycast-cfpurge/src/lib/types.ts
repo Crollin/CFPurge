@@ -1,9 +1,13 @@
+export type CDNProvider = "cloudflare" | "hostinger";
+
 export interface Site {
   id: string;
   name: string;
   zoneId: string;
   domain: string;
   sortOrder: number;
+  provider: CDNProvider;
+  hostingUsername?: string;
 }
 
 export interface CloudflareAPIError {

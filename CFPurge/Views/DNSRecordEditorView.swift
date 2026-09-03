@@ -15,12 +15,23 @@ struct DNSRecordEditorView: View {
     @State private var validationMessage: String?
     @State private var isSaving = false
 
-    private let ttlOptions: [(label: String, value: Int)] = [
+    private let cloudflareTTLOptions: [(label: String, value: Int)] = [
         ("Auto", 1),
         ("5 min", 300),
         ("1 h", 3600),
         ("1 jour", 86400)
     ]
+
+    private let hostingerTTLOptions: [(label: String, value: Int)] = [
+        ("5 min", 300),
+        ("1 h", 3600),
+        ("4 h", 14400),
+        ("1 jour", 86400)
+    ]
+
+    private var ttlOptions: [(label: String, value: Int)] {
+        site.provider == .hostinger ? hostingerTTLOptions : cloudflareTTLOptions
+    }
 
     private var isEditing: Bool {
         existingRecord != nil
@@ -62,7 +73,7 @@ struct DNSRecordEditorView: View {
                         .labelsHidden()
                     }
 
-                    if selectedType.isProxiable {
+                    if selectedType.isProxiable && site.provider.supportsProxiedDNS {
                         CFSettingRow(
                             title: "Proxied (nuage orange)",
                             subtitle: "Active le proxy Cloudflare pour cet enregistrement."
@@ -101,6 +112,9 @@ struct DNSRecordEditorView: View {
         .cfConfigureWindow()
         .preferredColorScheme(.dark)
         .onAppear {
+            if site.provider == .hostinger {
+                ttl = 14400
+            }
             prefillIfEditing()
         }
     }
@@ -158,7 +172,7 @@ struct DNSRecordEditorView: View {
         if ttlOptions.contains(where: { $0.value == value }) {
             return value
         }
-        return 1
+        return site.provider == .hostinger ? 14400 : 1
     }
 
     private func saveRecord() async {

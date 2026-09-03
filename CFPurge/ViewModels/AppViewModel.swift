@@ -14,10 +14,13 @@ final class AppViewModel: ObservableObject {
     @Published var urlInput: String = ""
     @Published var status: PurgeStatus = .idle
     @Published var tokenInput: String = ""
-    @Published var tokenConfigured: Bool = false
+    @Published var hostingerTokenInput: String = ""
+    @Published var cloudflareTokenConfigured: Bool = false
+    @Published var hostingerTokenConfigured: Bool = false
     @Published var showingSiteEditor = false
     @Published var editingSite: Site?
     @Published var connectionTestResult: String?
+    @Published var hostingerConnectionTestResult: String?
     @Published var cloudflareAccountId: String = ""
     @Published var accountIdCopyFeedback: String?
     @Published var launchAtLoginEnabled = LaunchAtLoginService.isEnabled
@@ -28,6 +31,7 @@ final class AppViewModel: ObservableObject {
     @Published var mainWindowPanel: MainWindowPanel = .cache
     @Published var soundNotificationsEnabled: Bool
     @Published var showURLsInNotifications: Bool
+    @Published var hostingerImportMessage: String?
 
     private let lastSelectedSiteIdKey = "lastSelectedSiteId"
     private let cloudflareAccountIdKey = "cloudflareAccountId"
@@ -41,6 +45,11 @@ final class AppViewModel: ObservableObject {
 
     var isLoading: Bool {
         status.isLoading
+    }
+
+    /// Au moins un jeton provider est configuré.
+    var tokenConfigured: Bool {
+        cloudflareTokenConfigured || hostingerTokenConfigured
     }
 
     var needsSetup: Bool {
@@ -60,7 +69,7 @@ final class AppViewModel: ObservableObject {
         showURLsInNotifications = UserDefaults.standard.bool(forKey: showURLsInNotificationsKey)
         cloudflareAccountId = UserDefaults.standard.string(forKey: cloudflareAccountIdKey) ?? ""
         reloadSites()
-        tokenConfigured = KeychainService.loadToken() != nil
+        refreshTokenFlags()
         PurgeNotificationService.requestAuthorizationIfNeeded()
     }
 
@@ -94,8 +103,12 @@ final class AppViewModel: ObservableObject {
         NSWorkspace.shared.open(CloudflareService.createAPITokenURL)
     }
 
+    func openCreateHostingerAPITokenPage() {
+        NSWorkspace.shared.open(HostingerService.createAPITokenURL)
+    }
+
     func refreshCloudflareAccountId() async {
-        guard let token = KeychainService.loadToken() else { return }
+        guard let token = KeychainService.loadToken(for: .cloudflare) else { return }
 
         do {
             if let accountId = try await CloudflareService.verifyToken(token: token), !accountId.isEmpty {
@@ -163,16 +176,19 @@ final class AppViewModel: ObservableObject {
         selectedSite = site
         if let site {
             saveLastSelectedSiteId(site.id)
+            if !site.provider.supportsURLPurge, mainWindowPanel == .cache {
+                urlInput = ""
+            }
         }
     }
 
     func saveToken() {
         do {
-            let token = try SiteValidator.validateAPIToken(tokenInput)
-            try KeychainService.saveToken(token)
-            tokenConfigured = true
+            let token = try SiteValidator.validateAPIToken(tokenInput, provider: .cloudflare)
+            try KeychainService.saveToken(token, for: .cloudflare)
+            refreshTokenFlags()
             tokenInput = ""
-            connectionTestResult = "Jeton enregistré."
+            connectionTestResult = "Jeton Cloudflare enregistré."
             Task { await refreshCloudflareAccountId() }
         } catch {
             connectionTestResult = error.localizedDescription
@@ -180,15 +196,15 @@ final class AppViewModel: ObservableObject {
     }
 
     func deleteToken() {
-        KeychainService.deleteToken()
-        tokenConfigured = false
+        KeychainService.deleteToken(for: .cloudflare)
+        refreshTokenFlags()
         tokenInput = ""
-        connectionTestResult = "Jeton supprimé."
+        connectionTestResult = "Jeton Cloudflare supprimé."
     }
 
     func verifyToken() async {
-        guard let token = KeychainService.loadToken() else {
-            connectionTestResult = CFPurgeError.missingToken.localizedDescription
+        guard let token = KeychainService.loadToken(for: .cloudflare) else {
+            connectionTestResult = CFPurgeError.missingToken(.cloudflare).localizedDescription
             return
         }
 
@@ -199,9 +215,95 @@ final class AppViewModel: ObservableObject {
             if let accountId, !accountId.isEmpty {
                 saveCloudflareAccountId(accountId)
             }
-            connectionTestResult = "Connexion réussie."
+            connectionTestResult = "Connexion Cloudflare réussie."
         } catch {
             connectionTestResult = error.localizedDescription
+        }
+    }
+
+    func saveHostingerToken() {
+        do {
+            let token = try SiteValidator.validateAPIToken(hostingerTokenInput, provider: .hostinger)
+            try KeychainService.saveToken(token, for: .hostinger)
+            refreshTokenFlags()
+            hostingerTokenInput = ""
+            hostingerConnectionTestResult = "Jeton Hostinger enregistré."
+        } catch {
+            hostingerConnectionTestResult = error.localizedDescription
+        }
+    }
+
+    func deleteHostingerToken() {
+        KeychainService.deleteToken(for: .hostinger)
+        refreshTokenFlags()
+        hostingerTokenInput = ""
+        hostingerConnectionTestResult = "Jeton Hostinger supprimé."
+    }
+
+    func verifyHostingerToken() async {
+        guard let token = KeychainService.loadToken(for: .hostinger) else {
+            hostingerConnectionTestResult = CFPurgeError.missingToken(.hostinger).localizedDescription
+            return
+        }
+
+        hostingerConnectionTestResult = "Test en cours…"
+
+        do {
+            _ = try await HostingerService.verifyToken(token: token)
+            hostingerConnectionTestResult = "Connexion Hostinger réussie."
+        } catch {
+            hostingerConnectionTestResult = error.localizedDescription
+        }
+    }
+
+    func importHostingerWebsites() async {
+        guard let token = KeychainService.loadToken(for: .hostinger) else {
+            hostingerImportMessage = CFPurgeError.missingToken(.hostinger).localizedDescription
+            return
+        }
+
+        hostingerImportMessage = "Import en cours…"
+
+        do {
+            let websites = try await HostingerService.listWebsites(token: token)
+            var imported = 0
+
+            for website in websites {
+                guard let domain = website.domain,
+                      let username = website.username,
+                      let validatedDomain = try? SiteValidator.validateDomain(domain),
+                      let validatedUsername = try? SiteValidator.validateHostingUsername(username) else {
+                    continue
+                }
+
+                let alreadyExists = sites.contains {
+                    $0.provider == .hostinger
+                        && $0.domain == validatedDomain
+                        && $0.hostingUsername == validatedUsername
+                }
+                guard !alreadyExists else { continue }
+
+                addSite(
+                    Site(
+                        name: website.displayName,
+                        zoneId: "",
+                        domain: validatedDomain,
+                        provider: .hostinger,
+                        hostingUsername: validatedUsername
+                    )
+                )
+                imported += 1
+            }
+
+            if imported == 0 {
+                hostingerImportMessage = websites.isEmpty
+                    ? "Aucun site Hostinger trouvé."
+                    : "Aucun nouveau site à importer."
+            } else {
+                hostingerImportMessage = "\(imported) site(s) Hostinger importé(s)."
+            }
+        } catch {
+            hostingerImportMessage = error.localizedDescription
         }
     }
 
@@ -211,8 +313,13 @@ final class AppViewModel: ObservableObject {
             return
         }
 
-        guard let token = KeychainService.loadToken() else {
-            setStatus(.error(CFPurgeError.missingToken.localizedDescription))
+        guard site.provider.supportsURLPurge else {
+            setStatus(.error(CFPurgeError.urlPurgeUnsupported.localizedDescription))
+            return
+        }
+
+        guard let token = KeychainService.loadToken(for: .cloudflare) else {
+            setStatus(.error(CFPurgeError.missingToken(.cloudflare).localizedDescription))
             return
         }
 
@@ -243,15 +350,28 @@ final class AppViewModel: ObservableObject {
             return
         }
 
-        guard let token = KeychainService.loadToken() else {
-            setStatus(.error(CFPurgeError.missingToken.localizedDescription))
+        guard let token = KeychainService.loadToken(for: site.provider) else {
+            setStatus(.error(CFPurgeError.missingToken(site.provider).localizedDescription))
             return
         }
 
         setStatus(.loading)
 
         do {
-            try await CloudflareService.purgeEverything(zoneId: site.zoneId, token: token)
+            switch site.provider {
+            case .cloudflare:
+                try await CloudflareService.purgeEverything(zoneId: site.zoneId, token: token)
+            case .hostinger:
+                guard let username = site.hostingUsername, !username.isEmpty else {
+                    throw CFPurgeError.invalidHostingUsername
+                }
+                try await HostingerService.purgeEverything(
+                    username: username,
+                    domain: site.domain,
+                    token: token
+                )
+            }
+
             let message = "Tout le cache a été vidé pour \(site.name)"
             setStatus(.success(message))
             PurgeFeedback.showPurgeSuccess(
@@ -348,7 +468,7 @@ final class AppViewModel: ObservableObject {
             let confirmed = ConfirmationAlert.confirm(
                 title: "Autoriser la modification DNS ?",
                 message: """
-                Vous pourrez modifier des enregistrements DNS déjà présents sur Cloudflare.
+                Vous pourrez modifier des enregistrements DNS déjà présents (Cloudflare ou Hostinger).
 
                 Une erreur peut rendre un site inaccessible. Activez uniquement si vous savez ce que vous faites.
                 """,
@@ -383,6 +503,11 @@ final class AppViewModel: ObservableObject {
     func clearStatus() {
         statusDismissTask?.cancel()
         status = .idle
+    }
+
+    private func refreshTokenFlags() {
+        cloudflareTokenConfigured = KeychainService.isConfigured(for: .cloudflare)
+        hostingerTokenConfigured = KeychainService.isConfigured(for: .hostinger)
     }
 
     private func setStatus(_ newStatus: PurgeStatus) {

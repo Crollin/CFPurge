@@ -46,8 +46,8 @@ final class DNSViewModel: ObservableObject {
     }
 
     func loadRecords(for site: Site, reset: Bool = true) async {
-        guard let token = KeychainService.loadToken() else {
-            status = .error(CFPurgeError.missingToken.localizedDescription)
+        guard let token = KeychainService.loadToken(for: site.provider) else {
+            status = .error(CFPurgeError.missingToken(site.provider).localizedDescription)
             return
         }
 
@@ -62,19 +62,28 @@ final class DNSViewModel: ObservableObject {
         status = .loading
 
         do {
-            let result = try await CloudflareService.listDNSRecords(
-                zoneId: site.zoneId,
-                token: token,
-                page: currentPage
-            )
+            switch site.provider {
+            case .cloudflare:
+                let result = try await CloudflareService.listDNSRecords(
+                    zoneId: site.zoneId,
+                    token: token,
+                    page: currentPage
+                )
 
-            if reset {
-                records = result.records
-            } else {
-                records.append(contentsOf: result.records)
+                if reset {
+                    records = result.records
+                } else {
+                    records.append(contentsOf: result.records)
+                }
+
+                hasMorePages = result.hasMore
+
+            case .hostinger:
+                let result = try await HostingerService.listDNSRecords(domain: site.domain, token: token)
+                records = result
+                hasMorePages = false
             }
 
-            hasMorePages = result.hasMore
             status = .idle
         } catch {
             status = .error(error.localizedDescription)
@@ -82,6 +91,7 @@ final class DNSViewModel: ObservableObject {
     }
 
     func loadMore(for site: Site) async {
+        guard site.provider == .cloudflare else { return }
         guard hasMorePages, !status.isLoading else { return }
         currentPage += 1
         await loadRecords(for: site, reset: false)
@@ -95,27 +105,49 @@ final class DNSViewModel: ObservableObject {
         ttl: Int,
         proxied: Bool
     ) async -> Bool {
-        guard let token = KeychainService.loadToken() else {
-            status = .error(CFPurgeError.missingToken.localizedDescription)
+        guard let token = KeychainService.loadToken(for: site.provider) else {
+            status = .error(CFPurgeError.missingToken(site.provider).localizedDescription)
             return false
         }
 
         do {
-            let request = try DNSRecordValidator.validateWithOptions(
-                type: type,
-                name: name,
-                content: content,
-                domain: site.domain,
-                ttl: ttl,
-                proxied: proxied
-            )
-
             status = .loading
-            let created = try await CloudflareService.createDNSRecord(
-                zoneId: site.zoneId,
-                token: token,
-                record: request
-            )
+
+            let created: DNSRecord
+            switch site.provider {
+            case .cloudflare:
+                let request = try DNSRecordValidator.validateWithOptions(
+                    type: type,
+                    name: name,
+                    content: content,
+                    domain: site.domain,
+                    ttl: ttl,
+                    proxied: proxied
+                )
+                created = try await CloudflareService.createDNSRecord(
+                    zoneId: site.zoneId,
+                    token: token,
+                    record: request
+                )
+
+            case .hostinger:
+                let request = try DNSRecordValidator.validateWithOptions(
+                    type: type,
+                    name: name,
+                    content: content,
+                    domain: site.domain,
+                    ttl: ttl <= 1 ? 14400 : ttl,
+                    proxied: false
+                )
+                created = try await HostingerService.createDNSRecord(
+                    domain: site.domain,
+                    token: token,
+                    type: request.type,
+                    name: request.name,
+                    content: request.content,
+                    ttl: request.ttl
+                )
+            }
 
             withAnimation(.easeInOut(duration: 0.25)) {
                 records.insert(created, at: 0)
@@ -138,28 +170,50 @@ final class DNSViewModel: ObservableObject {
         ttl: Int,
         proxied: Bool
     ) async -> Bool {
-        guard let token = KeychainService.loadToken() else {
-            status = .error(CFPurgeError.missingToken.localizedDescription)
+        guard let token = KeychainService.loadToken(for: site.provider) else {
+            status = .error(CFPurgeError.missingToken(site.provider).localizedDescription)
             return false
         }
 
         do {
-            let request = try DNSRecordValidator.validateWithOptions(
-                type: type,
-                name: name,
-                content: content,
-                domain: site.domain,
-                ttl: ttl,
-                proxied: proxied
-            )
-
             status = .loading
-            let updated = try await CloudflareService.updateDNSRecord(
-                zoneId: site.zoneId,
-                token: token,
-                recordId: recordId,
-                record: request
-            )
+
+            let updated: DNSRecord
+            switch site.provider {
+            case .cloudflare:
+                let request = try DNSRecordValidator.validateWithOptions(
+                    type: type,
+                    name: name,
+                    content: content,
+                    domain: site.domain,
+                    ttl: ttl,
+                    proxied: proxied
+                )
+                updated = try await CloudflareService.updateDNSRecord(
+                    zoneId: site.zoneId,
+                    token: token,
+                    recordId: recordId,
+                    record: request
+                )
+
+            case .hostinger:
+                let request = try DNSRecordValidator.validateWithOptions(
+                    type: type,
+                    name: name,
+                    content: content,
+                    domain: site.domain,
+                    ttl: ttl <= 1 ? 14400 : ttl,
+                    proxied: false
+                )
+                updated = try await HostingerService.updateDNSRecord(
+                    domain: site.domain,
+                    token: token,
+                    type: request.type,
+                    name: request.name,
+                    content: request.content,
+                    ttl: request.ttl
+                )
+            }
 
             withAnimation(.easeInOut(duration: 0.25)) {
                 if let index = records.firstIndex(where: { $0.id == recordId }) {

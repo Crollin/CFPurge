@@ -66,9 +66,16 @@ export default function Command() {
       }
     >
       <Form.Dropdown id="siteId" title="Site" storeValue>
-        {sites.map((site) => (
-          <Form.Dropdown.Item key={site.id} value={site.id} title={`${site.name} (${site.domain})`} icon={Icon.Globe} />
-        ))}
+        {sites
+          .filter((site) => site.provider === "cloudflare")
+          .map((site) => (
+            <Form.Dropdown.Item
+              key={site.id}
+              value={site.id}
+              title={`${site.name} (${site.domain})`}
+              icon={Icon.Globe}
+            />
+          ))}
       </Form.Dropdown>
       <Form.TextField
         id="url"
@@ -76,7 +83,7 @@ export default function Command() {
         placeholder="/ma-page/ ou https://monsite.com/page/"
         autoFocus
       />
-      <Form.Description text="La purge est exécutée par l'app CFPurge (token Keychain). CFPurge doit être installé." />
+      <Form.Description text="Sites Cloudflare uniquement. Hostinger : utilisez « Purger tout ». La purge est exécutée par CFPurge." />
     </Form>
   );
 }

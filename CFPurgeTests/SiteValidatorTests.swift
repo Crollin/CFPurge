@@ -55,19 +55,83 @@ final class SiteValidatorTests: XCTestCase {
         }
     }
 
-    func testIsValidStoredSite() {
+    func testHostingerTokenMinimumLength() {
+        XCTAssertThrowsError(
+            try SiteValidator.validateAPIToken(String(repeating: "a", count: 19), provider: .hostinger)
+        ) { error in
+            XCTAssertEqual(error as? CFPurgeError, .invalidHostingerTokenFormat)
+        }
+        XCTAssertNoThrow(
+            try SiteValidator.validateAPIToken(String(repeating: "a", count: 20), provider: .hostinger)
+        )
+    }
+
+    func testValidHostingUsername() throws {
+        XCTAssertEqual(try SiteValidator.validateHostingUsername("u123456789"), "u123456789")
+    }
+
+    func testInvalidHostingUsername() {
+        XCTAssertThrowsError(try SiteValidator.validateHostingUsername("a")) { error in
+            XCTAssertEqual(error as? CFPurgeError, .invalidHostingUsername)
+        }
+    }
+
+    func testIsValidStoredSiteCloudflare() {
         XCTAssertTrue(
             SiteValidator.isValidStoredSite(
-                zoneId: "a1b2c3d4e5f6789012345678abcdef01",
-                domain: "example.com"
+                Site(
+                    name: "Demo",
+                    zoneId: "a1b2c3d4e5f6789012345678abcdef01",
+                    domain: "example.com",
+                    provider: .cloudflare
+                )
             )
         )
-        XCTAssertFalse(SiteValidator.isValidStoredSite(zoneId: "bad", domain: "example.com"))
         XCTAssertFalse(
             SiteValidator.isValidStoredSite(
-                zoneId: "a1b2c3d4e5f6789012345678abcdef01",
-                domain: "com"
+                Site(name: "Demo", zoneId: "bad", domain: "example.com", provider: .cloudflare)
             )
         )
+    }
+
+    func testIsValidStoredSiteHostinger() {
+        XCTAssertTrue(
+            SiteValidator.isValidStoredSite(
+                Site(
+                    name: "WP",
+                    zoneId: "",
+                    domain: "monsite.com",
+                    provider: .hostinger,
+                    hostingUsername: "u123456789"
+                )
+            )
+        )
+        XCTAssertFalse(
+            SiteValidator.isValidStoredSite(
+                Site(
+                    name: "WP",
+                    zoneId: "",
+                    domain: "monsite.com",
+                    provider: .hostinger,
+                    hostingUsername: nil
+                )
+            )
+        )
+    }
+
+    func testSiteDecodingDefaultsProviderToCloudflare() throws {
+        let json = """
+        {
+          "id": "11111111-1111-1111-1111-111111111111",
+          "name": "Legacy",
+          "zoneId": "a1b2c3d4e5f6789012345678abcdef01",
+          "domain": "example.com",
+          "sortOrder": 0
+        }
+        """.data(using: .utf8)!
+
+        let site = try JSONDecoder().decode(Site.self, from: json)
+        XCTAssertEqual(site.provider, .cloudflare)
+        XCTAssertNil(site.hostingUsername)
     }
 }

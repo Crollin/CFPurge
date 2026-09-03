@@ -64,7 +64,7 @@ export default function Command() {
         <List.Item
           key={site.id}
           title={site.name}
-          subtitle={site.domain}
+          subtitle={`${site.domain} · ${site.provider === "hostinger" ? "Hostinger" : "Cloudflare"}`}
           icon={Icon.Globe}
           actions={
             <ActionPanel>
