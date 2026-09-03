@@ -38,7 +38,7 @@ struct MenuBarView: View {
                 Text("CFPurge")
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(CFDesignTokens.textPrimary)
-                Text("Cache Cloudflare")
+                Text("Cache Cloudflare & Hostinger")
                     .font(.caption2)
                     .foregroundStyle(CFDesignTokens.textSecondary)
             }
@@ -54,7 +54,7 @@ struct MenuBarView: View {
                 .foregroundStyle(CFDesignTokens.accentOrange)
 
             if !viewModel.tokenConfigured {
-                Text("1. Ajoutez votre token API Cloudflare")
+                Text("1. Ajoutez un jeton API Cloudflare et/ou Hostinger")
                     .font(.caption)
                     .foregroundStyle(CFDesignTokens.textSecondary)
             }
@@ -74,27 +74,47 @@ struct MenuBarView: View {
         VStack(alignment: .leading, spacing: 10) {
             sitePicker
 
-            CFTextField(placeholder: "URL ou chemin (ex. /page)", text: $viewModel.urlInput)
-                .disabled(viewModel.isLoading || viewModel.selectedSite == nil)
+            let supportsURLPurge = viewModel.selectedSite?.provider.supportsURLPurge ?? true
 
-            HStack(spacing: 8) {
-                CFButton(title: "Purger URL", icon: "bolt.fill", style: .primary, size: .compact, expands: true) {
-                    Task { await viewModel.purgeURL() }
+            if supportsURLPurge {
+                CFTextField(placeholder: "URL ou chemin (ex. /page)", text: $viewModel.urlInput)
+                    .disabled(viewModel.isLoading || viewModel.selectedSite == nil)
+
+                HStack(spacing: 8) {
+                    CFButton(title: "Purger URL", icon: "bolt.fill", style: .primary, size: .compact, expands: true) {
+                        Task { await viewModel.purgeURL() }
+                    }
+                    .disabled(
+                        viewModel.isLoading
+                            || viewModel.selectedSite == nil
+                            || viewModel.urlInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                    )
+
+                    CFButton(title: "Vider tout", icon: "trash", style: .destructive, size: .compact, expands: true) {
+                        confirmPurgeEverything()
+                    }
+                    .disabled(viewModel.isLoading || viewModel.selectedSite == nil)
+
+                    if viewModel.isLoading {
+                        ProgressView()
+                            .controlSize(.small)
+                    }
                 }
-                .disabled(
-                    viewModel.isLoading
-                        || viewModel.selectedSite == nil
-                        || viewModel.urlInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-                )
+            } else {
+                Text("Purge Hostinger : cache complet uniquement")
+                    .font(.caption)
+                    .foregroundStyle(CFDesignTokens.textSecondary)
 
-                CFButton(title: "Vider tout", icon: "trash", style: .destructive, size: .compact, expands: true) {
-                    confirmPurgeEverything()
-                }
-                .disabled(viewModel.isLoading || viewModel.selectedSite == nil)
+                HStack(spacing: 8) {
+                    CFButton(title: "Vider tout", icon: "trash", style: .destructive, size: .compact, expands: true) {
+                        confirmPurgeEverything()
+                    }
+                    .disabled(viewModel.isLoading || viewModel.selectedSite == nil)
 
-                if viewModel.isLoading {
-                    ProgressView()
-                        .controlSize(.small)
+                    if viewModel.isLoading {
+                        ProgressView()
+                            .controlSize(.small)
+                    }
                 }
             }
 
@@ -130,8 +150,8 @@ struct MenuBarView: View {
                     Text(viewModel.selectedSite?.name ?? "Choisir un site")
                         .font(.body.weight(.medium))
                         .foregroundStyle(CFDesignTokens.textPrimary)
-                    if let domain = viewModel.selectedSite?.domain {
-                        Text(domain)
+                    if let site = viewModel.selectedSite {
+                        Text("\(site.domain) · \(site.provider.displayName)")
                             .font(.caption)
                             .foregroundStyle(CFDesignTokens.textSecondary)
                     }
@@ -198,7 +218,7 @@ struct MenuBarView: View {
 
         let confirmed = ConfirmationAlert.confirm(
             title: "Vider tout le cache ?",
-            message: "Cette action purgera l'intégralité du cache Cloudflare pour \(site.name).",
+            message: "Cette action purgera l'intégralité du cache \(site.provider.displayName) pour \(site.name).",
             confirmTitle: "Vider",
             isDestructive: true
         )

@@ -6,6 +6,19 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/)
 
 ## [Unreleased]
 
+### Ajouté
+
+- Support **Hostinger** : jeton API dédié (Keychain), sites Hostinger, purge cache complète (serveur + CDN)
+- Import des sites Hostinger depuis l’API (`GET /api/hosting/v1/websites`)
+- DNS Hostinger (lecture / création / modification) dans l’onglet DNS
+- Sélecteur de fournisseur à l’ajout d’un site (Cloudflare | Hostinger)
+
+### Modifié
+
+- Réglages → Jeton API : sections Cloudflare et Hostinger
+- L’UI masque la purge par URL pour les sites Hostinger
+- Extension Raycast : sites Hostinger dans « Purger tout » ; « Purger URL » reste Cloudflare
+
 ## [1.1.1] — 2026-08-16
 
 ### Ajouté

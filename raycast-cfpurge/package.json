@@ -2,7 +2,7 @@
   "$schema": "https://www.raycast.com/schemas/extension.json",
   "name": "cfpurge",
   "title": "CFPurge",
-  "description": "Purger le cache Cloudflare depuis Raycast",
+  "description": "Purger le cache Cloudflare ou Hostinger depuis Raycast",
   "icon": "icon.svg",
   "author": "creactiveweb",
   "categories": ["Developer Tools"],
@@ -20,7 +20,7 @@
     {
       "name": "purge-all",
       "title": "Purger tout le cache",
-      "description": "Purge totale du cache d'un site Cloudflare",
+      "description": "Purge totale du cache d'un site Cloudflare ou Hostinger",
       "mode": "view"
     }
   ],

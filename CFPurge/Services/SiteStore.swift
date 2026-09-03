@@ -38,9 +38,7 @@ enum SiteStore {
         do {
             let data = try Data(contentsOf: fileURL)
             let decoded = try JSONDecoder().decode([Site].self, from: data)
-            let valid = decoded.filter {
-                SiteValidator.isValidStoredSite(zoneId: $0.zoneId, domain: $0.domain)
-            }
+            let valid = decoded.filter { SiteValidator.isValidStoredSite($0) }
             return normalizeSortOrder(valid)
         } catch {
             return []

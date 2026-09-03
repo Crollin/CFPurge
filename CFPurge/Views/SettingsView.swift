@@ -115,7 +115,7 @@ struct SettingsView: View {
             CFCard {
                 CFSettingRow(
                     title: "Activer la gestion DNS",
-                    subtitle: "Nécessite la permission Zone > DNS > Edit sur votre token API Cloudflare, en plus de Cache Purge."
+                    subtitle: "Cloudflare : permission Zone > DNS > Edit. Hostinger : jeton API avec accès DNS."
                 ) {
                     CFToggle(isOn: Binding(
                         get: { viewModel.dnsManagementEnabled },
@@ -188,6 +188,22 @@ struct SettingsView: View {
 
     private var tokenSettings: some View {
         VStack(alignment: .leading, spacing: 24) {
+            cloudflareTokenSection
+            hostingerTokenSection
+        }
+        .onAppear {
+            if viewModel.cloudflareTokenConfigured,
+               viewModel.cloudflareAccountId.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                Task { await viewModel.refreshCloudflareAccountId() }
+            }
+        }
+        .onDisappear {
+            viewModel.saveCloudflareAccountId()
+        }
+    }
+
+    private var cloudflareTokenSection: some View {
+        VStack(alignment: .leading, spacing: 24) {
             CFSectionHeader("Compte Cloudflare")
             CFCard {
                 VStack(alignment: .leading, spacing: 16) {
@@ -203,7 +219,7 @@ struct SettingsView: View {
                         }
                         .disabled(viewModel.cloudflareAccountId.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
 
-                        if viewModel.tokenConfigured {
+                        if viewModel.cloudflareTokenConfigured {
                             CFButton(title: "Détecter", icon: "arrow.clockwise", style: .secondary) {
                                 Task { await viewModel.refreshCloudflareAccountId() }
                             }
@@ -220,28 +236,10 @@ struct SettingsView: View {
             CFSectionHeader("Jeton API Cloudflare")
             CFCard {
                 VStack(alignment: .leading, spacing: 16) {
-                    Button {
-                        viewModel.openCreateAPITokenPage()
-                    } label: {
-                        HStack(spacing: 8) {
-                            Image(systemName: "arrow.up.right.square")
-                                .font(.caption.weight(.semibold))
-                            Text("Créer un jeton API sur Cloudflare")
-                                .font(.body.weight(.medium))
-                            Spacer()
-                            Image(systemName: "chevron.right")
-                                .font(.caption.weight(.semibold))
-                                .foregroundStyle(CFDesignTokens.textTertiary)
-                        }
-                        .foregroundStyle(CFDesignTokens.accent)
-                        .padding(12)
-                        .background(CFDesignTokens.surfaceElevated, in: RoundedRectangle(cornerRadius: CFDesignTokens.radiusButton, style: .continuous))
-                        .overlay {
-                            RoundedRectangle(cornerRadius: CFDesignTokens.radiusButton, style: .continuous)
-                                .strokeBorder(CFDesignTokens.border, lineWidth: 1)
-                        }
-                    }
-                    .buttonStyle(.plain)
+                    providerTokenLinkButton(
+                        title: "Créer un jeton API sur Cloudflare",
+                        action: { viewModel.openCreateAPITokenPage() }
+                    )
 
                     CFTextFieldLabel(label: "Jeton API", text: $viewModel.tokenInput, isSecure: true)
 
@@ -252,23 +250,17 @@ struct SettingsView: View {
                         CFButton(title: "Tester la connexion", style: .secondary) {
                             Task { await viewModel.verifyToken() }
                         }
-                        .disabled(!viewModel.tokenConfigured)
+                        .disabled(!viewModel.cloudflareTokenConfigured)
 
-                        if viewModel.tokenConfigured {
+                        if viewModel.cloudflareTokenConfigured {
                             CFButton(title: "Supprimer", style: .destructive) {
                                 viewModel.deleteToken()
                             }
                         }
                     }
 
-                    if viewModel.tokenConfigured {
-                        HStack(spacing: 6) {
-                            Image(systemName: "checkmark.circle.fill")
-                                .foregroundStyle(CFDesignTokens.success)
-                            Text("Jeton configuré")
-                                .font(.caption)
-                                .foregroundStyle(CFDesignTokens.success)
-                        }
+                    if viewModel.cloudflareTokenConfigured {
+                        configuredTokenBadge(label: "Jeton Cloudflare configuré")
                     }
 
                     if let result = viewModel.connectionTestResult {
@@ -284,13 +276,85 @@ struct SettingsView: View {
                 .font(.caption)
                 .foregroundStyle(CFDesignTokens.textSecondary)
         }
-        .onAppear {
-            if viewModel.tokenConfigured, viewModel.cloudflareAccountId.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                Task { await viewModel.refreshCloudflareAccountId() }
+    }
+
+    private var hostingerTokenSection: some View {
+        VStack(alignment: .leading, spacing: 24) {
+            CFSectionHeader("Jeton API Hostinger")
+            CFCard {
+                VStack(alignment: .leading, spacing: 16) {
+                    providerTokenLinkButton(
+                        title: "Créer un jeton API sur Hostinger (hPanel)",
+                        action: { viewModel.openCreateHostingerAPITokenPage() }
+                    )
+
+                    CFTextFieldLabel(label: "Jeton API Hostinger", text: $viewModel.hostingerTokenInput, isSecure: true)
+
+                    HStack(spacing: 8) {
+                        CFButton(title: "Enregistrer le jeton", style: .primary) {
+                            viewModel.saveHostingerToken()
+                        }
+                        CFButton(title: "Tester la connexion", style: .secondary) {
+                            Task { await viewModel.verifyHostingerToken() }
+                        }
+                        .disabled(!viewModel.hostingerTokenConfigured)
+
+                        if viewModel.hostingerTokenConfigured {
+                            CFButton(title: "Supprimer", style: .destructive) {
+                                viewModel.deleteHostingerToken()
+                            }
+                        }
+                    }
+
+                    if viewModel.hostingerTokenConfigured {
+                        configuredTokenBadge(label: "Jeton Hostinger configuré")
+                    }
+
+                    if let result = viewModel.hostingerConnectionTestResult {
+                        Text(result)
+                            .font(.caption)
+                            .foregroundStyle(CFDesignTokens.textSecondary)
+                    }
+                }
+                .padding(16)
+            }
+
+            Text("Générez le jeton dans hPanel → API. La purge Hostinger vide tout le cache serveur (et CDN Hostinger si activé). Pas de purge par URL.")
+                .font(.caption)
+                .foregroundStyle(CFDesignTokens.textSecondary)
+        }
+    }
+
+    private func providerTokenLinkButton(title: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 8) {
+                Image(systemName: "arrow.up.right.square")
+                    .font(.caption.weight(.semibold))
+                Text(title)
+                    .font(.body.weight(.medium))
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(CFDesignTokens.textTertiary)
+            }
+            .foregroundStyle(CFDesignTokens.accent)
+            .padding(12)
+            .background(CFDesignTokens.surfaceElevated, in: RoundedRectangle(cornerRadius: CFDesignTokens.radiusButton, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: CFDesignTokens.radiusButton, style: .continuous)
+                    .strokeBorder(CFDesignTokens.border, lineWidth: 1)
             }
         }
-        .onDisappear {
-            viewModel.saveCloudflareAccountId()
+        .buttonStyle(.plain)
+    }
+
+    private func configuredTokenBadge(label: String) -> some View {
+        HStack(spacing: 6) {
+            Image(systemName: "checkmark.circle.fill")
+                .foregroundStyle(CFDesignTokens.success)
+            Text(label)
+                .font(.caption)
+                .foregroundStyle(CFDesignTokens.success)
         }
     }
 
@@ -299,11 +363,22 @@ struct SettingsView: View {
     private var sitesSettings: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
-                CFSectionHeader("Sites Cloudflare")
+                CFSectionHeader("Sites")
                 Spacer()
+                if viewModel.hostingerTokenConfigured {
+                    CFButton(title: "Importer Hostinger", icon: "square.and.arrow.down", style: .secondary) {
+                        Task { await viewModel.importHostingerWebsites() }
+                    }
+                }
                 CFButton(title: "Ajouter un site", icon: "plus", style: .primary) {
                     viewModel.beginAddSite()
                 }
+            }
+
+            if let importMessage = viewModel.hostingerImportMessage {
+                Text(importMessage)
+                    .font(.caption)
+                    .foregroundStyle(CFDesignTokens.textSecondary)
             }
 
             if viewModel.sites.isEmpty {
@@ -315,7 +390,7 @@ struct SettingsView: View {
                         Text("Aucun site")
                             .font(.headline)
                             .foregroundStyle(CFDesignTokens.textPrimary)
-                        Text("Ajoutez un site Cloudflare pour commencer à purger le cache.")
+                        Text("Ajoutez un site Cloudflare ou Hostinger pour commencer.")
                             .font(.caption)
                             .foregroundStyle(CFDesignTokens.textSecondary)
                             .multilineTextAlignment(.center)
@@ -431,7 +506,7 @@ struct SettingsView: View {
                             Text("CFPurge")
                                 .font(.title3.weight(.semibold))
                                 .foregroundStyle(CFDesignTokens.textPrimary)
-                            Text("Purge de cache Cloudflare pour macOS")
+                            Text("Purge de cache Cloudflare & Hostinger pour macOS")
                                 .font(.caption)
                                 .foregroundStyle(CFDesignTokens.textSecondary)
                         }
@@ -462,16 +537,28 @@ private struct SiteSettingsCard: View {
             CFIconBadge(icon: "globe", color: CFDesignTokens.accent, size: 32)
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(site.name)
-                    .font(.body.weight(.semibold))
-                    .foregroundStyle(CFDesignTokens.textPrimary)
+                HStack(spacing: 6) {
+                    Text(site.name)
+                        .font(.body.weight(.semibold))
+                        .foregroundStyle(CFDesignTokens.textPrimary)
+                    Text(site.provider.displayName)
+                        .font(.caption2.weight(.medium))
+                        .foregroundStyle(CFDesignTokens.textTertiary)
+                }
                 Text(site.domain)
                     .font(.caption)
                     .foregroundStyle(CFDesignTokens.textSecondary)
-                Text("Zone : \(site.zoneId)")
-                    .font(.caption2)
-                    .foregroundStyle(CFDesignTokens.textTertiary)
-                    .textSelection(.enabled)
+                Group {
+                    switch site.provider {
+                    case .cloudflare:
+                        Text("Zone : \(site.zoneId)")
+                    case .hostinger:
+                        Text("Utilisateur : \(site.hostingUsername ?? "—")")
+                    }
+                }
+                .font(.caption2)
+                .foregroundStyle(CFDesignTokens.textTertiary)
+                .textSelection(.enabled)
             }
 
             Spacer()
