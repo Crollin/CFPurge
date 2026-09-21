@@ -71,16 +71,7 @@ enum HostingerService {
     }
 
     static func listDNSRecords(domain: String, token: String) async throws -> [DNSRecord] {
-        let encodedDomain = domain.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? domain
-        let url = try makeURL(path: "/api/dns/v1/zones/\(encodedDomain)")
-        let request = try makeRequest(url: url, token: token, method: "GET")
-        let (data, response) = try await URLSession.shared.data(for: request)
-
-        var zoneRecords: [HostingerDNSZoneRecord] = []
-        try handleResponse(data: data, httpResponse: response, isDNSOperation: true) { data in
-            zoneRecords = try JSONDecoder().decode([HostingerDNSZoneRecord].self, from: data)
-        }
-
+        let zoneRecords = try await fetchDNSZoneRecords(domain: domain, token: token)
         return flattenDNSRecords(zoneRecords, domain: domain)
     }
 
@@ -121,6 +112,7 @@ enum HostingerService {
     static func updateDNSRecord(
         domain: String,
         token: String,
+        originalRecord: DNSRecord,
         type: String,
         name: String,
         content: String,
@@ -128,16 +120,15 @@ enum HostingerService {
     ) async throws -> DNSRecord {
         let relativeName = relativeDNSName(name, domain: domain)
         let effectiveTTL = ttl <= 1 ? 14400 : ttl
-        let body = HostingerDNSUpdateRequest(
-            overwrite: true,
-            zone: [
-                HostingerDNSUpdateZoneEntry(
-                    name: relativeName,
-                    type: type.uppercased(),
-                    ttl: effectiveTTL,
-                    records: [HostingerDNSUpdateContent(content: content)]
-                )
-            ]
+        let zoneRecords = try await fetchDNSZoneRecords(domain: domain, token: token)
+        let body = try makeDNSUpdateRequest(
+            zoneRecords: zoneRecords,
+            originalRecord: originalRecord,
+            domain: domain,
+            type: type,
+            name: name,
+            content: content,
+            ttl: effectiveTTL
         )
 
         try await updateDNSZone(domain: domain, token: token, body: body)
@@ -150,6 +141,82 @@ enum HostingerService {
             proxied: nil,
             proxiable: false
         )
+    }
+
+    static func makeDNSUpdateRequest(
+        zoneRecords: [HostingerDNSZoneRecord],
+        originalRecord: DNSRecord,
+        domain: String,
+        type: String,
+        name: String,
+        content: String,
+        ttl: Int
+    ) throws -> HostingerDNSUpdateRequest {
+        let originalType = originalRecord.type.uppercased()
+        let requestedType = type.uppercased()
+        let originalName = relativeDNSName(originalRecord.name, domain: domain)
+        let requestedName = relativeDNSName(name, domain: domain)
+
+        guard originalType == requestedType, originalName == requestedName else {
+            throw CFPurgeError.recordValidationFailed(
+                "Hostinger ne permet pas de renommer un enregistrement isolé en toute sécurité. Créez le nouvel enregistrement puis supprimez l’ancien dans hPanel."
+            )
+        }
+
+        guard let zoneRecord = zoneRecords.first(where: {
+            $0.type?.uppercased() == originalType
+                && relativeDNSName($0.name ?? "@", domain: domain) == originalName
+        }) else {
+            throw CFPurgeError.recordValidationFailed(
+                "L’enregistrement DNS d’origine n’existe plus. Actualisez la zone avant de réessayer."
+            )
+        }
+
+        let sourceRecords = zoneRecord.records ?? []
+        guard !sourceRecords.contains(where: { $0.isDisabled == true }) else {
+            throw CFPurgeError.recordValidationFailed(
+                "Ce groupe DNS contient un enregistrement désactivé que l’API Hostinger ne peut pas préserver. Modifiez-le dans hPanel."
+            )
+        }
+
+        var contents = try sourceRecords.map { sourceRecord -> String in
+            guard let sourceContent = sourceRecord.content, !sourceContent.isEmpty else {
+                throw CFPurgeError.decodingError
+            }
+            return sourceContent
+        }
+
+        guard let targetIndex = contents.firstIndex(of: originalRecord.content) else {
+            throw CFPurgeError.recordValidationFailed(
+                "L’enregistrement DNS d’origine a changé. Actualisez la zone avant de réessayer."
+            )
+        }
+        contents[targetIndex] = content
+
+        return HostingerDNSUpdateRequest(
+            overwrite: true,
+            zone: [
+                HostingerDNSUpdateZoneEntry(
+                    name: requestedName,
+                    type: requestedType,
+                    ttl: ttl <= 1 ? 14400 : ttl,
+                    records: contents.map { HostingerDNSUpdateContent(content: $0) }
+                )
+            ]
+        )
+    }
+
+    private static func fetchDNSZoneRecords(domain: String, token: String) async throws -> [HostingerDNSZoneRecord] {
+        let encodedDomain = domain.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? domain
+        let url = try makeURL(path: "/api/dns/v1/zones/\(encodedDomain)")
+        let request = try makeRequest(url: url, token: token, method: "GET")
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        var zoneRecords: [HostingerDNSZoneRecord] = []
+        try handleResponse(data: data, httpResponse: response, isDNSOperation: true) { data in
+            zoneRecords = try JSONDecoder().decode([HostingerDNSZoneRecord].self, from: data)
+        }
+        return zoneRecords
     }
 
     private static func updateDNSZone(domain: String, token: String, body: HostingerDNSUpdateRequest) async throws {

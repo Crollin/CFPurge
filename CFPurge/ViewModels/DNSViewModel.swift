@@ -45,6 +45,31 @@ final class DNSViewModel: ObservableObject {
         showingEditor = true
     }
 
+    static func replacingHostingerRecord(
+        in records: [DNSRecord],
+        recordId: String,
+        with updated: DNSRecord
+    ) -> [DNSRecord] {
+        records.map { record in
+            if record.id == recordId {
+                return updated
+            }
+            guard record.type.caseInsensitiveCompare(updated.type) == .orderedSame,
+                  record.name.caseInsensitiveCompare(updated.name) == .orderedSame else {
+                return record
+            }
+            return DNSRecord(
+                id: record.id,
+                type: record.type,
+                name: record.name,
+                content: record.content,
+                ttl: updated.ttl,
+                proxied: record.proxied,
+                proxiable: record.proxiable
+            )
+        }
+    }
+
     func loadRecords(for site: Site, reset: Bool = true) async {
         guard let token = KeychainService.loadToken(for: site.provider) else {
             status = .error(CFPurgeError.missingToken(site.provider).localizedDescription)
@@ -205,9 +230,15 @@ final class DNSViewModel: ObservableObject {
                     ttl: ttl <= 1 ? 14400 : ttl,
                     proxied: false
                 )
+                guard let originalRecord = records.first(where: { $0.id == recordId }) else {
+                    throw CFPurgeError.recordValidationFailed(
+                        "L’enregistrement DNS d’origine n’existe plus. Actualisez la zone avant de réessayer."
+                    )
+                }
                 updated = try await HostingerService.updateDNSRecord(
                     domain: site.domain,
                     token: token,
+                    originalRecord: originalRecord,
                     type: request.type,
                     name: request.name,
                     content: request.content,
@@ -216,7 +247,13 @@ final class DNSViewModel: ObservableObject {
             }
 
             withAnimation(.easeInOut(duration: 0.25)) {
-                if let index = records.firstIndex(where: { $0.id == recordId }) {
+                if site.provider == .hostinger {
+                    records = Self.replacingHostingerRecord(
+                        in: records,
+                        recordId: recordId,
+                        with: updated
+                    )
+                } else if let index = records.firstIndex(where: { $0.id == recordId }) {
                     records[index] = updated
                 }
             }
