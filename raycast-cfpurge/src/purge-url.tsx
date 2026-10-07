@@ -14,6 +14,7 @@ interface FormValues {
 export default function Command() {
   const [isLoading, setIsLoading] = useState(false);
   const { sites, errorMessage } = useSites();
+  const cloudflareSites = sites.filter((site) => site.provider === "cloudflare");
 
   if (errorMessage) {
     return (
@@ -28,11 +29,17 @@ export default function Command() {
     );
   }
 
+  if (cloudflareSites.length === 0) {
+    return (
+      <Detail markdown="# Aucun site Cloudflare\n\nLa purge par URL n'est disponible que pour les sites Cloudflare. Pour Hostinger, utilisez la commande **Purger tout le cache**." />
+    );
+  }
+
   async function handleSubmit(values: FormValues) {
     setIsLoading(true);
 
     try {
-      const site = sites.find((entry) => entry.id === values.siteId);
+      const site = cloudflareSites.find((entry) => entry.id === values.siteId);
       if (!site) {
         throw new Error("Site introuvable.");
       }
@@ -66,23 +73,11 @@ export default function Command() {
       }
     >
       <Form.Dropdown id="siteId" title="Site" storeValue>
-        {sites
-          .filter((site) => site.provider === "cloudflare")
-          .map((site) => (
-            <Form.Dropdown.Item
-              key={site.id}
-              value={site.id}
-              title={`${site.name} (${site.domain})`}
-              icon={Icon.Globe}
-            />
-          ))}
+        {cloudflareSites.map((site) => (
+          <Form.Dropdown.Item key={site.id} value={site.id} title={`${site.name} (${site.domain})`} icon={Icon.Globe} />
+        ))}
       </Form.Dropdown>
-      <Form.TextField
-        id="url"
-        title="URL ou chemin"
-        placeholder="/ma-page/ ou https://monsite.com/page/"
-        autoFocus
-      />
+      <Form.TextField id="url" title="URL ou chemin" placeholder="/ma-page/ ou https://monsite.com/page/" autoFocus />
       <Form.Description text="Sites Cloudflare uniquement. Hostinger : utilisez « Purger tout ». La purge est exécutée par CFPurge." />
     </Form>
   );

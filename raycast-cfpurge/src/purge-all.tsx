@@ -69,7 +69,7 @@ export default function Command() {
           actions={
             <ActionPanel>
               <Action
-                title="Purger tout le cache"
+                title="Purger Tout Le Cache"
                 icon={Icon.Trash}
                 style={Action.Style.Destructive}
                 onAction={() => handlePurgeAll(site)}

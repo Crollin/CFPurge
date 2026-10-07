@@ -3,9 +3,14 @@
   "name": "cfpurge",
   "title": "CFPurge",
   "description": "Purger le cache Cloudflare ou Hostinger depuis Raycast",
-  "icon": "icon.svg",
+  "icon": "icon.png",
   "author": "creactiveweb",
-  "categories": ["Developer Tools"],
+  "platforms": [
+    "macOS"
+  ],
+  "categories": [
+    "Developer Tools"
+  ],
   "license": "MIT",
   "engines": {
     "node": ">=22.22.2"

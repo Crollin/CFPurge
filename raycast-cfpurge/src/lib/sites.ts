@@ -67,9 +67,7 @@ function parseSite(value: unknown): Site | null {
   const sortOrder = typeof site.sortOrder === "number" ? site.sortOrder : 0;
   const provider = parseProvider(site.provider);
   const hostingUsername =
-    typeof site.hostingUsername === "string" && site.hostingUsername.trim()
-      ? site.hostingUsername.trim()
-      : undefined;
+    typeof site.hostingUsername === "string" && site.hostingUsername.trim() ? site.hostingUsername.trim() : undefined;
 
   if (!id || !name || !domain) {
     return null;
