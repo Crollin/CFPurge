@@ -48,26 +48,27 @@ xcodegen generate && open CFPurge.xcodeproj
 
 ## Extension Raycast
 
-### Installation manuelle (première fois)
+### Installation recommandée (développeurs)
+
+```bash
+./scripts/install-raycast-extension.sh
+# ou avec l'app :
+./install.sh --raycast
+```
+
+Compile l’extension, vérifie la présence des exécutables (`purge-url`, `purge-all`), déploie vers `~/.config/raycast/extensions/cfpurge/` et recharge Raycast.
+
+> **Missing executable** : ce message apparaît si Raycast charge un dossier sans build (souvent `package.json` + `assets` seuls). Relancez le script ci-dessus — ne importez pas le dossier source brut.
+
+### Développement itératif
 
 ```bash
 cd raycast-cfpurge
-npm install && npm run build
+npm install
+npm run dev
 ```
 
-Dans Raycast : **Manage Extensions → + → Import Extension** → dossier `raycast-cfpurge`.
-
-### Mise à jour avec l'app (développeurs)
-
-```bash
-./install.sh --raycast
-# ou seulement l'extension :
-./scripts/install-raycast-extension.sh
-```
-
-Déploie vers `~/.config/raycast/extensions/cfpurge/` et recharge Raycast.
-
-En développement : `cd raycast-cfpurge && npm run dev`.
+`npm run dev` compile en continu ; importer alors le dossier `raycast-cfpurge` dans Raycast (**Manage Extensions → + → Import Extension**) est possible **après** un premier build réussi.
 
 ## Vérifications avant PR
 

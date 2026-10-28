@@ -1,8 +1,9 @@
-import { Action, ActionPanel, Alert, Detail, Icon, List, Toast, confirmAlert, open, showToast } from "@raycast/api";
+import { Action, ActionPanel, Alert, Icon, List, Toast, confirmAlert, open, showToast } from "@raycast/api";
 import { useState } from "react";
 
-import { buildPurgeAllURL } from "./lib/deep-link";
+import { CFPURGE_BUNDLE_ID, buildPurgeAllURL } from "./lib/deep-link";
 import { getErrorMessage } from "./lib/preferences";
+import { SitesNotConfiguredDetail } from "./lib/sites-not-configured";
 import { Site } from "./lib/types";
 import { useSites } from "./lib/use-sites";
 
@@ -11,16 +12,7 @@ export default function Command() {
   const { sites, errorMessage } = useSites();
 
   if (errorMessage) {
-    return (
-      <Detail
-        markdown={`# Sites non configurés\n\n${errorMessage}\n\n1. Ouvrez **CFPurge** depuis la barre de menus\n2. Ajoutez au moins un site dans les réglages\n3. Relancez cette commande`}
-        actions={
-          <ActionPanel>
-            <Action.OpenInBrowser title="Documentation CFPurge" url="https://github.com/Crollin/CFPurge" />
-          </ActionPanel>
-        }
-      />
-    );
+    return <SitesNotConfiguredDetail message={errorMessage} />;
   }
 
   async function handlePurgeAll(site: Site) {
@@ -40,7 +32,7 @@ export default function Command() {
     setIsLoading(true);
 
     try {
-      await open(buildPurgeAllURL(site.id));
+      await open(buildPurgeAllURL(site.id), CFPURGE_BUNDLE_ID);
 
       await showToast({
         style: Toast.Style.Success,

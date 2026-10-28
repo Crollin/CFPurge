@@ -1,6 +1,7 @@
 import { useState } from "react";
 
-import { requireSites, getErrorMessage } from "./preferences";
+import { getErrorMessage } from "./preferences";
+import { loadSites } from "./sites";
 import { Site, SitesNotConfiguredError } from "./types";
 
 interface UseSitesResult {
@@ -11,7 +12,7 @@ interface UseSitesResult {
 export function useSites(): UseSitesResult {
   const [state] = useState<UseSitesResult>(() => {
     try {
-      return { sites: requireSites(), errorMessage: null };
+      return { sites: loadSites(), errorMessage: null };
     } catch (error) {
       if (error instanceof SitesNotConfiguredError) {
         return { sites: [], errorMessage: error.message };

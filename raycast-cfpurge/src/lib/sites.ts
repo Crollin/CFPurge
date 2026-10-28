@@ -7,10 +7,6 @@ import { Site, SitesNotConfiguredError } from "./types";
 
 const sitesFilePath = join(homedir(), "Library", "Application Support", "CFPurge", "sites.json");
 
-export function getSitesFilePath(): string {
-  return sitesFilePath;
-}
-
 export function loadSites(): Site[] {
   if (!existsSync(sitesFilePath)) {
     throw new SitesNotConfiguredError();
@@ -98,8 +94,4 @@ function normalizeSortOrder(sites: Site[]): Site[] {
     ...site,
     sortOrder: index,
   }));
-}
-
-export function findSiteById(sites: Site[], siteId: string): Site | undefined {
-  return sites.find((site) => site.id === siteId);
 }

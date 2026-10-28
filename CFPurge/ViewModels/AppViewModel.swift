@@ -497,7 +497,7 @@ final class AppViewModel: ObservableObject {
         guard let site else { return }
         selectSite(site)
         mainWindowPanel = .dns
-        MainWindowPresenter.present(openWindow: openWindow)
+        WindowPresenter.presentMain(openWindow: openWindow)
     }
 
     func clearStatus() {

@@ -10,19 +10,6 @@ export interface Site {
   hostingUsername?: string;
 }
 
-export interface CloudflareAPIError {
-  code: number;
-  message: string;
-}
-
-export interface CloudflarePurgeResponse {
-  success: boolean;
-  errors?: CloudflareAPIError[];
-  result?: {
-    id?: string;
-  };
-}
-
 export class CFPurgeError extends Error {
   constructor(message: string) {
     super(message);

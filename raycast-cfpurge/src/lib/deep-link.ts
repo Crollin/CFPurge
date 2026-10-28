@@ -1,4 +1,5 @@
 const SCHEME = "cfpurge";
+export const CFPURGE_BUNDLE_ID = "com.creactiveweb.cfpurge";
 
 export function buildPurgeURL(siteId: string, url: string): string {
   const params = new URLSearchParams({

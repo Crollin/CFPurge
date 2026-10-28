@@ -1,31 +1,19 @@
 import SwiftUI
 
-enum DNSRecordsPresentation {
-    case window
-    case embedded
-}
-
 struct DNSRecordsView: View {
     let site: Site
-    var presentation: DNSRecordsPresentation = .window
 
     @EnvironmentObject private var dnsViewModel: DNSViewModel
     @EnvironmentObject private var appViewModel: AppViewModel
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            if presentation == .window {
-                windowHeader
-                Divider().overlay(CFDesignTokens.border)
-                filters
-            } else {
-                embeddedToolbar
-            }
+            toolbar
             Divider().overlay(CFDesignTokens.border)
             recordList
             footer
         }
-        .modifier(DNSRecordsChrome(presentation: presentation))
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .onAppear {
             Task { await dnsViewModel.loadRecords(for: site) }
         }
@@ -40,35 +28,7 @@ struct DNSRecordsView: View {
         }
     }
 
-    private var windowHeader: some View {
-        HStack(alignment: .center, spacing: 12) {
-            CFIconBadge(icon: "network", color: CFDesignTokens.accent, size: 36)
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text("DNS - \(site.name)")
-                    .font(.title2.weight(.semibold))
-                    .foregroundStyle(CFDesignTokens.textPrimary)
-                Text(site.domain)
-                    .font(.caption)
-                    .foregroundStyle(CFDesignTokens.textSecondary)
-            }
-
-            Spacer()
-
-            CFButton(title: "Actualiser", icon: "arrow.clockwise", style: .secondary, size: .compact) {
-                Task { await dnsViewModel.refresh(for: site) }
-            }
-            .disabled(dnsViewModel.status.isLoading)
-
-            CFButton(title: "Ajouter", icon: "plus", style: .primary, size: .compact) {
-                dnsViewModel.beginAddRecord()
-            }
-        }
-        .padding(16)
-        .background(CFDesignTokens.sidebar)
-    }
-
-    private var embeddedToolbar: some View {
+    private var toolbar: some View {
         HStack(spacing: 10) {
             CFTextField(placeholder: "Rechercher…", text: $dnsViewModel.searchText)
 
@@ -91,22 +51,6 @@ struct DNSRecordsView: View {
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 12)
-    }
-
-    private var filters: some View {
-        HStack(spacing: 12) {
-            CFTextField(placeholder: "Rechercher…", text: $dnsViewModel.searchText)
-
-            Picker("Type", selection: $dnsViewModel.typeFilter) {
-                ForEach(dnsViewModel.availableTypeFilters, id: \.self) { type in
-                    Text(type).tag(type)
-                }
-            }
-            .pickerStyle(.menu)
-            .frame(width: 120)
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 10)
     }
 
     @ViewBuilder
@@ -150,7 +94,7 @@ struct DNSRecordsView: View {
                         .transition(.opacity.combined(with: .move(edge: .top)))
                     }
                 }
-                .padding(presentation == .embedded ? 20 : 16)
+                .padding(20)
             }
         }
     }
@@ -176,7 +120,7 @@ struct DNSRecordsView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
-        .padding(presentation == .embedded ? EdgeInsets(top: 12, leading: 20, bottom: 16, trailing: 20) : EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
+        .padding(EdgeInsets(top: 12, leading: 20, bottom: 16, trailing: 20))
     }
 
     private var footerColor: Color {
@@ -187,26 +131,6 @@ struct DNSRecordsView: View {
             return CFDesignTokens.destructive
         }
         return CFDesignTokens.textSecondary
-    }
-}
-
-// MARK: - Presentation chrome
-
-private struct DNSRecordsChrome: ViewModifier {
-    let presentation: DNSRecordsPresentation
-
-    func body(content: Content) -> some View {
-        switch presentation {
-        case .window:
-            content
-                .cfWindowBackground()
-                .cfConfigureWindow()
-                .preferredColorScheme(.dark)
-                .frame(minWidth: 640, minHeight: 480)
-        case .embedded:
-            content
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-        }
     }
 }
 
