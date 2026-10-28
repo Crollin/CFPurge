@@ -19,13 +19,13 @@ Utilitaire macOS en barre de menus pour purger le cache **Cloudflare** et **Host
 
 - Popover compact dans la barre de menus + fenêtre principale complète
 - Multi-fournisseurs : **Cloudflare** et **Hostinger**
-- Purge par URL ou chemin (`/ma-page/`) — Cloudflare uniquement
+- Purge par URL(s) / chemin(s), préfixe, tag ou host — Cloudflare
 - Purge totale d'une zone / d'un site (avec confirmation)
 - Multi-sites avec sidebar (badge fournisseur)
 - Gestion DNS intégrée (onglet Cache | DNS) pour Cloudflare et Hostinger
 - Jetons API dans le Keychain macOS (un par fournisseur)
 - Réglages : jetons, Account ID Cloudflare, import des sites Hostinger, mises à jour
-- Extension [Raycast](raycast-cfpurge/README.md) (délègue à l'app via `cfpurge://`)
+- Extension [Raycast](raycast-cfpurge/README.md) (API directe ; jetons dans les prefs Raycast)
 
 ## Installation
 
@@ -57,7 +57,8 @@ Les mises à jour se vérifient automatiquement (Réglages → Général → Mis
 
 | Action | Comment |
 |--------|---------|
-| Purger une page | Popover ou fenêtre → URL ou chemin → **Purger URL** (Cloudflare) |
+| Purger une ou plusieurs pages | Popover ou fenêtre → URL(s) / chemins → **Purger** (Cloudflare) |
+| Purger par préfixe / tag / host | Fenêtre principale → mode Cache → sélecteur (Cloudflare) |
 | Purger tout | **Vider tout** → confirmer (Cloudflare & Hostinger) |
 | Gérer le DNS | Fenêtre principale → onglet **DNS** (ou **Gérer le DNS** depuis le popover) |
 | Ouvrir la fenêtre complète | Popover → **Ouvrir CFPurge** |

@@ -1,8 +1,19 @@
-import { Action, ActionPanel, Alert, Icon, List, Toast, confirmAlert, open, showToast } from "@raycast/api";
+import {
+  Action,
+  ActionPanel,
+  Alert,
+  Icon,
+  List,
+  Toast,
+  confirmAlert,
+  openExtensionPreferences,
+  showToast,
+} from "@raycast/api";
 import { useState } from "react";
 
-import { CFPURGE_BUNDLE_ID, buildPurgeAllURL } from "./lib/deep-link";
-import { getErrorMessage } from "./lib/preferences";
+import { purgeEverything as purgeCloudflareEverything } from "./lib/cloudflare";
+import { purgeEverything as purgeHostingerEverything } from "./lib/hostinger";
+import { getErrorMessage, requireCloudflareToken, requireHostingerToken } from "./lib/preferences";
 import { SitesNotConfiguredDetail } from "./lib/sites-not-configured";
 import { Site } from "./lib/types";
 import { useSites } from "./lib/use-sites";
@@ -18,9 +29,9 @@ export default function Command() {
   async function handlePurgeAll(site: Site) {
     const confirmed = await confirmAlert({
       title: "Purger tout le cache ?",
-      message: `Site : ${site.name} (${site.domain})\n\nCFPurge confirmera à nouveau avant d'exécuter la purge totale.`,
+      message: `Site : ${site.name} (${site.domain})\nFournisseur : ${site.provider === "hostinger" ? "Hostinger" : "Cloudflare"}`,
       primaryAction: {
-        title: "Continuer",
+        title: "Purger",
         style: Alert.ActionStyle.Destructive,
       },
     });
@@ -32,18 +43,35 @@ export default function Command() {
     setIsLoading(true);
 
     try {
-      await open(buildPurgeAllURL(site.id), CFPURGE_BUNDLE_ID);
+      if (site.provider === "hostinger") {
+        if (!site.hostingUsername) {
+          throw new Error("Nom d'utilisateur Hostinger manquant pour ce site.");
+        }
+        const token = requireHostingerToken();
+        await purgeHostingerEverything(site.hostingUsername, site.domain, token);
+      } else {
+        const token = requireCloudflareToken();
+        await purgeCloudflareEverything(site.zoneId, token);
+      }
 
       await showToast({
         style: Toast.Style.Success,
-        title: "Demande envoyée à CFPurge",
+        title: "Cache vidé",
         message: site.name,
       });
     } catch (error) {
+      const message = getErrorMessage(error);
       await showToast({
         style: Toast.Style.Failure,
         title: "Échec de la purge",
-        message: getErrorMessage(error),
+        message,
+        primaryAction:
+          message.includes("préférences") || message.includes("jeton")
+            ? {
+                title: "Ouvrir les préférences",
+                onAction: () => openExtensionPreferences(),
+              }
+            : undefined,
       });
     } finally {
       setIsLoading(false);
@@ -66,6 +94,7 @@ export default function Command() {
                 style={Action.Style.Destructive}
                 onAction={() => handlePurgeAll(site)}
               />
+              <Action title="Ouvrir les préférences" icon={Icon.Gear} onAction={openExtensionPreferences} />
             </ActionPanel>
           }
         />

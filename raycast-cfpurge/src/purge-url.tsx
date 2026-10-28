@@ -1,15 +1,15 @@
-import { Action, ActionPanel, Form, Icon, Toast, open, showToast } from "@raycast/api";
+import { Action, ActionPanel, Form, Icon, Toast, openExtensionPreferences, showToast } from "@raycast/api";
 import { useState } from "react";
 
-import { CFPURGE_BUNDLE_ID, buildPurgeURL } from "./lib/deep-link";
-import { getErrorMessage } from "./lib/preferences";
+import { purgeURLs } from "./lib/cloudflare";
+import { getErrorMessage, requireCloudflareToken } from "./lib/preferences";
 import { SitesNotConfiguredDetail } from "./lib/sites-not-configured";
 import { useSites } from "./lib/use-sites";
-import { normalizeURL } from "./lib/url-normalizer";
+import { normalizeManyURLs } from "./lib/url-normalizer";
 
 interface FormValues {
   siteId: string;
-  url: string;
+  urls: string;
 }
 
 export default function Command() {
@@ -28,20 +28,32 @@ export default function Command() {
       if (!site) {
         throw new Error("Site introuvable.");
       }
+      if (site.provider !== "cloudflare") {
+        throw new Error("Purge par URL réservée aux sites Cloudflare.");
+      }
 
-      const normalizedURL = normalizeURL(values.url, site);
-      await open(buildPurgeURL(site.id, normalizedURL), CFPURGE_BUNDLE_ID);
+      const token = requireCloudflareToken();
+      const urls = normalizeManyURLs(values.urls, site);
+      await purgeURLs(urls, site.zoneId, token);
 
       await showToast({
         style: Toast.Style.Success,
-        title: "Purge déléguée à CFPurge",
+        title: urls.length === 1 ? "URL purgée" : `${urls.length} URLs purgées`,
         message: site.name,
       });
     } catch (error) {
+      const message = getErrorMessage(error);
       await showToast({
         style: Toast.Style.Failure,
         title: "Échec de la purge",
-        message: getErrorMessage(error),
+        message,
+        primaryAction:
+          message.includes("préférences") || message.includes("jeton")
+            ? {
+                title: "Ouvrir les préférences",
+                onAction: () => openExtensionPreferences(),
+              }
+            : undefined,
       });
     } finally {
       setIsLoading(false);
@@ -54,6 +66,7 @@ export default function Command() {
       actions={
         <ActionPanel>
           <Action.SubmitForm title="Purger" icon={Icon.Trash} onSubmit={handleSubmit} />
+          <Action title="Ouvrir les préférences" icon={Icon.Gear} onAction={openExtensionPreferences} />
         </ActionPanel>
       }
     >
@@ -69,13 +82,13 @@ export default function Command() {
             />
           ))}
       </Form.Dropdown>
-      <Form.TextField
-        id="url"
-        title="URL ou chemin"
-        placeholder="/ma-page/ ou https://monsite.com/page/"
+      <Form.TextArea
+        id="urls"
+        title="URL(s) ou chemins"
+        placeholder={"/ma-page/\nhttps://monsite.com/autre/"}
+        info="Une entrée par ligne (max 30). Le jeton Cloudflare est lu dans les préférences de l'extension."
         autoFocus
       />
-      <Form.Description text="Sites Cloudflare uniquement. Hostinger : utilisez « Purger tout ». La purge est exécutée par CFPurge." />
     </Form>
   );
 }

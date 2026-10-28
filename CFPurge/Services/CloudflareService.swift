@@ -63,9 +63,25 @@ enum CloudflareService {
     }
 
     static func purgeURLs(_ urls: [String], zoneId: String, token: String) async throws {
+        try await purgeCache(body: ["files": urls], zoneId: zoneId, token: token)
+    }
+
+    static func purgeByPrefixes(_ prefixes: [String], zoneId: String, token: String) async throws {
+        try await purgeCache(body: ["prefixes": prefixes], zoneId: zoneId, token: token)
+    }
+
+    static func purgeByTags(_ tags: [String], zoneId: String, token: String) async throws {
+        try await purgeCache(body: ["tags": tags], zoneId: zoneId, token: token)
+    }
+
+    static func purgeByHosts(_ hosts: [String], zoneId: String, token: String) async throws {
+        try await purgeCache(body: ["hosts": hosts], zoneId: zoneId, token: token)
+    }
+
+    private static func purgeCache(body: [String: Any], zoneId: String, token: String) async throws {
         let url = try makeURL(path: "/zones/\(zoneId)/purge_cache")
         var request = try makeRequest(url: url, token: token, method: "POST")
-        request.httpBody = try JSONSerialization.data(withJSONObject: ["files": urls])
+        request.httpBody = try JSONSerialization.data(withJSONObject: body)
         let (data, response) = try await URLSession.shared.data(for: request)
         try handleResponse(data: data, httpResponse: response) { data in
             let decoded = try JSONDecoder().decode(CloudflarePurgeResponse.self, from: data)

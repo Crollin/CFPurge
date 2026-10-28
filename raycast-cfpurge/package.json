@@ -14,14 +14,32 @@
     {
       "name": "purge-url",
       "title": "Purger une URL",
-      "description": "Purge une URL ou un chemin du cache Cloudflare",
+      "description": "Purge une ou plusieurs URLs du cache Cloudflare (API directe)",
       "mode": "view"
     },
     {
       "name": "purge-all",
       "title": "Purger tout le cache",
-      "description": "Purge totale du cache d'un site Cloudflare ou Hostinger",
+      "description": "Purge totale du cache d'un site Cloudflare ou Hostinger (API directe)",
       "mode": "view"
+    }
+  ],
+  "preferences": [
+    {
+      "name": "cloudflareToken",
+      "type": "password",
+      "required": false,
+      "title": "Jeton API Cloudflare",
+      "description": "Token API avec permission Zone → Cache Purge. Indépendant du Keychain de l'app CFPurge.",
+      "placeholder": "Cloudflare API Token"
+    },
+    {
+      "name": "hostingerToken",
+      "type": "password",
+      "required": false,
+      "title": "Jeton API Hostinger",
+      "description": "Token API Hostinger (hPanel → API). Requis pour purger les sites Hostinger.",
+      "placeholder": "Hostinger API Token"
     }
   ],
   "dependencies": {
