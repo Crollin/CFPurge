@@ -3,3 +3,7 @@ dist/
 .raycast-swift-build/
 .swiftpm/
 .DS_Store
+purge-url.js
+purge-url.js.map
+purge-all.js
+purge-all.js.map
