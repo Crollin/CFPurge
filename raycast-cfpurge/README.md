@@ -10,7 +10,13 @@ Depuis la racine du dépôt :
 ./scripts/install-raycast-extension.sh
 ```
 
-Puis dans Raycast : **Extensions → CFPurge → Prefs** → coller les jetons Cloudflare / Hostinger.
+Pour les jetons (le menu `…` des extensions Development ne les montre souvent pas) :
+
+1. Lance **Purger une URL** (ou **Purger tout**)
+2. `⌘K` → **Open Extension Preferences**
+3. Colle le jeton Cloudflare (et Hostinger si besoin)
+
+Ou recherche Raycast : « Configure Extension CFPurge ».
 
 Si Raycast affiche **Missing executable**, relancez le script (ne pas importer le source brut sans build).
 

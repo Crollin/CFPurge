@@ -28,7 +28,7 @@
     {
       "name": "cloudflareToken",
       "type": "password",
-      "required": false,
+      "required": true,
       "title": "Jeton API Cloudflare",
       "description": "Token API avec permission Zone → Cache Purge. Indépendant du Keychain de l'app CFPurge.",
       "placeholder": "Cloudflare API Token"
