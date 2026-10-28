@@ -1,10 +1,11 @@
-import { Action, ActionPanel, Detail, Form, Icon, Toast, open, showToast } from "@raycast/api";
+import { Action, ActionPanel, Form, Icon, Toast, open, showToast } from "@raycast/api";
 import { useState } from "react";
 
+import { CFPURGE_BUNDLE_ID, buildPurgeURL } from "./lib/deep-link";
 import { getErrorMessage } from "./lib/preferences";
+import { SitesNotConfiguredDetail } from "./lib/sites-not-configured";
 import { useSites } from "./lib/use-sites";
 import { normalizeURL } from "./lib/url-normalizer";
-import { buildPurgeURL } from "./lib/deep-link";
 
 interface FormValues {
   siteId: string;
@@ -16,16 +17,7 @@ export default function Command() {
   const { sites, errorMessage } = useSites();
 
   if (errorMessage) {
-    return (
-      <Detail
-        markdown={`# Sites non configurés\n\n${errorMessage}\n\n1. Ouvrez **CFPurge** depuis la barre de menus\n2. Ajoutez au moins un site dans les réglages\n3. Relancez cette commande`}
-        actions={
-          <ActionPanel>
-            <Action.OpenInBrowser title="Documentation CFPurge" url="https://github.com/Crollin/CFPurge" />
-          </ActionPanel>
-        }
-      />
-    );
+    return <SitesNotConfiguredDetail message={errorMessage} />;
   }
 
   async function handleSubmit(values: FormValues) {
@@ -38,7 +30,7 @@ export default function Command() {
       }
 
       const normalizedURL = normalizeURL(values.url, site);
-      await open(buildPurgeURL(site.id, normalizedURL));
+      await open(buildPurgeURL(site.id, normalizedURL), CFPURGE_BUNDLE_ID);
 
       await showToast({
         style: Toast.Style.Success,

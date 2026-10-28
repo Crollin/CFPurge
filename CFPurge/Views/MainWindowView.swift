@@ -17,7 +17,7 @@ struct MainWindowView: View {
         .frame(minWidth: 900, minHeight: 600)
         .onAppear {
             viewModel.openSettingsIfNeeded {
-                SettingsWindowPresenter.present(openWindow: openWindow)
+                WindowPresenter.presentSettings(openWindow: openWindow)
             }
         }
         .onChange(of: viewModel.dnsManagementEnabled) { _, enabled in
@@ -109,7 +109,7 @@ struct MainWindowView: View {
 
     private var sidebarFooter: some View {
         Button {
-            SettingsWindowPresenter.present(openWindow: openWindow)
+            WindowPresenter.presentSettings(openWindow: openWindow)
         } label: {
             HStack(spacing: 8) {
                 Image(systemName: "gearshape")
@@ -162,7 +162,7 @@ struct MainWindowView: View {
             }
 
             CFButton(title: "Ouvrir les réglages", style: .primary) {
-                SettingsWindowPresenter.present(openWindow: openWindow)
+                WindowPresenter.presentSettings(openWindow: openWindow)
             }
             Spacer()
         }
@@ -227,7 +227,7 @@ struct MainWindowView: View {
                 cachePanel
             case .dns:
                 if let site = viewModel.selectedSite {
-                    DNSRecordsView(site: site, presentation: .embedded)
+                    DNSRecordsView(site: site)
                         .environmentObject(dnsViewModel)
                         .id(site.id)
                 }

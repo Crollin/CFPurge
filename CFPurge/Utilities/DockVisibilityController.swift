@@ -1,10 +1,9 @@
 import AppKit
 
 /// Affiche temporairement CFPurge dans le Dock pendant qu'une fenêtre
-/// (réglages / DNS) est ouverte — l'app reste un agent (`LSUIElement`) au repos.
+/// (principale / réglages) est ouverte — l'app reste un agent (`LSUIElement`) au repos.
 enum DockVisibilityController {
-    private static let managedWindowTitles = ["Réglages CFPurge"]
-    private static let managedWindowTitlePrefixes = ["DNS"]
+    private static let managedWindowTitles = ["CFPurge", "Réglages CFPurge"]
 
     @MainActor
     static func showInDock() {
@@ -28,8 +27,7 @@ enum DockVisibilityController {
         NSApp.windows.contains { window in
             if let closingWindow, window === closingWindow { return false }
             guard window.isVisible, !window.isMiniaturized else { return false }
-            if managedWindowTitles.contains(window.title) { return true }
-            return managedWindowTitlePrefixes.contains { window.title.hasPrefix($0) }
+            return managedWindowTitles.contains(window.title)
         }
     }
 }

@@ -26,7 +26,7 @@ struct MenuBarView: View {
         .animation(.easeInOut(duration: CFDesignTokens.animationNormal), value: viewModel.status)
         .onAppear {
             viewModel.openSettingsIfNeeded {
-                SettingsWindowPresenter.present(openWindow: openWindow)
+                WindowPresenter.presentSettings(openWindow: openWindow)
             }
         }
     }
@@ -176,7 +176,7 @@ struct MenuBarView: View {
     private var footer: some View {
         VStack(spacing: 6) {
             Button {
-                MainWindowPresenter.present(openWindow: openWindow)
+                WindowPresenter.presentMain(openWindow: openWindow)
             } label: {
                 HStack {
                     Image(systemName: "macwindow")
@@ -210,7 +210,7 @@ struct MenuBarView: View {
     }
 
     private func openSettingsPanel() {
-        SettingsWindowPresenter.present(openWindow: openWindow)
+        WindowPresenter.presentSettings(openWindow: openWindow)
     }
 
     private func confirmPurgeEverything() {
