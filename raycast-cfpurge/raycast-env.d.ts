@@ -9,7 +9,7 @@
 
 type ExtensionPreferences = {
   /** Jeton API Cloudflare - Token API avec permission Zone → Cache Purge. Indépendant du Keychain de l'app CFPurge. */
-  "cloudflareToken"?: string,
+  "cloudflareToken": string,
   /** Jeton API Hostinger - Token API Hostinger (hPanel → API). Requis pour purger les sites Hostinger. */
   "hostingerToken"?: string
 }
