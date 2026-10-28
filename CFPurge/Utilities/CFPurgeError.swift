@@ -12,6 +12,10 @@ enum CFPurgeError: LocalizedError, Equatable {
     case invalidURL
     case domainMismatch
     case emptyURL
+    case emptyPurgeInput
+    case tooManyURLs(max: Int)
+    case invalidPrefix
+    case invalidHost
     case noSiteSelected
     case urlPurgeUnsupported
     case unauthorized
@@ -48,6 +52,14 @@ enum CFPurgeError: LocalizedError, Equatable {
             return "L'URL ne correspond pas au domaine du site sélectionné."
         case .emptyURL:
             return "Veuillez saisir une URL à purger."
+        case .emptyPurgeInput:
+            return "Veuillez saisir au moins une valeur à purger."
+        case .tooManyURLs(let max):
+            return "Maximum \(max) entrées par requête Cloudflare."
+        case .invalidPrefix:
+            return "Préfixe invalide. Ex. /blog/ ou www.example.com/images"
+        case .invalidHost:
+            return "Hostname invalide."
         case .noSiteSelected:
             return "Aucun site sélectionné."
         case .urlPurgeUnsupported:

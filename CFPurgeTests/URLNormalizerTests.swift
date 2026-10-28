@@ -29,4 +29,26 @@ final class URLNormalizerTests: XCTestCase {
             XCTAssertEqual(error as? CFPurgeError, .emptyURL)
         }
     }
+
+    func testNormalizeManyLinesAndDedup() throws {
+        let input = """
+        /about
+        https://example.com/about
+        /contact
+
+        /about
+        """
+        let result = try URLNormalizer.normalizeMany(input, for: site)
+        XCTAssertEqual(result, [
+            "https://example.com/about",
+            "https://example.com/contact"
+        ])
+    }
+
+    func testNormalizeManyTooMany() {
+        let lines = (1...31).map { "/p\($0)" }.joined(separator: "\n")
+        XCTAssertThrowsError(try URLNormalizer.normalizeMany(lines, for: site)) { error in
+            XCTAssertEqual(error as? CFPurgeError, .tooManyURLs(max: 30))
+        }
+    }
 }

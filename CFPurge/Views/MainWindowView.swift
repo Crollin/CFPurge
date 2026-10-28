@@ -250,21 +250,38 @@ struct MainWindowView: View {
             CFCard {
                 VStack(alignment: .leading, spacing: 14) {
                     if viewModel.selectedSite?.provider.supportsURLPurge != false {
-                        Text("URL ou chemin")
+                        CFSegmentPicker(selection: $viewModel.cachePurgeMode)
+                            .disabled(viewModel.isLoading)
+
+                        Text(cacheInputLabel)
                             .font(.caption.weight(.medium))
                             .foregroundStyle(CFDesignTokens.textSecondary)
 
-                        CFTextField(placeholder: "ex. /page ou https://…", text: $viewModel.urlInput)
-                            .disabled(viewModel.isLoading || viewModel.selectedSite == nil)
+                        CFTextField(
+                            placeholder: cacheInputPlaceholder,
+                            text: $viewModel.urlInput,
+                            axis: .vertical,
+                            lineLimit: 3...8
+                        )
+                        .disabled(viewModel.isLoading || viewModel.selectedSite == nil)
 
                         HStack(spacing: 8) {
                             CFButton(
-                                title: "Purger URL",
+                                title: "Presse-papiers",
+                                icon: "doc.on.clipboard",
+                                style: .secondary
+                            ) {
+                                viewModel.pasteURLInputFromClipboard()
+                            }
+                            .disabled(viewModel.isLoading)
+
+                            CFButton(
+                                title: cachePurgeButtonTitle,
                                 icon: "bolt.fill",
                                 style: .primary,
                                 expands: true
                             ) {
-                                Task { await viewModel.purgeURL() }
+                                Task { await viewModel.purgeCache() }
                             }
                             .disabled(
                                 viewModel.isLoading
@@ -318,6 +335,33 @@ struct MainWindowView: View {
         }
         .padding(20)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+    }
+
+    private var cacheInputLabel: String {
+        switch viewModel.cachePurgeMode {
+        case .url: return "URL ou chemin (une entrée par ligne)"
+        case .prefix: return "Préfixes (hostname/chemin, une entrée par ligne)"
+        case .tag: return "Cache tags (virgule ou ligne)"
+        case .host: return "Hostnames (virgule ou ligne)"
+        }
+    }
+
+    private var cacheInputPlaceholder: String {
+        switch viewModel.cachePurgeMode {
+        case .url: return "/page\nhttps://…"
+        case .prefix: return "/blog/\nou www.example.com/images"
+        case .tag: return "post-123, product-images"
+        case .host: return "www.example.com"
+        }
+    }
+
+    private var cachePurgeButtonTitle: String {
+        switch viewModel.cachePurgeMode {
+        case .url: return "Purger"
+        case .prefix: return "Purger préfixe"
+        case .tag: return "Purger tag"
+        case .host: return "Purger host"
+        }
     }
 
     private func confirmPurgeEverything() {

@@ -4,11 +4,16 @@ struct CFTextField: View {
     let placeholder: String
     @Binding var text: String
     var isSecure: Bool = false
+    var axis: Axis = .horizontal
+    var lineLimit: ClosedRange<Int>? = nil
 
     var body: some View {
         Group {
             if isSecure {
                 SecureField(placeholder, text: $text)
+            } else if axis == .vertical {
+                TextField(placeholder, text: $text, axis: .vertical)
+                    .lineLimit(lineLimit ?? 3...8)
             } else {
                 TextField(placeholder, text: $text)
             }

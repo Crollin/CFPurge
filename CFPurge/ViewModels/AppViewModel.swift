@@ -12,6 +12,7 @@ final class AppViewModel: ObservableObject {
     @Published var sites: [Site] = []
     @Published var selectedSite: Site?
     @Published var urlInput: String = ""
+    @Published var cachePurgeMode: CachePurgeMode = .url
     @Published var status: PurgeStatus = .idle
     @Published var tokenInput: String = ""
     @Published var hostingerTokenInput: String = ""
@@ -307,7 +308,17 @@ final class AppViewModel: ObservableObject {
         }
     }
 
-    func purgeURL() async {
+    func pasteURLInputFromClipboard() {
+        guard let pasted = NSPasteboard.general.string(forType: .string)?
+            .trimmingCharacters(in: .whitespacesAndNewlines),
+              !pasted.isEmpty else {
+            setStatus(.error("Presse-papiers vide."))
+            return
+        }
+        urlInput = pasted
+    }
+
+    func purgeCache() async {
         guard let site = selectedSite else {
             setStatus(.error(CFPurgeError.noSiteSelected.localizedDescription))
             return
@@ -326,14 +337,40 @@ final class AppViewModel: ObservableObject {
         setStatus(.loading)
 
         do {
-            let normalizedURL = try URLNormalizer.normalize(urlInput, for: site)
-            try await CloudflareService.purgeURLs([normalizedURL], zoneId: site.zoneId, token: token)
-            let message = "Cache purgé pour \(normalizedURL)"
-            setStatus(.success(message))
+            let mode = cachePurgeMode
+            let detail: String
+            switch mode {
+            case .url:
+                let urls = try CachePurgeInput.parseURLs(urlInput, for: site)
+                try await CloudflareService.purgeURLs(urls, zoneId: site.zoneId, token: token)
+                detail = urls.count == 1
+                    ? "Cache purgé pour \(urls[0])"
+                    : "\(urls.count) URL(s) purgée(s)"
+            case .prefix:
+                let prefixes = try CachePurgeInput.parsePrefixes(urlInput, for: site)
+                try await CloudflareService.purgeByPrefixes(prefixes, zoneId: site.zoneId, token: token)
+                detail = prefixes.count == 1
+                    ? "Préfixe purgé : \(prefixes[0])"
+                    : "\(prefixes.count) préfixe(s) purgé(s)"
+            case .tag:
+                let tags = try CachePurgeInput.parseTags(urlInput)
+                try await CloudflareService.purgeByTags(tags, zoneId: site.zoneId, token: token)
+                detail = tags.count == 1
+                    ? "Tag purgé : \(tags[0])"
+                    : "\(tags.count) tag(s) purgé(s)"
+            case .host:
+                let hosts = try CachePurgeInput.parseHosts(urlInput, for: site)
+                try await CloudflareService.purgeByHosts(hosts, zoneId: site.zoneId, token: token)
+                detail = hosts.count == 1
+                    ? "Host purgé : \(hosts[0])"
+                    : "\(hosts.count) host(s) purgé(s)"
+            }
+
+            setStatus(.success(detail))
             PurgeFeedback.showPurgeSuccess(
                 siteName: site.name,
                 siteDomain: site.domain,
-                detail: message,
+                detail: detail,
                 soundEnabled: soundNotificationsEnabled,
                 showURLsInNotifications: showURLsInNotifications
             )
@@ -342,6 +379,14 @@ final class AppViewModel: ObservableObject {
             setStatus(.error(message))
             PurgeFeedback.showPurgeFailure(siteName: site.name, detail: message)
         }
+    }
+
+    /// Compat deep link / anciens appels : purge URL(s) uniquement.
+    func purgeURL() async {
+        let previous = cachePurgeMode
+        cachePurgeMode = .url
+        await purgeCache()
+        cachePurgeMode = previous
     }
 
     func purgeEverything() async {

@@ -77,12 +77,25 @@ struct MenuBarView: View {
             let supportsURLPurge = viewModel.selectedSite?.provider.supportsURLPurge ?? true
 
             if supportsURLPurge {
-                CFTextField(placeholder: "URL ou chemin (ex. /page)", text: $viewModel.urlInput)
-                    .disabled(viewModel.isLoading || viewModel.selectedSite == nil)
+                CFTextField(
+                    placeholder: "URL ou chemin (une par ligne)",
+                    text: $viewModel.urlInput,
+                    axis: .vertical,
+                    lineLimit: 2...5
+                )
+                .disabled(viewModel.isLoading || viewModel.selectedSite == nil)
 
                 HStack(spacing: 8) {
-                    CFButton(title: "Purger URL", icon: "bolt.fill", style: .primary, size: .compact, expands: true) {
-                        Task { await viewModel.purgeURL() }
+                    CFButton(title: "Coller", icon: "doc.on.clipboard", style: .secondary, size: .compact) {
+                        viewModel.pasteURLInputFromClipboard()
+                    }
+                    .disabled(viewModel.isLoading)
+
+                    CFButton(title: "Purger", icon: "bolt.fill", style: .primary, size: .compact, expands: true) {
+                        Task {
+                            viewModel.cachePurgeMode = .url
+                            await viewModel.purgeCache()
+                        }
                     }
                     .disabled(
                         viewModel.isLoading
