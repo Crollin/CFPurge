@@ -1,31 +1,31 @@
 # CFPurge (Raycast)
 
-Purge le cache Cloudflare ou Hostinger **directement** depuis Raycast (appels API). Les sites viennent de `~/Library/Application Support/CFPurge/sites.json` (même fichier que l’app). Les jetons API se configurent dans les **préférences de l’extension** (indépendants du Keychain macOS de l’app).
+Purge Cloudflare / Hostinger via API depuis Raycast. Sites lus dans `~/Library/Application Support/CFPurge/sites.json`.
 
 ## Installation
-
-Depuis la racine du dépôt :
 
 ```bash
 ./scripts/install-raycast-extension.sh
 ```
 
-Pour les jetons (le menu `…` des extensions Development ne les montre souvent pas) :
+Puis `⌘Q` Raycast et relance.
 
-1. Lance **Purger une URL** (ou **Purger tout**)
-2. `⌘K` → **Open Extension Preferences**
-3. Colle le jeton Cloudflare (et Hostinger si besoin)
+## Où mettre les jetons
 
-Ou recherche Raycast : « Configure Extension CFPurge ».
+Le menu `…` (View Build Folder / Uninstall) **ne contient pas** les jetons.
 
-Si Raycast affiche **Missing executable**, relancez le script (ne pas importer le source brut sans build).
+D’après la doc Raycast, les préférences s’affichent en **sélectionnant la commande** :
+
+1. Raycast → **Settings** → **Extensions** → **CFPurge**
+2. Clique sur la ligne **Purger une URL** (pas seulement le titre de l’extension)
+3. Une section **Preferences** apparaît dessous → colle le **Jeton API Cloudflare**
+4. Pour Hostinger : clique **Purger tout le cache** → champ Hostinger
+
+Au premier lancement de la commande depuis le launcher, Raycast peut aussi demander les prefs `required`.
 
 ## Commandes
 
-- **Purger une URL** — Cloudflare ; une ou plusieurs URLs/chemins (une par ligne, max 30)
-- **Purger tout le cache** — Cloudflare et Hostinger
+- **Purger une URL** — Cloudflare, une entrée par ligne (max 30)
+- **Purger tout le cache** — Cloudflare / Hostinger
 
-## Notes
-
-- Les jetons Raycast ≠ Keychain de l’app CFPurge : à configurer une fois dans chaque outil.
-- L’app macOS reste utile pour DNS, réglages multi-sites et purge tags/préfixes/hosts.
+Les jetons Raycast ≠ Keychain de l’app CFPurge.

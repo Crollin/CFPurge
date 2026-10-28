@@ -7,21 +7,24 @@
 
 /* eslint-disable @typescript-eslint/ban-types */
 
-type ExtensionPreferences = {
-  /** Jeton API Cloudflare - Token API avec permission Zone → Cache Purge. Indépendant du Keychain de l'app CFPurge. */
-  "cloudflareToken": string,
-  /** Jeton API Hostinger - Token API Hostinger (hPanel → API). Requis pour purger les sites Hostinger. */
-  "hostingerToken"?: string
-}
+type ExtensionPreferences = {}
 
 /** Preferences accessible in all the extension's commands */
 declare type Preferences = ExtensionPreferences
 
 declare namespace Preferences {
   /** Preferences accessible in the `purge-url` command */
-  export type PurgeUrl = ExtensionPreferences & {}
+  export type PurgeUrl = ExtensionPreferences & {
+  /** Jeton API Cloudflare - Token API avec permission Zone → Cache Purge. Indépendant du Keychain de l'app CFPurge. */
+  "cloudflareToken": string
+}
   /** Preferences accessible in the `purge-all` command */
-  export type PurgeAll = ExtensionPreferences & {}
+  export type PurgeAll = ExtensionPreferences & {
+  /** Jeton API Cloudflare - Token API Cloudflare (sites Cloudflare). */
+  "cloudflareToken": string,
+  /** Jeton API Hostinger - Token API Hostinger (hPanel → API). Requis pour les sites Hostinger. */
+  "hostingerToken"?: string
+}
 }
 
 declare namespace Arguments {
