@@ -1,9 +1,10 @@
-import { Action, ActionPanel, Form, Icon, Toast, launchCommand, LaunchType, showToast } from "@raycast/api";
+import { Action, ActionPanel, Form, Icon, Toast, showToast } from "@raycast/api";
 import { useState } from "react";
 
 import { purgeURLs } from "./lib/cloudflare";
 import { getErrorMessage } from "./lib/preferences";
 import { SitesNotConfiguredDetail } from "./lib/sites-not-configured";
+import { TokenSetupForm } from "./lib/token-setup-form";
 import { requireCloudflareToken } from "./lib/tokens";
 import { useSites } from "./lib/use-sites";
 import { normalizeManyURLs } from "./lib/url-normalizer";
@@ -15,14 +16,15 @@ interface FormValues {
 
 export default function Command() {
   const [isLoading, setIsLoading] = useState(false);
+  const [showTokenSetup, setShowTokenSetup] = useState(false);
   const { sites, errorMessage } = useSites();
 
   if (errorMessage) {
     return <SitesNotConfiguredDetail message={errorMessage} />;
   }
 
-  async function openTokenSetup() {
-    await launchCommand({ name: "configure-tokens", type: LaunchType.UserInitiated });
+  if (showTokenSetup) {
+    return <TokenSetupForm onDone={() => setShowTokenSetup(false)} />;
   }
 
   async function handleSubmit(values: FormValues) {
@@ -55,9 +57,7 @@ export default function Command() {
         primaryAction: message.includes("jeton")
           ? {
               title: "Configurer les jetons",
-              onAction: () => {
-                void openTokenSetup();
-              },
+              onAction: () => setShowTokenSetup(true),
             }
           : undefined,
       });
@@ -72,7 +72,7 @@ export default function Command() {
       actions={
         <ActionPanel>
           <Action.SubmitForm title="Purger" icon={Icon.Trash} onSubmit={handleSubmit} />
-          <Action title="Configurer les jetons" icon={Icon.Key} onAction={openTokenSetup} />
+          <Action title="Configurer les jetons" icon={Icon.Key} onAction={() => setShowTokenSetup(true)} />
         </ActionPanel>
       }
     >
@@ -92,7 +92,7 @@ export default function Command() {
         id="urls"
         title="URL(s) ou chemins"
         placeholder={"/ma-page/\nhttps://monsite.com/autre/"}
-        info="Une entrée par ligne (max 30). Jetons : commande « Configurer les jetons »."
+        info="Une entrée par ligne (max 30). Jetons : Action « Configurer les jetons » (⌘K)."
         autoFocus
       />
     </Form>

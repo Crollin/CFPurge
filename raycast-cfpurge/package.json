@@ -5,7 +5,9 @@
   "description": "Purger le cache Cloudflare ou Hostinger depuis Raycast",
   "icon": "icon.svg",
   "author": "creactiveweb",
-  "categories": ["Developer Tools"],
+  "categories": [
+    "Developer Tools"
+  ],
   "license": "MIT",
   "engines": {
     "node": ">=22.22.2"

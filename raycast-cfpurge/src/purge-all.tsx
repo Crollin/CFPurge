@@ -1,35 +1,26 @@
-import {
-  Action,
-  ActionPanel,
-  Alert,
-  Icon,
-  List,
-  Toast,
-  confirmAlert,
-  launchCommand,
-  LaunchType,
-  showToast,
-} from "@raycast/api";
+import { Action, ActionPanel, Alert, Icon, List, Toast, confirmAlert, showToast } from "@raycast/api";
 import { useState } from "react";
 
 import { purgeEverything as purgeCloudflareEverything } from "./lib/cloudflare";
 import { purgeEverything as purgeHostingerEverything } from "./lib/hostinger";
 import { getErrorMessage } from "./lib/preferences";
 import { SitesNotConfiguredDetail } from "./lib/sites-not-configured";
+import { TokenSetupForm } from "./lib/token-setup-form";
 import { requireCloudflareToken, requireHostingerToken } from "./lib/tokens";
 import { Site } from "./lib/types";
 import { useSites } from "./lib/use-sites";
 
 export default function Command() {
   const [isLoading, setIsLoading] = useState(false);
+  const [showTokenSetup, setShowTokenSetup] = useState(false);
   const { sites, errorMessage } = useSites();
 
   if (errorMessage) {
     return <SitesNotConfiguredDetail message={errorMessage} />;
   }
 
-  async function openTokenSetup() {
-    await launchCommand({ name: "configure-tokens", type: LaunchType.UserInitiated });
+  if (showTokenSetup) {
+    return <TokenSetupForm onDone={() => setShowTokenSetup(false)} />;
   }
 
   async function handlePurgeAll(site: Site) {
@@ -74,9 +65,7 @@ export default function Command() {
         primaryAction: message.includes("jeton")
           ? {
               title: "Configurer les jetons",
-              onAction: () => {
-                void openTokenSetup();
-              },
+              onAction: () => setShowTokenSetup(true),
             }
           : undefined,
       });
@@ -101,7 +90,7 @@ export default function Command() {
                 style={Action.Style.Destructive}
                 onAction={() => handlePurgeAll(site)}
               />
-              <Action title="Configurer les jetons" icon={Icon.Key} onAction={openTokenSetup} />
+              <Action title="Configurer les jetons" icon={Icon.Key} onAction={() => setShowTokenSetup(true)} />
             </ActionPanel>
           }
         />
