@@ -58,7 +58,7 @@ xcodegen generate && open CFPurge.xcodeproj
 
 Compile l’extension, vérifie la présence des exécutables (`purge-url`, `purge-all`), déploie vers `~/.config/raycast/extensions/cfpurge/` et recharge Raycast.
 
-Configurez ensuite les jetons Cloudflare / Hostinger dans **Raycast → Extensions → CFPurge → Prefs** (indépendants du Keychain de l’app).
+Configurez ensuite les jetons via la commande Raycast **Configurer les jetons** (LocalStorage ; indépendants du Keychain de l’app).
 
 > **Missing executable** : ce message apparaît si Raycast charge un dossier sans build (souvent `package.json` + `assets` seuls). Relancez le script ci-dessus — ne importez pas le dossier source brut.
 

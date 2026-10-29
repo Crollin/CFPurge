@@ -8,24 +8,23 @@ Purge Cloudflare / Hostinger via API depuis Raycast. Sites lus dans `~/Library/A
 ./scripts/install-raycast-extension.sh
 ```
 
-Puis `⌘Q` Raycast et relance.
+Puis quittez Raycast (`⌘Q`) et relancez.
 
-## Où mettre les jetons
+## Jetons API
 
-Le menu `…` (View Build Folder / Uninstall) **ne contient pas** les jetons.
+Les préférences natives Raycast ne s’affichent pas correctement sur certaines installs **Development**.  
+Les jetons passent donc par une **commande dédiée** (LocalStorage Raycast) :
 
-D’après la doc Raycast, les préférences s’affichent en **sélectionnant la commande** :
+1. Lancez **Configurer les jetons**
+2. Collez le jeton Cloudflare (et Hostinger si besoin)
+3. Enregistrer
 
-1. Raycast → **Settings** → **Extensions** → **CFPurge**
-2. Clique sur la ligne **Purger une URL** (pas seulement le titre de l’extension)
-3. Une section **Preferences** apparaît dessous → colle le **Jeton API Cloudflare**
-4. Pour Hostinger : clique **Purger tout le cache** → champ Hostinger
+Ensuite : **Purger une URL** / **Purger tout le cache**.
 
-Au premier lancement de la commande depuis le launcher, Raycast peut aussi demander les prefs `required`.
+Ces jetons ≠ Keychain de l’app macOS CFPurge.
 
 ## Commandes
 
+- **Configurer les jetons** — Cloudflare + Hostinger
 - **Purger une URL** — Cloudflare, une entrée par ligne (max 30)
 - **Purger tout le cache** — Cloudflare / Hostinger
-
-Les jetons Raycast ≠ Keychain de l’app CFPurge.

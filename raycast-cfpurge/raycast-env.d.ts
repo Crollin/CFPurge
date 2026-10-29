@@ -13,21 +13,17 @@ type ExtensionPreferences = {}
 declare type Preferences = ExtensionPreferences
 
 declare namespace Preferences {
+  /** Preferences accessible in the `configure-tokens` command */
+  export type ConfigureTokens = ExtensionPreferences & {}
   /** Preferences accessible in the `purge-url` command */
-  export type PurgeUrl = ExtensionPreferences & {
-  /** Jeton API Cloudflare - Token API avec permission Zone → Cache Purge. Indépendant du Keychain de l'app CFPurge. */
-  "cloudflareToken": string
-}
+  export type PurgeUrl = ExtensionPreferences & {}
   /** Preferences accessible in the `purge-all` command */
-  export type PurgeAll = ExtensionPreferences & {
-  /** Jeton API Cloudflare - Token API Cloudflare (sites Cloudflare). */
-  "cloudflareToken": string,
-  /** Jeton API Hostinger - Token API Hostinger (hPanel → API). Requis pour les sites Hostinger. */
-  "hostingerToken"?: string
-}
+  export type PurgeAll = ExtensionPreferences & {}
 }
 
 declare namespace Arguments {
+  /** Arguments passed to the `configure-tokens` command */
+  export type ConfigureTokens = {}
   /** Arguments passed to the `purge-url` command */
   export type PurgeUrl = {}
   /** Arguments passed to the `purge-all` command */
