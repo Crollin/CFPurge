@@ -1,29 +1,26 @@
-import {
-  Action,
-  ActionPanel,
-  Alert,
-  Icon,
-  List,
-  Toast,
-  confirmAlert,
-  openExtensionPreferences,
-  showToast,
-} from "@raycast/api";
+import { Action, ActionPanel, Alert, Icon, List, Toast, confirmAlert, showToast } from "@raycast/api";
 import { useState } from "react";
 
 import { purgeEverything as purgeCloudflareEverything } from "./lib/cloudflare";
 import { purgeEverything as purgeHostingerEverything } from "./lib/hostinger";
-import { getErrorMessage, requireCloudflareToken, requireHostingerToken } from "./lib/preferences";
+import { getErrorMessage } from "./lib/preferences";
 import { SitesNotConfiguredDetail } from "./lib/sites-not-configured";
+import { TokenSetupForm } from "./lib/token-setup-form";
+import { requireCloudflareToken, requireHostingerToken } from "./lib/tokens";
 import { Site } from "./lib/types";
 import { useSites } from "./lib/use-sites";
 
 export default function Command() {
   const [isLoading, setIsLoading] = useState(false);
+  const [showTokenSetup, setShowTokenSetup] = useState(false);
   const { sites, errorMessage } = useSites();
 
   if (errorMessage) {
     return <SitesNotConfiguredDetail message={errorMessage} />;
+  }
+
+  if (showTokenSetup) {
+    return <TokenSetupForm onDone={() => setShowTokenSetup(false)} />;
   }
 
   async function handlePurgeAll(site: Site) {
@@ -47,10 +44,10 @@ export default function Command() {
         if (!site.hostingUsername) {
           throw new Error("Nom d'utilisateur Hostinger manquant pour ce site.");
         }
-        const token = requireHostingerToken();
+        const token = await requireHostingerToken();
         await purgeHostingerEverything(site.hostingUsername, site.domain, token);
       } else {
-        const token = requireCloudflareToken();
+        const token = await requireCloudflareToken();
         await purgeCloudflareEverything(site.zoneId, token);
       }
 
@@ -65,13 +62,12 @@ export default function Command() {
         style: Toast.Style.Failure,
         title: "Échec de la purge",
         message,
-        primaryAction:
-          message.includes("préférences") || message.includes("jeton")
-            ? {
-                title: "Ouvrir les préférences",
-                onAction: () => openExtensionPreferences(),
-              }
-            : undefined,
+        primaryAction: message.includes("jeton")
+          ? {
+              title: "Configurer les jetons",
+              onAction: () => setShowTokenSetup(true),
+            }
+          : undefined,
       });
     } finally {
       setIsLoading(false);
@@ -94,7 +90,7 @@ export default function Command() {
                 style={Action.Style.Destructive}
                 onAction={() => handlePurgeAll(site)}
               />
-              <Action title="Ouvrir les préférences" icon={Icon.Gear} onAction={openExtensionPreferences} />
+              <Action title="Configurer les jetons" icon={Icon.Key} onAction={() => setShowTokenSetup(true)} />
             </ActionPanel>
           }
         />

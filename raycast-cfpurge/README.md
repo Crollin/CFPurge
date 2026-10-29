@@ -1,25 +1,36 @@
 # CFPurge (Raycast)
 
-Purge le cache Cloudflare ou Hostinger **directement** depuis Raycast (appels API). Les sites viennent de `~/Library/Application Support/CFPurge/sites.json` (même fichier que l’app). Les jetons API se configurent dans les **préférences de l’extension** (indépendants du Keychain macOS de l’app).
+Purge Cloudflare / Hostinger via API depuis Raycast. Sites lus dans `~/Library/Application Support/CFPurge/sites.json`.
 
 ## Installation
-
-Depuis la racine du dépôt :
 
 ```bash
 ./scripts/install-raycast-extension.sh
 ```
 
-Puis dans Raycast : **Extensions → CFPurge → Prefs** → coller les jetons Cloudflare / Hostinger.
+Puis quittez Raycast (`⌘Q`) et relancez.
 
 Si Raycast affiche **Missing executable**, relancez le script (ne pas importer le source brut sans build).
 
+## Jetons API
+
+Les préférences natives Raycast ne s’affichent pas correctement sur certaines installs **Development**.  
+Les jetons passent donc par une **commande dédiée** (LocalStorage Raycast) :
+
+1. Lancez **Configurer les jetons** (ou ⌘K depuis Purger une URL / Purger tout)
+2. Collez le jeton Cloudflare (et Hostinger si besoin)
+3. Enregistrer
+
+Ensuite : **Purger une URL** / **Purger tout le cache**.
+
+Ces jetons ≠ Keychain de l’app macOS CFPurge.
+
 ## Commandes
 
-- **Purger une URL** — Cloudflare ; une ou plusieurs URLs/chemins (une par ligne, max 30)
-- **Purger tout le cache** — Cloudflare et Hostinger
+- **Configurer les jetons** — Cloudflare + Hostinger
+- **Purger une URL** — Cloudflare, une entrée par ligne (max 30)
+- **Purger tout le cache** — Cloudflare / Hostinger
 
 ## Notes
 
-- Les jetons Raycast ≠ Keychain de l’app CFPurge : à configurer une fois dans chaque outil.
 - L’app macOS reste utile pour DNS, réglages multi-sites et purge tags/préfixes/hosts.

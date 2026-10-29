@@ -5,12 +5,20 @@
   "description": "Purger le cache Cloudflare ou Hostinger depuis Raycast",
   "icon": "icon.svg",
   "author": "creactiveweb",
-  "categories": ["Developer Tools"],
+  "categories": [
+    "Developer Tools"
+  ],
   "license": "MIT",
   "engines": {
     "node": ">=22.22.2"
   },
   "commands": [
+    {
+      "name": "configure-tokens",
+      "title": "Configurer les jetons",
+      "description": "Enregistrer les jetons API Cloudflare et Hostinger (LocalStorage Raycast)",
+      "mode": "view"
+    },
     {
       "name": "purge-url",
       "title": "Purger une URL",
@@ -22,24 +30,6 @@
       "title": "Purger tout le cache",
       "description": "Purge totale du cache d'un site Cloudflare ou Hostinger (API directe)",
       "mode": "view"
-    }
-  ],
-  "preferences": [
-    {
-      "name": "cloudflareToken",
-      "type": "password",
-      "required": false,
-      "title": "Jeton API Cloudflare",
-      "description": "Token API avec permission Zone → Cache Purge. Indépendant du Keychain de l'app CFPurge.",
-      "placeholder": "Cloudflare API Token"
-    },
-    {
-      "name": "hostingerToken",
-      "type": "password",
-      "required": false,
-      "title": "Jeton API Hostinger",
-      "description": "Token API Hostinger (hPanel → API). Requis pour purger les sites Hostinger.",
-      "placeholder": "Hostinger API Token"
     }
   ],
   "dependencies": {

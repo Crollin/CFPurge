@@ -8,7 +8,7 @@ ext_src="$repo_root/raycast-cfpurge"
 raycast_ext_dir="${RAYCAST_EXT_DIR:-$HOME/.config/raycast/extensions/cfpurge}"
 min_node="22.22.2"
 reload_url="raycast://extensions/raycast/raycast/reload-extensions"
-required_commands=(purge-url purge-all)
+required_commands=(configure-tokens purge-url purge-all)
 
 usage() {
   cat <<EOF

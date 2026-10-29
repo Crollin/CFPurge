@@ -25,7 +25,7 @@ Utilitaire macOS en barre de menus pour purger le cache **Cloudflare** et **Host
 - Gestion DNS intégrée (onglet Cache | DNS) pour Cloudflare et Hostinger
 - Jetons API dans le Keychain macOS (un par fournisseur)
 - Réglages : jetons, Account ID Cloudflare, import des sites Hostinger, mises à jour
-- Extension [Raycast](raycast-cfpurge/README.md) (API directe ; jetons dans les prefs Raycast)
+- Extension [Raycast](raycast-cfpurge/README.md) (API directe ; commande « Configurer les jetons »)
 
 ## Installation
 
